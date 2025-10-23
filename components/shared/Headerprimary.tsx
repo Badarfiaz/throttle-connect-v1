@@ -2,8 +2,7 @@
 
 import { FC } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
+ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Togglenav from "./ToggleNav";
  
@@ -17,7 +16,7 @@ const HeaderPrimary: FC = () => {
     "hover:text-[#19376D] transition-colors text-[#0B2447] font-medium";
 
   return (
-    <header className="w-full bg-[#f8fcff] shadow-sm">
+<header className="w-full bg-[#f8fcff] shadow-sm sticky top-0 z-50 backdrop-blur-md">
       <div className={mainContainer}>
         {/* Left: Logo and Title */}
         <div className="flex items-center gap-2">

@@ -1,32 +1,33 @@
 export const vehicleCategories = [
   {
     id: 1,
-    title: "Sedans",
+    categoryType: "sedans",
     image: "/images/category/sedan.webp",
+    slugs :""
   },
   {
     id: 2,
-    title: "Hatchbacks",
+    categoryType: "Hatchbacks",
     image: "/images/category/hatchback.webp",
   },
   {
     id: 3,
-    title: "OffRoad",
+    categoryType: "OffRoad",
     image: "/images/category/offroad.webp",
   },
   {
     id: 4,
-    title: "Super-Cars",
+    categoryType: "Super-Cars",
     image: "/images/category/supercar.webp",
   },
   {
     id: 5,
-    title: "Bikes",
+    categoryType: "Bikes",
     image: "/images/category/classic.webp",
   },
   {
     id: 6,
-    title: "Superbikes",
+    categoryType: "Superbikes",
     image: "/images/category/superbike.webp",
   },
 ];

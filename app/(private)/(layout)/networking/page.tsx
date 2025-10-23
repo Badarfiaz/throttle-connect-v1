@@ -20,8 +20,8 @@ function home() {
             onCtaClick={() => alert("Let's go!")}
           />
       <CategorySection />
-      <FeaturedSection />
-      <RegistureClubBanner />
+    
+                <FeaturedSection />
 
       <div className="bg-background text-text py-16 px-6">
         <div className="max-w-6xl mx-auto text-center space-y-8">
@@ -40,6 +40,8 @@ function home() {
 
         </div>
       </div>
+       <RegistureClubBanner />
+
     </div>
   );
 }
