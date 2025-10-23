@@ -1,5 +1,6 @@
-import RegistureFormClub from "@/components/networking/RegistureFormClub"
+import RegistureFormClub from "@/components/forms/RegistureFormClub"
 
+ 
  
 function page() {
   return (
