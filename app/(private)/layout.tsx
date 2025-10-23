@@ -1,14 +1,13 @@
- import React from 'react';
-import styles from "./styles.module.scss";
-import Headerprimary from '@/components/shared/Headerprimary';
- 
+ import HeaderPrimary from '@/components/shared/HeaderPrimary';
+import React from 'react';
+   
 const Layout = async ({ children }: { children: React.ReactNode }) => {
   return (
     <>
        <main>
-<Headerprimary/>
-      {children}
-      
+<HeaderPrimary/>
+       {children}
+
     </main>
      </>
   );

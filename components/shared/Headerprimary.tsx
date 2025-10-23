@@ -5,8 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import Togglenav from "./Togglenav";
-
+import Togglenav from "./ToggleNav";
+ 
 const HeaderPrimary: FC = () => {
   const pathname = usePathname();
 
