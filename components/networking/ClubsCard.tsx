@@ -30,14 +30,14 @@ const ClubCard = ({ club }: ClubCardProps) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
           {/* Category Tag */}
-          <div className="absolute top-4 left-4 bg-primary/90 text-white text-xs uppercase tracking-wide px-3 py-1 rounded-full shadow-md backdrop-blur-sm">
+          <div className="absolute top-4 left-4 bg-secondary/90 text-primary text-xs uppercase tracking-wide px-3 py-1 rounded-full shadow-md backdrop-blur-sm">
             {club.categoryType.replace("-", " ")}
           </div>
         </div>
 
         {/* Card Content */}
         <CardHeader className="px-5 pt-4">
-          <h3 className="text-lg font-semibold text-white group-hover:text-primary transition-colors">
+          <h3 className="text-lg font-semibold text-primary group-hover:text-primary transition-colors">
             {club.name}
           </h3>
         </CardHeader>
