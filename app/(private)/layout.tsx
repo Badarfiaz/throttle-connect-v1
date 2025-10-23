@@ -5,8 +5,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
   return (
     <>
        <main>
-<HeaderPrimary/>
-       {children}
+        {children}
 
     </main>
      </>

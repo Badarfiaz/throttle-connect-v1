@@ -7,8 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
-// import { Badge } from "@/components/ui/badge";
-import { vehicleCategories } from "@/dummydata/networking";
+ import { vehicleCategories } from "@/dummydata/networking";
 
 export default function CategorySection() {
   return (
@@ -49,17 +48,7 @@ export default function CategorySection() {
                 </Card>
               </HoverCardTrigger>
 
-              {/* Hover Details */}
-              {/* <HoverCardContent className="text-sm bg-white/90 backdrop-blur-sm border border-gray-100 shadow-lg rounded-lg">
-                <p className="text-[#19376D]/80">
-                  {category.description || "Click to explore available rides in this category."}
-                </p>
-                <div className="mt-3">
-                  <Badge variant="outline" className="text-[#0B2447] border-[#BFD7FF]">
-                    {category.type || "Available"}
-                  </Badge>
-                </div>
-              </HoverCardContent> */}
+               
             </HoverCard>
           ))}
         </div>

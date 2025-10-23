@@ -21,12 +21,12 @@ const HeaderPrimary: FC = () => {
       <div className={mainContainer}>
         {/* Left: Logo and Title */}
         <div className="flex items-center gap-2">
-          <Image
+          {/* <Image
             src="/logo.svg" // replace with your logo
             alt="ThrottleConnect Logo"
             width={32}
             height={32}
-          />
+          /> */}
           <span className="text-xl font-semibold text-[#0B2447]">
             Throttle<span className="text-[#19376D]">Connect</span>
           </span>
