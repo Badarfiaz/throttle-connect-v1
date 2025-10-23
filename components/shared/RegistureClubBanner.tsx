@@ -1,8 +1,8 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
+ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Globe2, ClipboardPlus } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 const RegistureClubBanner = () => {
   return (
@@ -30,8 +30,8 @@ const RegistureClubBanner = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Button size="lg" className="rounded-2xl px-8">
-            Register Club
+          <Button  size="lg" className="rounded-2xl px-8">
+           <Link href={'/networking/Club-Registration'}>Register Club</Link>  
           </Button>
           <Button size="lg" variant="outline" className="rounded-2xl px-8">
             Find a Club

@@ -30,6 +30,17 @@ export const vehicleCategories = [
     image: "/images/category/superbike.webp",
   },
 ];
+export  const categories: CategoryType[] = [
+    "sedans",
+    "hatchbacks",
+    "offroad",
+    "super-cars",
+    "bikes",
+    "electric-bikes",
+    "superbikes",
+    "cruisers",
+  ];
+
 export type CategoryType =
   | "sedans"
   | "hatchbacks"
