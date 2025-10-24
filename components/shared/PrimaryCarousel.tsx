@@ -1,23 +1,21 @@
-"use client"
-
-import * as React from "react"
+import * as React from "react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
+} from "@/components/ui/carousel";
 
 interface PrimaryCarouselProps<T> {
   /** Array of items to render in the carousel */
-  items: T[]
+  items: T[];
   /** Render function for each item */
-  renderItem: (item: T, index: number) => React.ReactNode
+  renderItem: (item: T, index: number) => React.ReactNode;
   /** Number of items visible per view */
-  multiple?: number
+  multiple?: number;
   /** Optional className for container */
-  className?: string
+  className?: string;
 }
 
 function PrimaryCarousel<T>({
@@ -26,7 +24,7 @@ function PrimaryCarousel<T>({
   multiple = 1,
   className,
 }: PrimaryCarouselProps<T>) {
-  const itemWidth = 100 / multiple
+  const itemWidth = 100 / multiple;
 
   return (
     <Carousel
@@ -53,7 +51,7 @@ function PrimaryCarousel<T>({
       <CarouselPrevious />
       <CarouselNext />
     </Carousel>
-  )
+  );
 }
 
-export default PrimaryCarousel
+export default PrimaryCarousel;

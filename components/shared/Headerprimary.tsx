@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { FC, useCallback, useMemo, useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { shallowEqual, useSelector } from "react-redux"
-import { Button } from "@/components/ui/button"
+import { FC, useCallback, useMemo, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { shallowEqual, useSelector } from "react-redux";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,10 +12,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,55 +23,55 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { useAppDispatch } from "@/app/redux/hooks"
+import { useAppDispatch } from "@/app/redux/hooks";
 import {
   loginUser,
   createUser,
   loginUserWithGoogle,
   logoutUser,
-} from "@/app/redux/features/authSlice"
-import type { RootState } from "@/app/redux/store"
-import Togglenav from "./ToggleNav"
+} from "@/app/redux/features/authSlice";
+import type { RootState } from "@/app/redux/store";
+import Togglenav from "./ToggleNav";
 
-type AuthMode = "login" | "signup"
+type AuthMode = "login" | "signup";
 
 interface FormValues {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 const HeaderPrimary: FC = () => {
-  const dispatch = useAppDispatch()
-   const pathname = usePathname()
+  const dispatch = useAppDispatch();
+  const pathname = usePathname();
 
-  const [open, setOpen] = useState(false)
-  const [mode, setMode] = useState<AuthMode>("login")
-  const [submitting, setSubmitting] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [submitting, setSubmitting] = useState(false);
 
   // 🔹 Redux selectors
   const userEmail = useSelector(
     (s: RootState) => s.auth.user?.email ?? "",
     shallowEqual
-  )
-  const userId = useSelector((s: RootState) => s.auth.user?.id ?? "")
-  const isAuthed = !!userEmail
+  );
+  const userId = useSelector((s: RootState) => s.auth.user?.id ?? "");
+  const isAuthed = !!userEmail;
 
   // 🔹 Derived helpers
   const avatarLetter = useMemo(
     () => (isAuthed ? userEmail.trim().charAt(0).toUpperCase() : "?"),
     [isAuthed, userEmail]
-  )
+  );
 
   // 🔹 Helpers
   const closeModal = useCallback(() => {
-    setOpen(false)
-    setMode("login")
-  }, [])
+    setOpen(false);
+    setMode("login");
+  }, []);
 
-  const openModal = useCallback(() => setOpen(true), [])
+  const openModal = useCallback(() => setOpen(true), []);
 
   const thunkByMode = useMemo(
     () => ({
@@ -79,69 +79,67 @@ const HeaderPrimary: FC = () => {
       signup: createUser,
     }),
     []
-  )
+  );
 
   const getErrorMessage = (e: unknown, fallback: string) =>
-    e instanceof Error ? e.message : fallback
+    e instanceof Error ? e.message : fallback;
 
   // 🔹 Email/password auth
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault()
-      const formData = new FormData(e.currentTarget)
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget);
       const values: FormValues = {
         email: formData.get("email") as string,
         password: formData.get("password") as string,
-      }
+      };
 
       try {
-        setSubmitting(true)
-        const thunk = thunkByMode[mode]
-        await dispatch(thunk(values)).unwrap()
+        setSubmitting(true);
+        const thunk = thunkByMode[mode];
+        await dispatch(thunk(values)).unwrap();
 
-      
-toast.success("Login successful", {
-  description: "Welcome back to Throttle Connect!",
-});
+        toast.success("Login successful", {
+          description: "Welcome back to Throttle Connect!",
+        });
 
-        closeModal()
+        closeModal();
       } catch (err) {
-      toast.error("Authentication error", {
-  description: "Login failed.",
-});
+        toast.error("Authentication error", {
+          description: "Login failed.",
+        });
       } finally {
-        setSubmitting(false)
+        setSubmitting(false);
       }
     },
     [dispatch, mode, thunkByMode, closeModal, toast]
-  )
+  );
 
   // 🔹 Google login
   const handleGoogle = useCallback(async () => {
     try {
-      setSubmitting(true)
-      await dispatch(loginUserWithGoogle()).unwrap()
-     
-toast.success("Login successful", {
-  description: "Welcome back to Throttle Connect!",
-});
-      closeModal()
+      setSubmitting(true);
+      await dispatch(loginUserWithGoogle()).unwrap();
+
+      toast.success("Login successful", {
+        description: "Welcome back to Throttle Connect!",
+      });
+      closeModal();
     } catch (e) {
-       toast.error("Authentication error", {
-  description: "Login failed.",
-});
+      toast.error("Authentication error", {
+        description: "Login failed.",
+      });
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }, [dispatch, closeModal, toast])
+  }, [dispatch, closeModal, toast]);
 
   const handleLogout = useCallback(() => {
-    dispatch(logoutUser())
-  toast.success("Logout successful", {
-  description: "Welcome back to Throttle Connect!",
-});
-
-  }, [dispatch, toast])
+    dispatch(logoutUser());
+    toast.success("Logout successful", {
+      description: "Welcome back to Throttle Connect!",
+    });
+  }, [dispatch, toast]);
 
   const navLinks = useMemo(
     () => [
@@ -150,7 +148,7 @@ toast.success("Login successful", {
       { href: "/contact", label: "Contact Us" },
     ],
     []
-  )
+  );
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#f8fcff]/80 backdrop-blur-md shadow-sm">
@@ -197,9 +195,7 @@ toast.success("Login successful", {
               <DropdownMenuItem asChild>
                 <Link href="/profile">Profile</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLogout}>
-                Logout
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
@@ -240,7 +236,11 @@ toast.success("Login successful", {
                       <InputGroup label="Full Name" id="name" type="text" />
                     )}
                     <InputGroup label="Email" id="email" type="email" />
-                    <InputGroup label="Password" id="password" type="password" />
+                    <InputGroup
+                      label="Password"
+                      id="password"
+                      type="password"
+                    />
 
                     <Button
                       type="submit"
@@ -273,8 +273,8 @@ toast.success("Login successful", {
         )}
       </div>
     </header>
-  )
-}
+  );
+};
 
 /** Small helper for repeated fields */
 const InputGroup: FC<{ label: string; id: string; type: string }> = ({
@@ -286,6 +286,6 @@ const InputGroup: FC<{ label: string; id: string; type: string }> = ({
     <Label htmlFor={id}>{label}</Label>
     <Input id={id} name={id} type={type} required />
   </div>
-)
+);
 
-export default HeaderPrimary
+export default HeaderPrimary;

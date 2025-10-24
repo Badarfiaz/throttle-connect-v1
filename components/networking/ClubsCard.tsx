@@ -1,12 +1,17 @@
 "use client";
 
 import React from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
-import { Club } from "@/dummydata/networking";
 import { motion } from "framer-motion";
+import { Club } from "@/types/main";
 
 interface ClubCardProps {
   club: Club;
@@ -52,7 +57,9 @@ const ClubCard = ({ club }: ClubCardProps) => {
               <MapPin className="w-4 h-4 text-primary" />
               <span className="truncate">{club.location}</span>
             </div>
-            <span className="font-medium text-text/80">{club.memberCount} Members</span>
+            <span className="font-medium text-text/80">
+              {club.memberCount} Members
+            </span>
           </div>
         </CardContent>
 

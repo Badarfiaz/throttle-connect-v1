@@ -1,6 +1,6 @@
  import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import HeaderPrimary from "@/components/shared/HeaderPrimary";
+import HeaderPrimary from "@/components/shared/Headerprimary";
 import ReduxProvider from "./redux/reduxProvider";
 import { Toaster } from "sonner"
 

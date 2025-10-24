@@ -5,23 +5,27 @@ import FeaturedSection from "@/components/shared/FeaturedSection";
 import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
- 
+
 import { clubs } from "@/dummydata/networking";
 
 function home() {
   return (
     <div>
-          <HeroSection
-            // layout={1}
-            title="Your Next Adventure Awaits"
-            subtitle="Join a club that matches your passion and make unforgettable memories."
-            ctaText="Get Started"
-            // imageSrc="/images/category/offroad.webp"
-            onCtaClick={() => alert("Let's go!")}
-          />
-      <CategorySection />
-    
-                <FeaturedSection />
+      <HeroSection
+        // layout={1}
+        title="Your Next Adventure Awaits"
+        subtitle="Join a club that matches your passion and make unforgettable memories."
+        ctaText="Get Started"
+        // imageSrc="/images/category/offroad.webp"
+        onCtaClick={() => alert("Let's go!")}
+      />
+      <CategorySection
+        title="Explore Categories"
+        description="Discover your next ride — from elegant sedans to powerful
+            superbikes"
+      />
+
+      <FeaturedSection />
 
       <div className="bg-background text-text py-16 px-6">
         <div className="max-w-6xl mx-auto text-center space-y-8">
@@ -37,11 +41,9 @@ function home() {
             multiple={3}
             renderItem={(club) => <ClubCard club={club} />}
           />
-
         </div>
       </div>
-       <RegistureClubBanner />
-
+      <RegistureClubBanner />
     </div>
   );
 }

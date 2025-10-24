@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
-import { Sparkles, Rocket, Construction } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Sparkles, Rocket, Construction } from "lucide-react";
 
 export default function NotFound() {
   return (
@@ -21,11 +21,13 @@ export default function NotFound() {
         </div>
 
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
-          We’re Building Something <span className="text-primary">Extraordinary</span> 🚀
+          We’re Building Something{" "}
+          <span className="text-primary">Extraordinary</span> 🚀
         </h1>
         <p className="text-lg text-muted-foreground mb-6">
-          The page you’re looking for doesn’t exist — yet.  
-          But behind the scenes, we’re crafting an experience for automotive lovers that’ll redefine connection, passion, and performance.
+          The page you’re looking for doesn’t exist — yet. But behind the
+          scenes, we’re crafting an experience for automotive lovers that’ll
+          redefine connection, passion, and performance.
         </p>
 
         <div className="flex justify-center gap-4">
@@ -33,7 +35,10 @@ export default function NotFound() {
             <Button className="rounded-2xl px-6 py-2">Go Home</Button>
           </Link>
           <Link href="/about">
-            <Button variant="outline" className="rounded-2xl px-6 py-2 flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="rounded-2xl px-6 py-2 flex items-center gap-2"
+            >
               <Construction className="w-4 h-4" />
               Learn More
             </Button>
@@ -46,5 +51,5 @@ export default function NotFound() {
         </div>
       </motion.div>
     </div>
-  )
+  );
 }

@@ -1,15 +1,14 @@
- 
- import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface HeroSectionProps {
-  layout?: 1 | 2
-  title: string
-  subtitle?: string
-  ctaText?: string
-  onCtaClick?: () => void
-  imageSrc?: string
+  layout?: 1 | 2;
+  title: string;
+  subtitle?: string;
+  ctaText?: string;
+  onCtaClick?: () => void;
+  imageSrc?: string;
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({
@@ -70,7 +69,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
       )}
     </section>
-  )
-}
+  );
+};
 
-export default HeroSection
+export default HeroSection;

@@ -1,16 +1,17 @@
- 
-
- import { categories, CategoryType } from "@/dummydata/networking";
+import { categories } from "@/dummydata/networking";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
- 
- 
 
 function RegistureFormClub() {
- 
   return (
     <div className="max-w-2xl mt-10 mx-auto bg-background shadow-lg rounded-xl p-6 space-y-6">
       <h2 className="text-2xl font-semibold text-center text-primary">
