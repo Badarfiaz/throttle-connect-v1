@@ -1,6 +1,5 @@
- 
 import { cn } from "@/lib/utils";
-import { Network, Store, Users } from "lucide-react";
+import { Network, Store } from "lucide-react";
 import Link from "next/link";
 
 interface ToggleNavProps {
@@ -10,7 +9,6 @@ interface ToggleNavProps {
 const Togglenav = ({ pathname }: ToggleNavProps) => {
   return (
     <nav className="flex items-center gap-8 text-[#0B2447] font-medium">
- 
       {/* Pills Group */}
       <div className="flex bg-[#dcecf6] rounded-full p-1 gap-1">
         <Link
