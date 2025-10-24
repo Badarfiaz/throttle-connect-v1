@@ -34,7 +34,7 @@ import {
   logoutUser,
 } from "@/app/redux/features/authSlice";
 import type { RootState } from "@/app/redux/store";
-import Togglenav from "./ToggleNav";
+import Togglenav from "./Togglenav";
 
 type AuthMode = "login" | "signup";
 
