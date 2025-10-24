@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Users, Globe2, ClipboardPlus } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Title from "@/components/shared/Title";
 const cardData = [
   {
     icon: Users,
@@ -45,12 +46,7 @@ const RegistureClubBanner = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-primary">
-            {title}
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            {description}
-          </p>
+          <Title title={title} description={description} />
         </motion.div>
 
         {/* Buttons */}
