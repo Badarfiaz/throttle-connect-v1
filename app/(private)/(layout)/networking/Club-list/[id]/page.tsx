@@ -1,19 +1,13 @@
-'use client';
+"use client";
 
-import ClubCard from '@/components/networking/ClubsCard';
-import { clubs } from '@/dummydata/networking';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import ClubCard from "@/components/networking/ClubsCard";
+import { clubs } from "@/dummydata/networking";
+import BreadcrumbNav from "@/components/shared/BreadcrumbReuse";
+import { useParams } from "next/navigation";
 
 export default function Page() {
-  const { id } = useParams(); // e.g. 'sedans', 'offroad', etc.
+  const params = useParams();
+  const id = params?.id?.toString() || "Unknown"; // ✅ Convert safely
 
   // Filter clubs by categoryType
   const filteredClubs = clubs.filter(
@@ -26,31 +20,13 @@ export default function Page() {
       <header className="w-full sticky top-0 z-50 bg-background/90 backdrop-blur-md shadow-sm border-b border-border/20">
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
           {/* Breadcrumb */}
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/">Home</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-
-              <BreadcrumbSeparator />
-
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/networking">Networking</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-
-              <BreadcrumbSeparator />
-
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href={`/networking/${id}`}>{id}</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <BreadcrumbNav
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Networking", href: "/networking" },
+              { label: id }, // last breadcrumb (no link)
+            ]}
+          />
 
           <h1 className="text-2xl sm:text-3xl font-bold text-primary capitalize mt-4 sm:mt-0">
             {id} Clubs

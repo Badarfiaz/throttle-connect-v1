@@ -18,18 +18,19 @@ export type Club = {
   description: string;
   createdBy: string;
 };
-export interface EventItem{
-  id:string;
-  title:string;
-  image:string;
-  hostedBy:string;
-  slotsAvailable:number;
-  totalSlots:number;
-  date:string;
-  description:string;
-  category:string;
-  rating:number
-  startTime:string;
-  location:string;
-  invitedClubs:string[];
+
+export interface EventItem {
+  id: string;
+  title: string;
+  image: string;
+  hostedBy: string;
+  slotsAvailable: number;
+  totalSlots: number;
+  date: string;
+  description: string;
+  category: string;
+  rating: number;
+  startTime: string;
+  location: string;
+  invitedClubs: string[];
 }

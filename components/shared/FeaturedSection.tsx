@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { whyThrottleConnectData } from "@/dummydata/shared";
+import Title from "@/components/shared/Title";
 
 const FeaturedSection = () => {
   const { title, description, buttonText, features } = whyThrottleConnectData;
@@ -9,11 +10,12 @@ const FeaturedSection = () => {
     <section className="bg-background text-text py-20 px-6">
       <div className="max-w-6xl mx-auto text-center space-y-6">
         {/* Header */}
-        <h2 className="text-4xl font-bold tracking-tight">{title}</h2>
+        {/* <h2 className="text-4xl font-bold tracking-tight">{title}</h2>
 
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           {description}
-        </p>
+        </p> */}
+        <Title title={title} description={description} />
 
         <div>
           <Button className="bg-primary hover:bg-primary/80 text-white px-8 py-3 rounded-xl shadow-md">

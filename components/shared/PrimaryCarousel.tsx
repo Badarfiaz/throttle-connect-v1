@@ -8,13 +8,9 @@ import {
 } from "@/components/ui/carousel";
 
 interface PrimaryCarouselProps<T> {
-  /** Array of items to render in the carousel */
   items: T[];
-  /** Render function for each item */
   renderItem: (item: T, index: number) => React.ReactNode;
-  /** Number of items visible per view */
   multiple?: number;
-  /** Optional className for container */
   className?: string;
 }
 

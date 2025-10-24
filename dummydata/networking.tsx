@@ -1,50 +1,51 @@
 import { CategoryType, Club, EventItem } from "@/types/main";
-
-export const vehicleCategories = [
+export interface vehicleCategoriesType {
+  id: number;
+  categoryType?: CategoryType;
+  image: string;
+}
+export const vehicleCategories: vehicleCategoriesType[] = [
   {
     id: 1,
     categoryType: "sedans",
     image: "/images/category/sedan.webp",
-    slugs :""
   },
   {
     id: 2,
-    categoryType: "Hatchbacks",
+    categoryType: "hatchbacks",
     image: "/images/category/hatchback.webp",
   },
   {
     id: 3,
-    categoryType: "OffRoad",
+    categoryType: "offroad",
     image: "/images/category/offroad.webp",
   },
   {
     id: 4,
-    categoryType: "Super-Cars",
+    categoryType: "super-cars",
     image: "/images/category/supercar.webp",
   },
   {
     id: 5,
-    categoryType: "Bikes",
+    categoryType: "bikes",
     image: "/images/category/classic.webp",
   },
   {
     id: 6,
-    categoryType: "Superbikes",
+    categoryType: "superbikes",
     image: "/images/category/superbike.webp",
   },
 ];
-export  const categories: CategoryType[] = [
-    "sedans",
-    "hatchbacks",
-    "offroad",
-    "super-cars",
-    "bikes",
-    "electric-bikes",
-    "superbikes",
-    "cruisers",
-  ];
-
- 
+export const categories: CategoryType[] = [
+  "sedans",
+  "hatchbacks",
+  "offroad",
+  "super-cars",
+  "bikes",
+  "electric-bikes",
+  "superbikes",
+  "cruisers",
+];
 
 export const clubs: Club[] = [
   {
@@ -160,52 +161,70 @@ export const clubs: Club[] = [
   // },
 ];
 
- 
-
 export const events: EventItem[] = [
   {
-    id: 'ev1',
-    title: 'Sunset Drift Meetup',
+    id: "ev1",
+    title: "Sunset Drift Meetup",
     image: "/images/category/offroad.webp",
-    hostedBy: 'Karachi Auto Club',
+    hostedBy: "Karachi Auto Club",
     slotsAvailable: 18,
     totalSlots: 30,
-    date: '2025-10-05',
-    startTime: '17:30',
-    location: 'Port Grand, Karachi',
-    invitedClubs: ['Redline Racers', 'Highway Hounds', 'Turbo Titans', 'The Apex Society', 'Night Owls Garage'],
-    description: 'An exciting drift meetup at sunset along Karachi’s port with food stalls and live music.',
-    category: 'Drifting',
+    date: "2025-10-05",
+    startTime: "17:30",
+    location: "Port Grand, Karachi",
+    invitedClubs: [
+      "Redline Racers",
+      "Highway Hounds",
+      "Turbo Titans",
+      "The Apex Society",
+      "Night Owls Garage",
+    ],
+    description:
+      "An exciting drift meetup at sunset along Karachi’s port with food stalls and live music.",
+    category: "Drifting",
     rating: 4.5,
   },
   {
-    id: 'ev2',
-    title: 'Vintage & Classics Showcase',
+    id: "ev2",
+    title: "Vintage & Classics Showcase",
     image: "/images/category/offroad.webp",
-    hostedBy: 'Vintage Wheels Pakistan',
+    hostedBy: "Vintage Wheels Pakistan",
     slotsAvailable: 9,
     totalSlots: 20,
-    date: '2025-11-12',
-    startTime: '11:00',
-    location: 'Frere Hall, Karachi',
-    invitedClubs: ['Classic Cruisers', 'Chrome & Coffee', 'Old Timers Guild', 'Retro Riders'],
-    description: 'Showcase of rare classic cars and vintage beauties at the historic Frere Hall.',
-    category: 'Vintage',
+    date: "2025-11-12",
+    startTime: "11:00",
+    location: "Frere Hall, Karachi",
+    invitedClubs: [
+      "Classic Cruisers",
+      "Chrome & Coffee",
+      "Old Timers Guild",
+      "Retro Riders",
+    ],
+    description:
+      "Showcase of rare classic cars and vintage beauties at the historic Frere Hall.",
+    category: "Vintage",
     rating: 5,
   },
   {
-    id: 'ev3',
-    title: '4x4 Trail & BBQ',
+    id: "ev3",
+    title: "4x4 Trail & BBQ",
     image: "/images/category/offroad.webp",
-    hostedBy: 'Desert Fox Offroad',
+    hostedBy: "Desert Fox Offroad",
     slotsAvailable: 25,
     totalSlots: 40,
-    date: '2025-12-03',
-    startTime: '08:00',
-    location: 'Gadani Trails',
-    invitedClubs: ['Mud Masters', 'Trail Blazers', 'Torque Tribe', 'SandStormers', 'Overland Collective'],
-    description: 'Off-road adventure through rugged Gadani trails, ending with a BBQ feast.',
-    category: 'Offroad',
+    date: "2025-12-03",
+    startTime: "08:00",
+    location: "Gadani Trails",
+    invitedClubs: [
+      "Mud Masters",
+      "Trail Blazers",
+      "Torque Tribe",
+      "SandStormers",
+      "Overland Collective",
+    ],
+    description:
+      "Off-road adventure through rugged Gadani trails, ending with a BBQ feast.",
+    category: "Offroad",
     rating: 4,
   },
 ];

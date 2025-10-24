@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   Card,
   CardContent,
@@ -12,6 +11,7 @@ import Image from "next/image";
 import { MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import { Club } from "@/types/main";
+import Link from "next/link";
 
 interface ClubCardProps {
   club: Club;
@@ -68,13 +68,15 @@ const ClubCard = ({ club }: ClubCardProps) => {
           <span className="text-xs text-muted-foreground/80 italic">
             By {club.createdBy}
           </span>
-          <Button
-            size="sm"
-            variant="default"
-            className="bg-primary text-white hover:bg-secondary transition-colors rounded-xl px-4"
-          >
-            View Club
-          </Button>
+          <Link href={`/networking/Club-Profile/${club.id}`}>
+            <Button
+              size="sm"
+              variant="default"
+              className="bg-primary text-white hover:bg-secondary transition-colors rounded-xl px-4"
+            >
+              View Club
+            </Button>
+          </Link>
         </CardFooter>
 
         {/* Glow Effect */}
