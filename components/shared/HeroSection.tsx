@@ -29,7 +29,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           : "bg-[url('/images/hero-bg-2.jpg')] bg-cover bg-center"
       )}
     >
-      {/* Overlay */}
+      {/* Overlayy */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-smx z-0" />
 
       <div className="relative z-10 max-w-3xl px-6 py-12">
