@@ -151,7 +151,7 @@ const HeaderPrimary: FC = () => {
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#f8fcff]/80 backdrop-blur-md shadow-sm">
+    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
         {/* Logo */}
         <Link
