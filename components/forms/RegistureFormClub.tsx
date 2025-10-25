@@ -10,13 +10,13 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import Title from "../shared/Title";
+import SharedButton from "../shared/SharedButton";
 
 function RegistureFormClub() {
   return (
     <div className="max-w-2xl mt-10 mx-auto bg-background shadow-lg rounded-xl p-6 space-y-6">
-      <h2 className="text-2xl font-semibold text-center text-primary">
-        Register Your Club
-      </h2>
+      <Title title="Register Your Club" />
 
       {/* Banner Upload */}
       <div className="space-y-2">
@@ -76,9 +76,7 @@ function RegistureFormClub() {
       </div>
 
       {/* Submit */}
-      <div className="pt-4 text-center">
-        <Button className="px-6 py-2 rounded-lg">Register Club</Button>
-      </div>
+      <SharedButton label="Register Club" />
     </div>
   );
 }

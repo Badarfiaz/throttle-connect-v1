@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Sparkles, Rocket, Construction } from "lucide-react";
+import { Sparkles, Rocket, Construction, Home } from "lucide-react";
+import SharedButton from "@/components/shared/SharedButton";
 
 export default function NotFound() {
   return (
@@ -32,16 +33,22 @@ export default function NotFound() {
 
         <div className="flex justify-center gap-4">
           <Link href="/">
-            <Button className="rounded-2xl px-6 py-2">Go Home</Button>
+            <SharedButton
+              label="Go Home"
+              iconLeft={<Home className="w-4 h-4" />}
+              rounded="2xl"
+              className="px-6 py-2"
+            />
           </Link>
+
           <Link href="/about">
-            <Button
+            <SharedButton
+              label="Learn More"
+              iconRight={<Construction className="w-4 h-4" />}
               variant="outline"
-              className="rounded-2xl px-6 py-2 flex items-center gap-2"
-            >
-              <Construction className="w-4 h-4" />
-              Learn More
-            </Button>
+              rounded="2xl"
+              className="px-6 py-2"
+            />
           </Link>
         </div>
 

@@ -12,6 +12,7 @@ import { MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import { Club } from "@/types/main";
 import Link from "next/link";
+import SharedButton from "../shared/SharedButton";
 
 interface ClubCardProps {
   club: Club;
@@ -69,13 +70,7 @@ const ClubCard = ({ club }: ClubCardProps) => {
             By {club.createdBy}
           </span>
           <Link href={`/networking/Club-Profile/${club.id}`}>
-            <Button
-              size="sm"
-              variant="default"
-              className="bg-primary text-white hover:bg-secondary transition-colors rounded-xl px-4"
-            >
-              View Club
-            </Button>
+            <SharedButton size="sm" label="View Club" />
           </Link>
         </CardFooter>
 

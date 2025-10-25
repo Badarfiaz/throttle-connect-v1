@@ -26,6 +26,7 @@ import {
   Car,
   Bike,
 } from "lucide-react";
+import SharedButton from "@/components/shared/SharedButton";
 
 export default function ClubProfile() {
   const { id } = useParams();
@@ -79,11 +80,13 @@ export default function ClubProfile() {
 
   const renderEvents = () => (
     <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
-      <CardHeader>
+      <CardHeader className="mt-5">
         <CardTitle>Upcoming Events</CardTitle>
-        <CardDescription>Ride outs, meetups & track days</CardDescription>
+        <CardDescription className="mb-5">
+          Ride outs, meetups & track days
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 mb-5">
         {events.map((n) => (
           <div
             key={n}
@@ -98,9 +101,7 @@ export default function ClubProfile() {
                 </p>
               </div>
             </div>
-            <Button size="sm" variant="secondary">
-              Details
-            </Button>
+            <SharedButton label="Details" />
           </div>
         ))}
       </CardContent>
@@ -156,10 +157,10 @@ export default function ClubProfile() {
       {/* 🔹 Overview Section */}
       <Card className="bg-white/80 backdrop-blur-md border border-border/30 shadow-md rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-primary">
+          <CardTitle className="text-2xl mt-5 font-semibold text-primary">
             Club Overview
           </CardTitle>
-          <CardDescription className="text-muted-foreground">
+          <CardDescription className="text-muted-foreground p-3">
             A brief look into what makes {club.name} special.
           </CardDescription>
         </CardHeader>
@@ -172,7 +173,7 @@ export default function ClubProfile() {
           <Separator />
           <div className="flex items-start gap-3">
             <Info className="w-5 h-5 mt-1 text-primary" />
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground mb-5 leading-relaxed">
               {club.description}
             </p>
           </div>
@@ -197,12 +198,7 @@ export default function ClubProfile() {
         <h3 className="text-lg font-semibold text-primary">
           Ready to ride with {club.name}?
         </h3>
-        <Button
-          size="lg"
-          className="bg-primary hover:bg-secondary text-white transition-all duration-300"
-        >
-          Join Club
-        </Button>
+        <SharedButton label="Join Club" />
       </div>
     </section>
   );

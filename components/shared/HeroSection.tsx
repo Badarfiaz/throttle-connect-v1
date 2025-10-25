@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import SharedButton from "./SharedButton";
 
 interface HeroSectionProps {
   layout?: 1 | 2;
@@ -45,13 +46,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
         {ctaText && (
           <div className="mt-8 flex justify-center">
-            <Button
+            <SharedButton
+              label="Join Now"
               onClick={onCtaClick}
               size="lg"
-              className="bg-white text-black hover:bg-gray-100 font-semibold shadow-lg"
-            >
-              {ctaText}
-            </Button>
+              variant="secondary"
+              // className="bg-white text-black hover:bg-gray-100"
+            />
           </div>
         )}
       </div>
