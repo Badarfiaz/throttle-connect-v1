@@ -15,7 +15,10 @@ export default function CategorySection({ items }: CategorySectionProps) {
     <CardLinkWrapper link={link}>
       <HoverCard key={items?.id}>
         <HoverCardTrigger asChild>
-          <Card className="group relative overflow-hidden border border-transparent bg-white/70 backdrop-blur-sm hover:border-[#BFD7FF] hover:shadow-md transition-all duration-300 rounded-xl">
+          <Card
+            ispadding={false}
+            className="group relative overflow-hidden border border-transparent bg-white/70 backdrop-blur-sm hover:border-[#BFD7FF] hover:shadow-md transition-all duration-300 rounded-xl"
+          >
             <div className="relative w-full h-32 sm:h-40 overflow-hidden rounded-t-xl">
               <Image
                 src={items?.image || "/images/placeholder.webp"}
