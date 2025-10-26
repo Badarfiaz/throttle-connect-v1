@@ -8,16 +8,15 @@ interface ToggleNavProps {
 
 const Togglenav = ({ pathname }: ToggleNavProps) => {
   return (
-    <nav className="flex items-center gap-8 text-[#0B2447] font-medium">
-      {/* Pills Group */}
-      <div className="flex bg-[#dcecf6] rounded-full p-1 gap-1">
+    <nav className="flex items-center gap-8 text-primary font-medium">
+      <div className="flex bg-card/40 rounded-full p-1 gap-1">
         <Link
           href="/marketplace"
           className={cn(
             "flex items-center gap-2 px-4 py-1.5 rounded-full transition-all",
             pathname.startsWith("/marketplace")
-              ? "bg-white text-[#0B2447] font-semibold shadow-sm"
-              : "text-[#0B2447]/80 hover:text-[#0B2447]"
+              ? "bg-card text-primary font-semibold shadow-sm"
+              : "text-primary/80 hover:text-primary"
           )}
         >
           <Store className="w-4 h-4" />
@@ -28,8 +27,8 @@ const Togglenav = ({ pathname }: ToggleNavProps) => {
           className={cn(
             "flex items-center gap-2 px-4 py-1.5 rounded-full transition-all",
             pathname.startsWith("/networking")
-              ? "bg-white text-[#0B2447] font-semibold shadow-sm"
-              : "text-[#0B2447]/80 hover:text-[#0B2447]"
+              ? "bg-card text-primary font-semibold shadow-sm"
+              : "text-primary/80 hover:text-primary"
           )}
         >
           <Network className="w-4 h-4" />

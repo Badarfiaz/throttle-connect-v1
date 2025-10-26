@@ -5,12 +5,11 @@ interface SharedButtonProps {
   label?: string;
   onClick?: () => void;
   size?: "default" | "sm" | "lg" | "icon";
-  variant?: "default" | "outline" | "secondary" | "ghost" | "destructive";
+  variant?: "default" | "outline" | "secondary" | "ghost" | "destructive" | "link";
   className?: string;
   rounded?: "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full";
   iconLeft?: ReactNode;
   iconRight?: ReactNode;
-  /** alignment of content inside button */
   align?: "left" | "center" | "right";
 }
 
@@ -23,16 +22,34 @@ export default function SharedButton({
   rounded = "lg",
   iconLeft,
   iconRight,
+  align = "center",
 }: SharedButtonProps) {
-  // Map alignment to Tailwind justify classes
+  const justifyClass =
+    align === "left"
+      ? "justify-start"
+      : align === "right"
+      ? "justify-end"
+      : "justify-center";
+
+  // ✅ Tailwind-safe mapping for rounded sizes
+  const roundedMap: Record<NonNullable<SharedButtonProps["rounded"]>, string> = {
+    none: "rounded-none",
+    sm: "rounded-sm",
+    md: "rounded-md",
+    lg: "rounded-lg",
+    xl: "rounded-xl",
+    "2xl": "rounded-2xl",
+    "3xl": "rounded-3xl",
+    full: "rounded-full",
+  };
 
   return (
-    <div className="flex justify-center">
+    <div className={`flex ${justifyClass}`}>
       <Button
         onClick={onClick}
         size={size}
         variant={variant}
-        className={`font-semibold shadow-md rounded-${rounded} flex items-center gap-2  ${className}`}
+        className={`font-semibold shadow-md ${roundedMap[rounded]} flex items-center gap-2 ${className}`}
       >
         {iconLeft && <span className="flex items-center">{iconLeft}</span>}
         {label}

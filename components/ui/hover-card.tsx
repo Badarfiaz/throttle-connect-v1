@@ -11,11 +11,16 @@ function HoverCard({
   return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />
 }
 
+// ✅ Changed this function to remove focus outline
 function HoverCardTrigger({
   ...props
 }: React.ComponentProps<typeof HoverCardPrimitive.Trigger>) {
   return (
-    <HoverCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} />
+    <HoverCardPrimitive.Trigger
+      data-slot="hover-card-trigger"
+      className="outline-none focus:outline-none" // ✅ Added these classes to remove outline
+      {...props}
+    />
   )
 }
 

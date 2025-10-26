@@ -29,7 +29,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           : "bg-[url('/images/hero-bg-2.jpg')] bg-cover bg-center"
       )}
     >
-      {/* ---- Hero Content ---- */}
       <div className="relative z-10 max-w-3xl px-6 py-12">
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-primary-foreground drop-shadow-lg">
           {title}
@@ -43,12 +42,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
         {ctaText && (
           <div className="mt-8 flex justify-center">
-            <SharedButton label={ctaText} onClick={onCtaClick} size="lg" />
+            <SharedButton
+              label={ctaText}
+              onClick={onCtaClick}
+              size="lg"
+              variant="primary"
+            />
           </div>
         )}
       </div>
 
-      {/* ---- Optional Side Image ---- */}
       {layout === 2 && imageSrc && (
         <div className="absolute bottom-0 right-0 w-1/2 hidden md:block">
           <Image

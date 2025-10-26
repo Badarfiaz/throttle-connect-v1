@@ -51,21 +51,17 @@ const HeaderPrimary: FC = () => {
   const [mode, setMode] = useState<AuthMode>("login");
   const [submitting, setSubmitting] = useState(false);
 
-  // 🔹 Redux selectors
   const userEmail = useSelector(
     (s: RootState) => s.auth.user?.email ?? "",
     shallowEqual
   );
-  const userId = useSelector((s: RootState) => s.auth.user?.id ?? "");
   const isAuthed = !!userEmail;
 
-  // 🔹 Derived helpers
   const avatarLetter = useMemo(
     () => (isAuthed ? userEmail.trim().charAt(0).toUpperCase() : "?"),
     [isAuthed, userEmail]
   );
 
-  // 🔹 Helpers
   const closeModal = useCallback(() => {
     setOpen(false);
     setMode("login");
@@ -81,10 +77,6 @@ const HeaderPrimary: FC = () => {
     []
   );
 
-  const getErrorMessage = (e: unknown, fallback: string) =>
-    e instanceof Error ? e.message : fallback;
-
-  // 🔹 Email/password auth
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
@@ -112,10 +104,9 @@ const HeaderPrimary: FC = () => {
         setSubmitting(false);
       }
     },
-    [dispatch, mode, thunkByMode, closeModal, toast]
+    [dispatch, mode, thunkByMode, closeModal]
   );
 
-  // 🔹 Google login
   const handleGoogle = useCallback(async () => {
     try {
       setSubmitting(true);
@@ -132,14 +123,14 @@ const HeaderPrimary: FC = () => {
     } finally {
       setSubmitting(false);
     }
-  }, [dispatch, closeModal, toast]);
+  }, [dispatch, closeModal]);
 
   const handleLogout = useCallback(() => {
     dispatch(logoutUser());
     toast.success("Logout successful", {
       description: "Welcome back to Throttle Connect!",
     });
-  }, [dispatch, toast]);
+  }, [dispatch]);
 
   const navLinks = useMemo(
     () => [
@@ -153,21 +144,23 @@ const HeaderPrimary: FC = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-        {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-xl font-semibold text-[#0B2447]"
+          className="flex items-center gap-2 text-xl font-semibold text-primary"
         >
-          Throttle<span className="text-[#19376D]">Connect</span>
+          Throttle<span className="text-primary/80">Connect</span>
         </Link>
 
-        {/* Nav */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className="text-[#0B2447] font-medium hover:text-[#19376D] transition-colors"
+              className={`font-medium transition-colors ${
+                pathname.startsWith(href)
+                  ? "text-primary font-semibold"
+                  : "text-foreground hover:text-primary"
+              }`}
             >
               {label}
             </Link>
@@ -175,14 +168,15 @@ const HeaderPrimary: FC = () => {
           <Togglenav pathname={pathname} />
         </nav>
 
-        {/* Auth Section */}
         {isAuthed ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex items-center gap-2 cursor-pointer">
-                <span className="text-sm font-medium">{userEmail}</span>
-                <Avatar className="border border-[#19376D]/30">
-                  <AvatarFallback className="bg-[#19376D] text-white font-semibold">
+                <span className="text-sm font-medium text-primary">
+                  {userEmail}
+                </span>
+                <Avatar className="border border-primary/30">
+                  <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                     {avatarLetter}
                   </AvatarFallback>
                 </Avatar>
@@ -195,15 +189,17 @@ const HeaderPrimary: FC = () => {
               <DropdownMenuItem asChild>
                 <Link href="/profile">Profile</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
+                Logout
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button
-                className="bg-[#0B2447] hover:bg-[#19376D] text-white rounded-md px-5"
                 onClick={openModal}
+                className="bg-primary hover:bg-primary/80 text-primary-foreground rounded-md px-5"
               >
                 Login
               </Button>
@@ -214,7 +210,7 @@ const HeaderPrimary: FC = () => {
                 <DialogTitle className="text-2xl font-semibold text-center mb-2">
                   {mode === "login" ? "Log in" : "Sign up"}
                 </DialogTitle>
-                <DialogDescription className="text-center">
+                <DialogDescription className="text-center text-secondary/80">
                   Login or create an account to continue.
                 </DialogDescription>
               </DialogHeader>
@@ -229,22 +225,17 @@ const HeaderPrimary: FC = () => {
                   <TabsTrigger value="signup">Sign Up</TabsTrigger>
                 </TabsList>
 
-                {/* Auth Form */}
                 <TabsContent value={mode}>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     {mode === "signup" && (
                       <InputGroup label="Full Name" id="name" type="text" />
                     )}
                     <InputGroup label="Email" id="email" type="email" />
-                    <InputGroup
-                      label="Password"
-                      id="password"
-                      type="password"
-                    />
+                    <InputGroup label="Password" id="password" type="password" />
 
                     <Button
                       type="submit"
-                      className="w-full bg-[#0B2447] hover:bg-[#19376D] text-white"
+                      className="w-full bg-primary hover:bg-primary/80 text-primary-foreground"
                       disabled={submitting}
                     >
                       {submitting
@@ -259,7 +250,7 @@ const HeaderPrimary: FC = () => {
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full flex items-center justify-center gap-2"
+                      className="w-full flex items-center justify-center gap-2 text-secondary/80 border-secondary/30"
                       onClick={handleGoogle}
                       disabled={submitting}
                     >
@@ -276,14 +267,15 @@ const HeaderPrimary: FC = () => {
   );
 };
 
-/** Small helper for repeated fields */
 const InputGroup: FC<{ label: string; id: string; type: string }> = ({
   label,
   id,
   type,
 }) => (
   <div>
-    <Label htmlFor={id}>{label}</Label>
+    <Label htmlFor={id} className="text-secondary/80">
+      {label}
+    </Label>
     <Input id={id} name={id} type={type} required />
   </div>
 );
