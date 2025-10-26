@@ -24,7 +24,10 @@ const ClubCard = ({ club }: ClubCardProps) => {
       whileHover={{ y: -6 }}
       transition={{ type: "spring", stiffness: 150, damping: 12 }}
     >
-      <Card className="group relative overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-b from-secondary/30 to-background shadow-md hover:shadow-xl transition-all duration-500">
+      <Card
+        ispadding={false}
+        className="group relative overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-b from-secondary/30 to-background shadow-md hover:shadow-xl transition-all duration-500"
+      >
         {/* Image Section */}
         <div className="relative w-full h-56 overflow-hidden">
           <Image
