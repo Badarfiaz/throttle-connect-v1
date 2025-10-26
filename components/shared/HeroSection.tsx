@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import SharedButton from "./SharedButton";
 
@@ -30,39 +29,31 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           : "bg-[url('/images/hero-bg-2.jpg')] bg-cover bg-center"
       )}
     >
-      {/* Overlayy */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-smx z-0" />
-
+      {/* ---- Hero Content ---- */}
       <div className="relative z-10 max-w-3xl px-6 py-12">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white drop-shadow-lg">
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-primary-foreground drop-shadow-lg">
           {title}
         </h1>
 
         {subtitle && (
-          <p className="mt-4 text-lg md:text-xl text-white/90 leading-relaxed">
+          <p className="mt-4 text-lg md:text-xl text-foreground leading-relaxed">
             {subtitle}
           </p>
         )}
 
         {ctaText && (
           <div className="mt-8 flex justify-center">
-            <SharedButton
-              label="Join Now"
-              onClick={onCtaClick}
-              size="lg"
-              variant="secondary"
-              // className="bg-white text-black hover:bg-gray-100"
-            />
+            <SharedButton label={ctaText} onClick={onCtaClick} size="lg" />
           </div>
         )}
       </div>
 
-      {/* Optional side image or decorative layout element for layout 2 */}
+      {/* ---- Optional Side Image ---- */}
       {layout === 2 && imageSrc && (
         <div className="absolute bottom-0 right-0 w-1/2 hidden md:block">
           <Image
             src={imageSrc}
-            alt="Hero image"
+            alt="Hero illustration"
             width={600}
             height={600}
             className="object-contain drop-shadow-2xl"

@@ -32,10 +32,11 @@ export default function NotFound() {
         </p>
 
         <div className="flex justify-center gap-4">
-          <Link href="/">
+          <Link href="/"> 
             <SharedButton
               label="Go Home"
               iconLeft={<Home className="w-4 h-4" />}
+              // variant="destructive"wsy he lkh k check kiaa color chnage hua h
               rounded="2xl"
               className="px-6 py-2"
             />
@@ -46,7 +47,7 @@ export default function NotFound() {
               label="Learn More"
               iconRight={<Construction className="w-4 h-4" />}
               variant="outline"
-              rounded="2xl"
+              rounded="20xl"
               className="px-6 py-2"
             />
           </Link>
