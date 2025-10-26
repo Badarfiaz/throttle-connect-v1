@@ -110,7 +110,7 @@ const InputGroup: FC<{ label: string; id: string; type: string }> = ({
   id,
   type,
 }) => (
-  <div  className="flex flex-col space-y-2">
+  <div className="flex flex-col space-y-2">
     <Label htmlFor={id}>{label}</Label>
     <Input id={id} name={id} type={type} required />
   </div>
