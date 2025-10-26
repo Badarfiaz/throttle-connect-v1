@@ -4,27 +4,6 @@ import { FC, useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { shallowEqual, useSelector } from "react-redux";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useAppDispatch } from "@/app/redux/hooks";
 import {
@@ -35,6 +14,8 @@ import {
 } from "@/app/redux/features/authSlice";
 import type { RootState } from "@/app/redux/store";
 import Togglenav from "./Togglenav";
+import HeaderProfile from "./HeaderProfile";
+import LoginModal from "./LoginModal";
 
 type AuthMode = "login" | "signup";
 
@@ -151,7 +132,7 @@ const HeaderPrimary: FC = () => {
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md shadow-sm">
+    <header className="sticky top-0 z-50 w-full bg-[#f8fcff]/80 backdrop-blur-md shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
         {/* Logo */}
         <Link
@@ -177,115 +158,26 @@ const HeaderPrimary: FC = () => {
 
         {/* Auth Section */}
         {isAuthed ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="flex items-center gap-2 cursor-pointer">
-                <span className="text-sm font-medium">{userEmail}</span>
-                <Avatar className="border border-[#19376D]/30">
-                  <AvatarFallback className="bg-[#19376D] text-white font-semibold">
-                    {avatarLetter}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>{userEmail}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/profile">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <HeaderProfile
+            avatar={avatarLetter}
+            email={userEmail}
+            logout={handleLogout}
+          />
         ) : (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button
-                className="bg-[#0B2447] hover:bg-[#19376D] text-white rounded-md px-5"
-                onClick={openModal}
-              >
-                Login
-              </Button>
-            </DialogTrigger>
-
-            <DialogContent className="max-w-md rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-semibold text-center mb-2">
-                  {mode === "login" ? "Log in" : "Sign up"}
-                </DialogTitle>
-                <DialogDescription className="text-center">
-                  Login or create an account to continue.
-                </DialogDescription>
-              </DialogHeader>
-
-              <Tabs
-                value={mode}
-                onValueChange={(val) => setMode(val as AuthMode)}
-                className="w-full mt-4"
-              >
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                </TabsList>
-
-                {/* Auth Form */}
-                <TabsContent value={mode}>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    {mode === "signup" && (
-                      <InputGroup label="Full Name" id="name" type="text" />
-                    )}
-                    <InputGroup label="Email" id="email" type="email" />
-                    <InputGroup
-                      label="Password"
-                      id="password"
-                      type="password"
-                    />
-
-                    <Button
-                      type="submit"
-                      className="w-full bg-[#0B2447] hover:bg-[#19376D] text-white"
-                      disabled={submitting}
-                    >
-                      {submitting
-                        ? mode === "login"
-                          ? "Logging in..."
-                          : "Creating..."
-                        : mode === "login"
-                        ? "Log in"
-                        : "Create Account"}
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full flex items-center justify-center gap-2"
-                      onClick={handleGoogle}
-                      disabled={submitting}
-                    >
-                      Continue with Google
-                    </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
-            </DialogContent>
-          </Dialog>
+          <LoginModal
+            open={open}
+            setOpen={setOpen}
+            mode={mode}
+            setMode={setMode}
+            handleSubmit={handleSubmit}
+            handleGoogle={handleGoogle}
+            submitting={submitting}
+            openModal={openModal}
+          />
         )}
       </div>
     </header>
   );
 };
-
-/** Small helper for repeated fields */
-const InputGroup: FC<{ label: string; id: string; type: string }> = ({
-  label,
-  id,
-  type,
-}) => (
-  <div>
-    <Label htmlFor={id}>{label}</Label>
-    <Input id={id} name={id} type={type} required />
-  </div>
-);
 
 export default HeaderPrimary;
