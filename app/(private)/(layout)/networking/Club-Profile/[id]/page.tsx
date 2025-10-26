@@ -59,28 +59,24 @@ export default function ClubProfile() {
   const achievements = useMemo(() => [Trophy, Car, Bike], []);
 
   const renderMembers = () => (
-  <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
-    <CardHeader  className="mt-6">
-      <CardTitle>Featured Members</CardTitle>
-      <CardDescription>Meet the passionate team</CardDescription>
-    </CardHeader>
-    {/* ✅ Added padding top and bottom (py-6) for spacing above first avatar and below last avatar */}
-    {/* ✅ gap-6 ensures consistent spacing between members */}
-    <CardContent className="flex flex-wrap gap-6 justify-center py-6">
-      {members.map((n) => (
-        <div key={n} className="flex flex-col items-center space-y-2">
-          <Avatar className="w-16 h-16">
-            <AvatarImage src={`/images/avatar-${n}.jpg`} />
-            <AvatarFallback>TC</AvatarFallback>
-          </Avatar>
-          {/* ✅ space-y-2 keeps space between avatar and name */}
-          <p className="text-sm font-medium text-foreground">Member {n}</p>
-        </div>
-      ))}
-    </CardContent>
-  </Card>
-);
-
+    <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
+      <CardHeader>
+        <CardTitle>Featured Members</CardTitle>
+        <CardDescription>Meet the passionate team</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-wrap gap-6 justify-center">
+        {members.map((n) => (
+          <div key={n} className="flex flex-col items-center space-y-2">
+            <Avatar className="w-16 h-16">
+              <AvatarImage src={`/images/avatar-${n}.jpg`} />
+              <AvatarFallback>TC</AvatarFallback>
+            </Avatar>
+            <p className="text-sm font-medium text-foreground">Member {n}</p>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
 
   const renderEvents = () => (
     <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
@@ -113,32 +109,29 @@ export default function ClubProfile() {
   );
 
   const renderAchievements = () => (
-  <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
-    {/* ✅ Added mt-6 to CardHeader for spacing above heading */}
-    <CardHeader className="mt-6">
-      <CardTitle>Achievements</CardTitle>
-      <CardDescription>Celebrating milestones and victories</CardDescription>
-    </CardHeader>
-    {/* ✅ Added py-6 to CardContent for spacing above first card and below last card */}
-    <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 py-6">
-      {achievements.map((Icon, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent/20 transition"
-        >
-          <Icon className="w-6 h-6 text-primary" />
-          <div>
-            <p className="font-semibold">Achievement {i + 1}</p>
-            <p className="text-sm text-muted-foreground">
-              Outstanding performance & dedication
-            </p>
+    <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
+      <CardHeader>
+        <CardTitle>Achievements</CardTitle>
+        <CardDescription>Celebrating milestones and victories</CardDescription>
+      </CardHeader>
+      <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {achievements.map((Icon, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent/20 transition"
+          >
+            <Icon className="w-6 h-6 text-primary" />
+            <div>
+              <p className="font-semibold">Achievement {i + 1}</p>
+              <p className="text-sm text-muted-foreground">
+                Outstanding performance & dedication
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
-    </CardContent>
-  </Card>
-);
-
+        ))}
+      </CardContent>
+    </Card>
+  );
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-12 space-y-10">
