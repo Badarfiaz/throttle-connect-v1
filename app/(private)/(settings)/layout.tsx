@@ -14,8 +14,7 @@ const Layout = async ({ children }: { children: React.ReactNode }) => {
 
         {/* Main content */}
         <main className="flex-1 p-6 bg-gray-50 min-h-screen">
-          <h1>yahan pe settings ka component lagana apna</h1>
-          {children}
+           {children}
         </main>
       </div>
     </SidebarProvider>
