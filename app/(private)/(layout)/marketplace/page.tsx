@@ -1,0 +1,45 @@
+import CategorySection from "@/components/shared/CategorySection";
+import HeroSection from "@/components/shared/HeroSection";
+import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
+import Title from "@/components/shared/Title";
+import { markeptlaceCatgegoryies } from "@/dummydata/marketplace";
+import React from "react";
+
+function page() {
+  return (
+    <div>
+      <HeroSection
+        title="Discover Your Automotive Passion"
+        subtitle="Explore our marketplace of automotive clubs and find your perfect match."
+        ctaText="Explore products"
+        layout={2}
+      />
+      <div className="max-w-5xl mt-20 mx-auto px-6">
+        {/* Section Heading */}
+        <Title
+          title="Explore Products"
+          description="expore our marketplace of automotive clubs and find your perfect match."
+        />
+      </div>
+
+      <div className="px-4 sm:px-6 md:px-12 lg:px-20 pt-0 pb-0">
+        <PrimaryCarousel
+          items={markeptlaceCatgegoryies}
+          responsive={{
+            mobile: 2,
+            tablet: 3,
+            desktop: 4,
+          }}
+          className="w-full"
+          renderItem={(category) => (
+            <div className="w-full h-full">
+              <CategorySection key={category.id} items={category} />
+            </div>
+          )}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default page;

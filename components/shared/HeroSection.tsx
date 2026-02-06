@@ -27,7 +27,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         "md:h-[600px] h-[450px]",
         layout === 1
           ? "bg-[url('/images/HeroBanner.jpg')] bg-cover bg-center"
-          : "bg-[url('/images/hero-bg-2.jpg')] bg-cover bg-center"
+          : "bg-[url('/images/category/hatchback.webp')] bg-cover bg-center",
       )}
     >
       {/* Overlayy */}
@@ -47,7 +47,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         {ctaText && (
           <div className="mt-8 flex justify-center">
             <SharedButton
-              label="Join Now"
+              label={ctaText}
               onClick={onCtaClick}
               size="lg"
               variant="secondary"

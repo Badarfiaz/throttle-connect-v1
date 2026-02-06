@@ -4,6 +4,7 @@ export interface vehicleCategoriesType {
   id: number;
   categoryType?: CategoryType;
   image: string;
+  shopName?: string;
 }
 export const vehicleCategories: vehicleCategoriesType[] = [
   {

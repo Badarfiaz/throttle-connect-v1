@@ -30,7 +30,7 @@ export default function CategorySection({ items }: CategorySectionProps) {
             </div>
             <CardHeader className="p-3 text-center">
               <CardTitle className="text-base font-semibold text-[#0B2447] group-hover:text-[#19376D] transition-colors">
-                {items?.categoryType}
+                {items?.categoryType || items?.shopName || "Unknown Category"}
               </CardTitle>
             </CardHeader>
           </Card>
