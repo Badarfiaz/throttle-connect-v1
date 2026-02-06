@@ -30,16 +30,17 @@ function PrimaryCarousel<T>({
       }}
       className={className}
     >
-      <CarouselContent>
+      <CarouselContent className="-ml-2 md:-ml-4">
         {items.map((item, index) => (
           <CarouselItem
             key={index}
             style={{
               flex: `0 0 ${itemWidth}%`,
+              minWidth: `${itemWidth}%`,
             }}
             className="pl-2 md:pl-4"
           >
-            {renderItem(item, index)}
+            <div className="w-full h-full">{renderItem(item, index)}</div>
           </CarouselItem>
         ))}
       </CarouselContent>

@@ -27,10 +27,17 @@ function home() {
         />
       </div>
 
-      <div className="p-20 pt-0 pb-0 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-        {vehicleCategories.map((category) => (
-          <CategorySection key={category.id} items={category} />
-        ))}
+      <div className="px-6 sm:px-8 md:px-12 lg:px-20 pt-0 pb-0">
+        <PrimaryCarousel
+          items={vehicleCategories}
+          multiple={4}
+          className="w-full"
+          renderItem={(category) => (
+            <div className="w-full h-full">
+              <CategorySection key={category.id} items={category} />
+            </div>
+          )}
+        />
       </div>
 
       <FeaturedSection />
