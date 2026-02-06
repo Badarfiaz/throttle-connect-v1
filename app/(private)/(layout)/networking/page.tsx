@@ -1,4 +1,3 @@
-"use client";
 import ClubCard from "@/components/networking/ClubsCard";
 import CategorySection from "@/components/shared/CategorySection";
 import FeaturedSection from "@/components/shared/FeaturedSection";
@@ -16,7 +15,6 @@ function home() {
         title="Your Next Adventure Awaits"
         subtitle="Join a club that matches your passion and make unforgettable memories."
         ctaText="Get Started"
-        onCtaClick={() => alert("Let's go!")}
       />
 
       <div className="max-w-5xl mt-20 mx-auto px-6">
@@ -27,10 +25,14 @@ function home() {
         />
       </div>
 
-      <div className="px-6 sm:px-8 md:px-12 lg:px-20 pt-0 pb-0">
+      <div className="px-4 sm:px-6 md:px-12 lg:px-20 pt-0 pb-0">
         <PrimaryCarousel
           items={vehicleCategories}
-          multiple={4}
+          responsive={{
+            mobile: 2,
+            tablet: 3,
+            desktop: 4,
+          }}
           className="w-full"
           renderItem={(category) => (
             <div className="w-full h-full">
@@ -42,8 +44,8 @@ function home() {
 
       <FeaturedSection />
 
-      <div className="bg-background text-text py-16 px-6">
-        <div className="max-w-6xl mx-auto text-center space-y-8">
+      <div className="bg-background text-text py-12 xs:py-16 px-4 xs:px-6">
+        <div className="max-w-6xl mx-auto text-center space-y-6 xs:space-y-8">
           <Title
             title="Discover Clubs"
             description="Explore our thriving network of automotive clubs — from off-roaders
@@ -53,7 +55,11 @@ function home() {
           {/* 🚗 Shadcn Carousel */}
           <PrimaryCarousel
             items={clubs}
-            multiple={3}
+            responsive={{
+              mobile: 1,
+              tablet: 2,
+              desktop: 3,
+            }}
             renderItem={(club) => <ClubCard club={club} />}
           />
         </div>

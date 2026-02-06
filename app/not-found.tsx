@@ -1,15 +1,13 @@
-"use client";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import AnimateMotion from "@/components/shared/AnimateMotion";
 import { Sparkles, Rocket, Construction, Home } from "lucide-react";
 import SharedButton from "@/components/shared/SharedButton";
 
 export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background text-text px-6 text-center">
-      <motion.div
+      <AnimateMotion
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -56,7 +54,7 @@ export default function NotFound() {
           <Sparkles className="w-4 h-4 text-primary" />
           <span>ThrottleConnect — fueling your next adventure</span>
         </div>
-      </motion.div>
+      </AnimateMotion>
     </div>
   );
 }

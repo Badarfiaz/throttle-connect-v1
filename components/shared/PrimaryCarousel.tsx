@@ -6,11 +6,16 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import {
+  getResponsiveClasses,
+  ResponsiveConfig,
+} from "@/ulity/responsiveClass";
 
 interface PrimaryCarouselProps<T> {
   items: T[];
   renderItem: (item: T, index: number) => React.ReactNode;
-  multiple?: number;
+  multiple?: number; // fallback if responsive not provided
+  responsive?: ResponsiveConfig;
   className?: string;
 }
 
@@ -18,9 +23,21 @@ function PrimaryCarousel<T>({
   items,
   renderItem,
   multiple = 1,
+  responsive,
   className,
 }: PrimaryCarouselProps<T>) {
-  const itemWidth = 100 / multiple;
+  // Use responsive config if provided, otherwise fall back to multiple
+  const mobileItems = responsive?.mobile ?? 1;
+  const tabletItems =
+    responsive?.tablet ??
+    (multiple > 1 ? Math.max(2, Math.floor(multiple / 2)) : multiple);
+  const desktopItems = responsive?.desktop ?? multiple;
+
+  const responsiveClasses = getResponsiveClasses(
+    mobileItems,
+    tabletItems,
+    desktopItems,
+  );
 
   return (
     <Carousel
@@ -34,19 +51,15 @@ function PrimaryCarousel<T>({
         {items.map((item, index) => (
           <CarouselItem
             key={index}
-            style={{
-              flex: `0 0 ${itemWidth}%`,
-              minWidth: `${itemWidth}%`,
-            }}
-            className="pl-2 md:pl-4"
+            className={`pl-2 md:pl-4 ${responsiveClasses}`}
           >
             <div className="w-full h-full">{renderItem(item, index)}</div>
           </CarouselItem>
         ))}
       </CarouselContent>
 
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious className="hidden sm:flex" />
+      <CarouselNext className="hidden sm:flex" />
     </Carousel>
   );
 }

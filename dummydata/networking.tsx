@@ -1,4 +1,5 @@
 import { CategoryType, Club, EventItem } from "@/types/main";
+import { ClipboardPlus, Globe2, Users } from "lucide-react";
 export interface vehicleCategoriesType {
   id: number;
   categoryType?: CategoryType;
@@ -226,5 +227,26 @@ export const events: EventItem[] = [
       "Off-road adventure through rugged Gadani trails, ending with a BBQ feast.",
     category: "Offroad",
     rating: 4,
+  },
+];
+
+export const cardData = [
+  {
+    icon: Users,
+    title: "Thousands of Enthusiasts",
+    description:
+      "Join a growing network of clubs and enthusiasts around the globe.",
+  },
+  {
+    icon: Globe2,
+    title: "Global Club Community",
+    description:
+      "Explore meetups and auto events in your city or across the world.",
+  },
+  {
+    icon: ClipboardPlus,
+    title: "Easy Club Registration",
+    description:
+      "Create a profile for your club and start connecting instantly.",
   },
 ];
