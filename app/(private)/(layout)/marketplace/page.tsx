@@ -1,6 +1,7 @@
 import CategorySection from "@/components/shared/CategorySection";
 import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
+import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 import { markeptlaceCatgegoryies } from "@/dummydata/marketplace";
 import React from "react";
@@ -38,6 +39,13 @@ function page() {
           )}
         />
       </div>
+      <RegistureClubBanner
+        title="Join the Throttle Connect Marletplace"
+        description="Whether you’re a seller 
+        looking to reach passionate automotive enthusiasts or a buyer seeking unique products, our marketplace is your destination for all things automotive."
+        ctaButton1="Register as shop"
+        ctaButton2="Find a Club"
+      />
     </div>
   );
 }
