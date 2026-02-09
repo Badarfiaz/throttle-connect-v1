@@ -19,7 +19,7 @@ function page() {
         layout={2}
       />
       <div className="max-w-5xl mt-20 mx-auto px-6">
-        {/* Section Heading */}
+        {/* Sections Heading */}
         <Title
           title="Explore Products"
           description="expore our marketplace of automotive clubs and find your perfect match."
