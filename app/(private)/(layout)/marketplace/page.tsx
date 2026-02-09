@@ -1,10 +1,13 @@
+import ProductCard from "@/components/marketplace/ProductCard";
 import CategorySection from "@/components/shared/CategorySection";
 import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
-import { markeptlaceCatgegoryies } from "@/dummydata/marketplace";
-import React from "react";
+import {
+  markeptlaceCatgegoryies,
+  marketplaceProducts,
+} from "@/dummydata/marketplace";
 
 function page() {
   return (
@@ -46,6 +49,27 @@ function page() {
         ctaButton1="Register as shop"
         ctaButton2="Find a Club"
       />
+      <Title
+        title="Featured Products"
+        description="Discover our handpicked selection of automotive products, curated for quality and performance."
+      />
+
+      <div className="px-4 sm:px-6 md:px-12 lg:px-20 pt-0 pb-0">
+        <PrimaryCarousel
+          items={marketplaceProducts}
+          className="w-full"
+          responsive={{
+            mobile: 1,
+            tablet: 2,
+            desktop: 4,
+          }}
+          renderItem={(product) => (
+            <div className="w-full h-full">
+              <ProductCard product={product} />
+            </div>
+          )}
+        />
+      </div>
     </div>
   );
 }
