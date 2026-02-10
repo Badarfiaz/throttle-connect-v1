@@ -55,21 +55,25 @@ const MorePage = () => {
                 },
             ],
         },
-        {
-            title: "YOUR ACCOUNT",
-            items: [
+        ...(user
+            ? [
                 {
-                    label: "Personal",
-                    icon: User,
-                    href: "/profilePage",
+                    title: "YOUR ACCOUNT",
+                    items: [
+                        {
+                            label: "Personal",
+                            icon: User,
+                            href: "/profilePage",
+                        },
+                        {
+                            label: "Explore",
+                            icon: Compass,
+                            href: "/explore",
+                        },
+                    ],
                 },
-                {
-                    label: "Explore",
-                    icon: Compass,
-                    href: "/explore",
-                },
-            ],
-        },
+            ]
+            : []),
     ];
 
     return (
@@ -79,49 +83,74 @@ const MorePage = () => {
                 {/* Background Pattern (Optional) */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
 
-                <div className="flex items-center gap-4 relative z-10">
-                    <Avatar className="w-16 h-16 border-2 border-white/20 shadow-md">
+                <div className="flex flex-col items-center text-center relative z-10">
+                    <Avatar className="w-20 h-20 border-4 border-white/10 mb-4 bg-white/5">
                         <AvatarImage src={""} />
-                        <AvatarFallback className="bg-white/10 text-white text-xl font-bold">
-                            {user?.email?.charAt(0).toUpperCase() || "U"}
+                        <AvatarFallback className="bg-transparent text-white text-3xl">
+                            {user ? (
+                                user.name?.charAt(0).toUpperCase() ||
+                                user.email?.charAt(0).toUpperCase()
+                            ) : (
+                                <User className="w-8 h-8 opacity-50" />
+                            )}
                         </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                        <h1 className="text-xl font-bold mb-1">
-                            {user?.name || user?.email?.split("@")[0] || "User"}
-                        </h1>
-                        <Link href="/profilePage">
-                            <Button
-                                variant="outline"
-                                className="h-8 text-xs bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
-                            >
-                                View Profile
-                            </Button>
-                        </Link>
-                    </div>
+
+                    {user ? (
+                        <>
+                            <h1 className="text-xl font-bold mb-1">
+                                {user.name || user.email?.split("@")[0] || "User"}
+                            </h1>
+                            <Link href="/profilePage">
+                                <Button
+                                    variant="outline"
+                                    className="h-8 text-xs bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white mt-2"
+                                >
+                                    View Profile
+                                </Button>
+                            </Link>
+                        </>
+                    ) : (
+                        <>
+                            <h1 className="text-xl font-bold mb-2">
+                                Sign in to begin your journey
+                            </h1>
+                            <p className="text-blue-100 text-sm mb-6 max-w-[250px]">
+                                Access your profile, favorites, and personalized
+                                recommendations
+                            </p>
+                            <Link href="/login">
+                                <Button className="bg-[#1a5f8a] hover:bg-[#236da0] text-white border border-white/10 px-8">
+                                    Login or Sign up
+                                </Button>
+                            </Link>
+                        </>
+                    )}
                 </div>
 
-                {/* Stats Cards */}
-                <div className="grid grid-cols-2 gap-4 mt-8 relative z-10">
-                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 flex items-center gap-3">
-                        <div className="p-2 bg-white/10 rounded-lg">
-                            <Star className="w-5 h-5 text-yellow-300 fill-yellow-300" />
+                {/* Stats Cards - Only shown when logged in */}
+                {user && (
+                    <div className="grid grid-cols-2 gap-4 mt-8 relative z-10 w-full">
+                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 flex items-center gap-3">
+                            <div className="p-2 bg-white/10 rounded-lg">
+                                <Star className="w-5 h-5 text-yellow-300 fill-yellow-300" />
+                            </div>
+                            <div>
+                                <div className="text-lg font-bold">0</div>
+                                <div className="text-xs text-blue-100">Favorites</div>
+                            </div>
                         </div>
-                        <div>
-                            <div className="text-lg font-bold">0</div>
-                            <div className="text-xs text-blue-100">Favorites</div>
+                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 flex items-center gap-3">
+                            <div className="p-2 bg-white/10 rounded-lg">
+                                <LayoutTemplate className="w-5 h-5 text-blue-300" />
+                            </div>
+                            <div>
+                                <div className="text-lg font-bold">Profile</div>
+                                <div className="text-xs text-blue-100">Complete</div>
+                            </div>
                         </div>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 flex items-center gap-3">
-                        <div className="p-2 bg-white/10 rounded-lg">
-                            <LayoutTemplate className="w-5 h-5 text-blue-300" />
-                        </div>
-                        <div>
-                            <div className="text-lg font-bold">Profile</div>
-                            <div className="text-xs text-blue-100">Complete</div>
-                        </div>
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* Menu Sections */}
@@ -161,23 +190,27 @@ const MorePage = () => {
                 ))}
 
                 {/* Logout Section */}
-                <div>
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
-                        <button
-                            onClick={handleLogout}
-                            className="w-full flex items-center justify-between p-4 hover:bg-red-50 transition-colors group text-left"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="p-2 rounded-full bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white transition-colors">
-                                    <LogOut className="w-5 h-5" />
+                {user && (
+                    <div>
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center justify-between p-4 hover:bg-red-50 transition-colors group text-left"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="p-2 rounded-full bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                        <LogOut className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <div className="font-medium text-red-600">
+                                            Log Out
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div className="font-medium text-red-600">Log Out</div>
-                                </div>
-                            </div>
-                        </button>
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
