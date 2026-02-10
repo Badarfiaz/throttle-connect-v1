@@ -1,8 +1,9 @@
- import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HeaderPrimary from "@/components/shared/Headerprimary";
 import ReduxProvider from "./redux/reduxProvider";
 import { Toaster } from "sonner"
+import MobileBottomNav from "@/components/shared/MobileBottomNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
- 
+
 
 export default function RootLayout({
   children,
@@ -28,15 +29,16 @@ export default function RootLayout({
       >
         <ReduxProvider>
 
-        <HeaderPrimary/>
-        
-        {children}
-           <Toaster
-          position="top-center"
-          richColors
-          closeButton
-          toastOptions={{ duration: 3000 }}
-        />
+          <HeaderPrimary />
+
+          {children}
+          <MobileBottomNav />
+          <Toaster
+            position="top-center"
+            richColors
+            closeButton
+            toastOptions={{ duration: 3000 }}
+          />
         </ReduxProvider>
       </body>
     </html>
