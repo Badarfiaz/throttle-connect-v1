@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HeaderPrimary from "@/components/shared/Headerprimary";
+import Footer from "@/components/shared/Footer";
 import ReduxProvider from "./redux/reduxProvider";
 import { Toaster } from "sonner"
 import MobileBottomNav from "@/components/shared/MobileBottomNav";
@@ -25,13 +26,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <ReduxProvider>
 
           <HeaderPrimary />
 
-          {children}
+          <main className="flex-1 flex flex-col">
+            {children}
+          </main>
+          <Footer />
           <MobileBottomNav />
           <Toaster
             position="top-center"

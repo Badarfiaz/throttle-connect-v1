@@ -54,7 +54,7 @@ function page() {
         description="Discover our handpicked selection of automotive products, curated for quality and performance."
       />
 
-      <div className="px-4 sm:px-6 md:px-12 lg:px-20 pt-0 pb-0">
+      <div className="px-4  mb-10 sm:px-6 md:px-12 lg:px-20 pt-0 pb-0">
         <PrimaryCarousel
           items={marketplaceProducts}
           className="w-full"
