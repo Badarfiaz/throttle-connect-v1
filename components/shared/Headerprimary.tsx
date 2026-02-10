@@ -35,7 +35,7 @@ const HeaderPrimary: FC = () => {
   // 🔹 Redux selectors
   const userEmail = useSelector(
     (s: RootState) => s.auth.user?.email ?? "",
-    shallowEqual
+    shallowEqual,
   );
   const userId = useSelector((s: RootState) => s.auth.user?.id ?? "");
   const isAuthed = !!userEmail;
@@ -43,7 +43,7 @@ const HeaderPrimary: FC = () => {
   // 🔹 Derived helpers
   const avatarLetter = useMemo(
     () => (isAuthed ? userEmail.trim().charAt(0).toUpperCase() : "?"),
-    [isAuthed, userEmail]
+    [isAuthed, userEmail],
   );
 
   // 🔹 Helpers
@@ -59,7 +59,7 @@ const HeaderPrimary: FC = () => {
       login: loginUser,
       signup: createUser,
     }),
-    []
+    [],
   );
 
   const getErrorMessage = (e: unknown, fallback: string) =>
@@ -93,7 +93,7 @@ const HeaderPrimary: FC = () => {
         setSubmitting(false);
       }
     },
-    [dispatch, mode, thunkByMode, closeModal, toast]
+    [dispatch, mode, thunkByMode, closeModal, toast],
   );
 
   // 🔹 Google login
@@ -128,7 +128,7 @@ const HeaderPrimary: FC = () => {
       { href: "/blogs", label: "Blogs" },
       { href: "/contact", label: "Contact Us" },
     ],
-    []
+    [],
   );
 
   return (
@@ -158,11 +158,13 @@ const HeaderPrimary: FC = () => {
 
         {/* Auth Section */}
         {isAuthed ? (
-          <HeaderProfile
-            avatar={avatarLetter}
-            email={userEmail}
-            logout={handleLogout}
-          />
+          <div className="hidden md:block">
+            <HeaderProfile
+              avatar={avatarLetter}
+              email={userEmail}
+              logout={handleLogout}
+            />
+          </div>
         ) : (
           <LoginModal
             open={open}
