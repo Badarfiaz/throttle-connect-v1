@@ -108,12 +108,6 @@ function Home() {
 
         {/* Clubs Carousel */}
         <div className="space-y-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <Title
-              title="Discover Clubs"
-              description="Explore our thriving network of automotive clubs — from off-roaders to superbikes."
-            />
-          </div>
           <RegistureClubBanner
             title="Join the Club Network"
             description="Whether you’re looking to register your own club or discover new ones, we’ve got you covered."
