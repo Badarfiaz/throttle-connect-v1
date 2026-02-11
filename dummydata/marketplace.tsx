@@ -76,4 +76,11 @@ export const marketplaceProducts: marketplaceProductType[] = [
     profileName: "Segal Motors",
     price: 5000,
   },
+  {
+    id: 6,
+    productName: "Toyota carpets",
+    image: "/images/logos/carpet.jpeg",
+    profileName: "Segal Motors",
+    price: 5000,
+  },
 ];
