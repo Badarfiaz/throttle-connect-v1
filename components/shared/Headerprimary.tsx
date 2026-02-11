@@ -52,7 +52,7 @@ const HeaderPrimary: FC = () => {
   const navLinks = useMemo(
     () => [
       { href: "/", label: "Home" },
-      { href: "/blogs", label: "Blogs" },
+      { href: "/blogs", label: "News" },
       { href: "/contact", label: "Contact Us" },
     ],
     [],

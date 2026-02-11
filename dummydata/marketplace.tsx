@@ -29,6 +29,11 @@ export const markeptlaceCatgegoryies: markeptlaceType[] = [
     shopName: "Ls2 helments PK",
     image: "/images/logos/ls2.jpeg",
   },
+  {
+    id: 6,
+    shopName: "Segal Motors",
+    image: "/images/logos/indexHelmentlogo.png",
+  },
 ];
 
 export type marketplaceProductType = {
@@ -82,5 +87,12 @@ export const marketplaceProducts: marketplaceProductType[] = [
     image: "/images/logos/carpet.jpeg",
     profileName: "Segal Motors",
     price: 5000,
+  },
+  {
+    id: 7,
+    productName: "Index Helment",
+    image: "/images/logos/indexHelemnt.jpeg",
+    profileName: "Index Helmets PK",
+    price: 12680,
   },
 ];

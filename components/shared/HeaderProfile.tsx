@@ -33,7 +33,7 @@ function HeaderProfile({ email, avatar, logout }: headerProfileProps) {
           <DropdownMenuLabel>{email}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/profile">Profile</Link>
+            {/* <Link href="/profile">Profile</Link> */}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
