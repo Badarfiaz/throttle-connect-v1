@@ -15,32 +15,22 @@ import {
   LogOut,
 } from "lucide-react";
 import Link from "next/link";
-import {
-  logoutUser,
-  loginUser,
-  createUser,
-  loginUserWithGoogle,
-} from "@/app/redux/features/authSlice";
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import LoginModal from "@/components/shared/LoginModal";
+import { useAuthHandlers } from "@/hooks/useAuthHandlers";
+import { auth } from "@/firebase";
 
 type AuthMode = "login" | "signup";
-
-interface FormValues {
-  email: string;
-  password: string;
-}
 
 const MorePage = () => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
-
+  console.log("current user ", user);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<AuthMode>("login");
-  const [submitting, setSubmitting] = useState(false);
 
   const closeModal = useCallback(() => {
     setOpen(false);
@@ -49,66 +39,14 @@ const MorePage = () => {
 
   const openModal = useCallback(() => setOpen(true), []);
 
-  const thunkByMode = useMemo(
-    () => ({
-      login: loginUser,
-      signup: createUser,
-    }),
-    [],
-  );
-
-  // Email/password auth
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      const values: FormValues = {
-        email: formData.get("email") as string,
-        password: formData.get("password") as string,
-      };
-
-      try {
-        setSubmitting(true);
-        const thunk = thunkByMode[mode];
-        await dispatch(thunk(values)).unwrap();
-
-        toast.success("Login successful", {
-          description: "Welcome back to Throttle Connect!",
-        });
-
-        closeModal();
-      } catch (err) {
-        toast.error("Authentication error", {
-          description: "Login failed.",
-        });
-      } finally {
-        setSubmitting(false);
-      }
-    },
-    [dispatch, mode, thunkByMode, closeModal],
-  );
-
-  // Google login
-  const handleGoogle = useCallback(async () => {
-    try {
-      setSubmitting(true);
-      await dispatch(loginUserWithGoogle()).unwrap();
-
-      toast.success("Login successful", {
-        description: "Welcome back to Throttle Connect!",
-      });
-      closeModal();
-    } catch (e) {
-      toast.error("Authentication error", {
-        description: "Login failed.",
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  }, [dispatch, closeModal]);
+  // Use auth handlers hook
+  const { handleSubmit, handleGoogle, submitting } = useAuthHandlers({
+    mode,
+    closeModal,
+  });
 
   const handleLogout = useCallback(() => {
-    dispatch(logoutUser());
+    auth.signOut();
     toast.success("Logout successful", {
       description: "Welcome back to Throttle Connect!",
     });
