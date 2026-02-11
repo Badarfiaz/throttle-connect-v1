@@ -58,9 +58,9 @@ const MorePage = () => {
       title: "HELP & SUPPORT",
       items: [
         {
-          label: "Feedback",
+          label: "New Feed",
           icon: MessageCircle,
-          href: "/feedback",
+          href: "/blogs",
         },
         {
           label: "Help & Support",
