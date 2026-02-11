@@ -59,7 +59,7 @@ function page() {
           items={marketplaceProducts}
           className="w-full"
           responsive={{
-            mobile: 1,
+            mobile: 2,
             tablet: 2,
             desktop: 4,
           }}

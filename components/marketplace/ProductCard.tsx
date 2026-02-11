@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { marketplaceProductType } from "@/dummydata/marketplace";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Heart, ShoppingCart, Eye } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react"; // Changed ShoppingCart to ShoppingBag for a more modern feel
 import Image from "next/image";
-import SharedButton from "../shared/SharedButton";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type ProductCardProps = {
   product: marketplaceProductType;
@@ -16,58 +16,64 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
   return (
-    <Card className="group relative w-full bg-white rounded-3xl shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden border border-gray-100/50 hover:border-primary/20 flex flex-col h-full backdrop-blur-sm">
-      {/* Top Section: Image & Overlay Actions */}
-      <div className="relative aspect-[4/3] w-full bg-gradient-to-br from-gray-50 to-gray-100/50 flex items-center justify-center overflow-hidden">
-        {/* Product Image with Enhanced Hover Effect */}
-        <div className="relative w-full h-full p-6 flex items-center justify-center">
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <Image
-            fill
-            src={product.image}
-            alt={product.productName}
-            className="rounded-b-sm"
-          />
-        </div>
+    <Card className="group relative w-full h-full border-none shadow-none bg-transparent hover:shadow-none transition-all duration-300">
+      {/* Image Container */}
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gray-100">
+        <Image
+          fill
+          src={product.image}
+          alt={product.productName}
+          className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+        />
 
-        {/* Decorative Shine Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none"></div>
+        {/* Overlay Gradient (Subtle) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* Favorite Button (Top Right) */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            setIsFavorite(!isFavorite);
+          }}
+          className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:text-red-500 transition-colors shadow-sm"
+        >
+          <Heart
+            size={18}
+            className={cn("transition-all", isFavorite ? "fill-red-500 text-red-500" : "")}
+          />
+        </button>
+
+        {/* Quick Add Button (Bottom Right) - Visible on Hover for Desktop, Always for Mobile if desired, but here we keep it clean */}
+        <div className="absolute bottom-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+          <Button
+            size="icon"
+            className="h-10 w-10 rounded-full bg-white text-black hover:bg-black hover:text-white shadow-md transition-colors"
+            onClick={(e) => e.preventDefault()}
+          >
+            <ShoppingBag size={18} />
+          </Button>
+        </div>
       </div>
 
-      <CardContent className="flex flex-col flex-1 p-6 bg-white relative">
-        {/* Product Name */}
-        <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-300">
-          {product.productName}
-        </h3>
-
-        {/* Price & Action Section */}
-        <div className="flex items-end justify-between mt-auto gap-3">
-          <div className="flex-1">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
-              <span className="w-1 h-1 bg-primary rounded-full"></span>
-              Price
-            </p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-primary">
-                ${product.price}
-              </span>
-              <span className="text-sm text-gray-400 line-through">
-                ${Math.round(product.price * 1.2)}
-              </span>
-            </div>
-          </div>
-
-          <SharedButton
-            variant="default"
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300"
-            iconLeft={<ShoppingCart size={16} />}
-            label="Add"
-            size="sm"
-          />
+      {/* Content */}
+      <CardContent className="px-1 py-3">
+        <div className="flex justify-between items-start gap-2">
+          <h3 className="text-sm md:text-base font-medium text-gray-900 line-clamp-2 leading-tight group-hover:underline decoration-1 underline-offset-2">
+            {product.productName}
+          </h3>
         </div>
 
-        {/* Bottom Accent Line */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+        <div className="mt-1 flex items-baseline gap-2">
+          <span className="text-base md:text-lg font-bold text-gray-900">
+            ${product.price}
+          </span>
+          {product.price && (
+            <span className="text-xs text-gray-400 line-through">
+              ${Math.round(product.price * 1.2)}
+            </span>
+          )}
+        </div>
+        {/* Optional: Category or other meta info could go here, but keeping it minimal */}
       </CardContent>
     </Card>
   );
