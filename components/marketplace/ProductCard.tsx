@@ -73,6 +73,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </span>
           )}
         </div>
+        <span className="text-xs text-gray-400 ">
+          Profile: {product.profileName}
+        </span>
+
         {/* Optional: Category or other meta info could go here, but keeping it minimal */}
       </CardContent>
     </Card>
