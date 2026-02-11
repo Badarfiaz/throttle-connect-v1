@@ -1,3 +1,12 @@
+import { CalendarDays, ShieldCheck, Wrench, Users, LucideIcon } from "lucide-react";
+
+export interface FeatureItem {
+  id: number;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}
+
 export const whyThrottleConnectData = {
   title: "Why ThrottleConnect?",
   description:
@@ -6,31 +15,32 @@ export const whyThrottleConnectData = {
   features: [
     {
       id: 1,
-      icon: "🎉",
+      icon: CalendarDays,
       title: "CLUBS & EVENTS",
       description:
         "Create or join automotive clubs and register for upcoming events & meetups.",
     },
     {
       id: 2,
-      icon: "🔒",
+      icon: ShieldCheck,
       title: "SECURE PAYMENTS",
       description:
         "Safe transactions through verified and trusted payment methods.",
     },
     {
       id: 3,
-      icon: "🛠️",
+      icon: Wrench,
       title: "VERIFIED SERVICES",
       description:
         "Find mechanics, electricians, and service providers you can trust.",
     },
     {
       id: 4,
-      icon: "🚗",
+      icon: Users,
       title: "COMMUNITY CONNECT",
       description:
         "Engage in forums, share media, and connect with fellow car & bike enthusiasts.",
     },
-  ],
+  ] as FeatureItem[],
 };
+

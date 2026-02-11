@@ -1,5 +1,5 @@
 import { CategoryType, Club, EventItem } from "@/types/main";
-import { ClipboardPlus, Globe2, Users } from "lucide-react";
+import { ClipboardPlus, Globe2, LucideIcon, Users } from "lucide-react";
 export interface vehicleCategoriesType {
   id: number;
   categoryType?: CategoryType;
@@ -230,8 +230,12 @@ export const events: EventItem[] = [
     rating: 4,
   },
 ];
-
-export const cardData = [
+export type cardDataType = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}
+export const cardDataNetworking: cardDataType[] = [
   {
     icon: Users,
     title: "Thousands of Enthusiasts",
@@ -249,5 +253,26 @@ export const cardData = [
     title: "Easy Club Registration",
     description:
       "Create a profile for your club and start connecting instantly.",
+  },
+];
+
+export const cardDataMarketplace: cardDataType[] = [
+  {
+    icon: Users,
+    title: "Thousands of Products",
+    description:
+      "Browse a wide variety of bikes, cars, and accessories from trusted sellers.",
+  },
+  {
+    icon: Globe2,
+    title: "Shop Globally",
+    description:
+      "Find rare and exclusive vehicles and parts from around the world.",
+  },
+  {
+    icon: ClipboardPlus,
+    title: "Easy Buying & Selling",
+    description:
+      "List your products or make purchases with a few simple clicks.",
   },
 ];

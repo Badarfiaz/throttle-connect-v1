@@ -6,7 +6,7 @@ import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 
-import { clubs, vehicleCategories } from "@/dummydata/networking";
+import { cardDataNetworking, clubs, vehicleCategories } from "@/dummydata/networking";
 
 function home() {
   return (
@@ -71,6 +71,7 @@ function home() {
             meetups, and grow your community."
         ctaButton1="Register Club"
         ctaButton2="Find a Club"
+        cardData={cardDataNetworking}
       />
     </div>
   );

@@ -1,45 +1,39 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { whyThrottleConnectData } from "@/dummydata/shared";
 import Title from "@/components/shared/Title";
 import SharedButton from "./SharedButton";
 
 const FeaturedSection = () => {
-  const { title, description, buttonText, features } = whyThrottleConnectData;
+  const { title, description, features } = whyThrottleConnectData;
 
   return (
-    <section className="bg-background text-text py-20 px-6">
-      <div className="max-w-6xl mx-auto text-center space-y-6">
-        {/* Header */}
-        {/* <h2 className="text-4xl font-bold tracking-tight">{title}</h2>
+    <section className="bg-white text-gray-900 py-16 px-6 relative overflow-hidden border-t border-gray-100">
 
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          {description}
-        </p> */}
-        <Title title={title} description={description} />
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12 max-w-3xl mx-auto">
+          <Title title={title} description={description} />
+        </div>
 
-        <SharedButton label={buttonText} />
-
-        {/* Features Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
-          {features.map((feature, index) => (
-            <div key={feature.id}>
-              <Card className="border border-border/50 gap-2 py-6 bg-secondary/40 backdrop-blur-sm hover:bg-secondary/60 hover:shadow-lg transition-all duration-300 rounded-2xl">
-                <CardHeader>
-                  <div className="text-5xl mb-3">{feature.icon}</div>
-                  <CardTitle className="text-lg font-semibold">
+        {/* Features Grid - Compact & Horizontal */}
+        <div className="grid md:grid-cols-2 gap-x-12 gap-y-10">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <div key={feature.id} className="flex items-start gap-5 group">
+                <div className="shrink-0 w-12 h-12 rounded-xl bg-primary/5 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                  <Icon className="w-6 h-6" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors">
                     {feature.title}
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent>
-                  <p className="text-sm text-muted-foreground ">
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">
                     {feature.description}
                   </p>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

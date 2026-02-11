@@ -8,6 +8,7 @@ import {
   markeptlaceCatgegoryies,
   marketplaceProducts,
 } from "@/dummydata/marketplace";
+import { cardDataMarketplace } from "@/dummydata/networking";
 
 function page() {
   return (
@@ -43,11 +44,11 @@ function page() {
         />
       </div>
       <RegistureClubBanner
-        title="Join the Throttle Connect Marletplace"
-        description="Whether you’re a seller 
-        looking to reach passionate automotive enthusiasts or a buyer seeking unique products, our marketplace is your destination for all things automotive."
+        title="Join the Throttle Connect Marketplace"
+        description="Whether you’re a seller looking to reach passionate enthusiasts or a buyer seeking unique products, our marketplace is your destination."
         ctaButton1="Register as shop"
         ctaButton2="Find a Club"
+        cardData={cardDataMarketplace}
       />
       <Title
         title="Featured Products"
