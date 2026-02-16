@@ -61,7 +61,7 @@ const HeaderPrimary: FC = () => {
 
   // 🔹 NEW: Auto-open registration page for new users
   useEffect(() => {
-  if (isAuthed && user && !user.hasCompletedRegistration) {
+  if (isAuthed && user && !user.completed) {
     router.replace("/registration");
   }
 }, [isAuthed, user]);
