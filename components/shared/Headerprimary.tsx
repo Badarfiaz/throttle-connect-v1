@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { shallowEqual, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { useAppDispatch } from "@/app/redux/hooks";
@@ -17,25 +17,19 @@ type AuthMode = "login" | "signup";
 
 const HeaderPrimary: FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<AuthMode>("login");
 
-  // 🔹 Redux selectors
-  const userEmail = useSelector(
-    (s: RootState) => s.auth.user?.email ?? "",
-    shallowEqual,
-  );
-  const userId = useSelector((s: RootState) => s.auth.user?.id ?? "");
-  const isAuthed = !!userEmail;
+  const user = useSelector((s: RootState) => s.auth.user, shallowEqual);
+  const isAuthed = !!user?.email;
 
-  // 🔹 Derived helpers
   const avatarLetter = useMemo(
-    () => (isAuthed ? userEmail.trim().charAt(0).toUpperCase() : "?"),
-    [isAuthed, userEmail],
+    () => (isAuthed ? user!.email.trim().charAt(0).toUpperCase() : "?"),
+    [isAuthed, user],
   );
 
-  // 🔹 Helpers
   const closeModal = useCallback(() => {
     setOpen(false);
     setMode("login");
@@ -43,7 +37,6 @@ const HeaderPrimary: FC = () => {
 
   const openModal = useCallback(() => setOpen(true), []);
 
-  // 🔹 Use auth handlers hook
   const { handleSubmit, handleGoogle, submitting } = useAuthHandlers({
     mode,
     closeModal,
@@ -54,15 +47,24 @@ const HeaderPrimary: FC = () => {
       { href: "/", label: "Home" },
       { href: "/blogs", label: "News" },
       { href: "/contact", label: "Contact Us" },
+      { href: "/registration", label: "Registration" }, // FIXED lowercase route
     ],
     [],
   );
+
   const handleLogout = useCallback(() => {
     auth.signOut();
     toast.success("Logged out", {
       description: "You have been logged out successfully.",
     });
-  }, [toast]);
+  }, []);
+
+  // 🔹 NEW: Auto-open registration page for new users
+  useEffect(() => {
+  if (isAuthed && user && !user.hasCompletedRegistration) {
+    router.replace("/registration");
+  }
+}, [isAuthed, user]);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#f8fcff]/80 backdrop-blur-md shadow-sm">
@@ -94,7 +96,7 @@ const HeaderPrimary: FC = () => {
           <div className="hidden md:block">
             <HeaderProfile
               avatar={avatarLetter}
-              email={userEmail}
+              email={user.email}
               logout={handleLogout}
             />
           </div>
