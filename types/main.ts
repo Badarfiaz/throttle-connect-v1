@@ -34,3 +34,23 @@ export interface EventItem {
   location: string;
   invitedClubs: string[];
 }
+export type OnBoardType = {
+  storeTitle: string;
+  email: string;
+  contactNumber: string;
+  address: string;
+  selectCategory: string[]; // array of categories
+  overview: string;
+  location: {
+    province: string;
+    city: string;
+    area: string;
+  };
+  completed: boolean;
+  whatsappNumber: string;
+  contactMethod: string;
+  websiteLink: string;
+  facebook: string;
+  instagram: string;
+  tiktok: string;
+};

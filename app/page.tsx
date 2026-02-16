@@ -1,174 +1,75 @@
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import ProductCard from "@/components/marketplace/ProductCard";
-// import ClubCard from "@/components/networking/ClubsCard";
-// import CategorySection from "@/components/shared/CategorySection";
-// import FeaturedSection from "@/components/shared/FeaturedSection";
-// import HeroSection from "@/components/shared/HeroSection";
-// import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
-// import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
-// import Title from "@/components/shared/Title";
+"use client";
 
-// import {
-//   markeptlaceCatgegoryies,
-//   marketplaceProducts,
-// } from "@/dummydata/marketplace";
-// import {
-//   cardDataNetworking,
-//   clubs,
-//   vehicleCategories,
-// } from "@/dummydata/networking";
-// import { cardDataMarketplace } from "@/dummydata/networking";
-
-// function Home() {
-//   return (
-//     <div>
-//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-24">
-//         <Tabs defaultValue="networking" className="w-full space-y-12">
-//           <div className="flex justify-center">
-//             <TabsList className="grid w-full max-w-md grid-cols-2 h-14 bg-secondary/30 backdrop-blur-sm p-1.5 rounded-2xl">
-//               <TabsTrigger
-//                 value="networking"
-//                 className="rounded-xl text-base font-medium data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
-//               >
-//                 Networking
-//               </TabsTrigger>
-//               <TabsTrigger
-//                 value="marketplace"
-//                 className="rounded-xl text-base font-medium data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300"
-//               >
-//                 Marketplace
-//               </TabsTrigger>
-//             </TabsList>
-//           </div>
-
-//           {/* NETWORKING TAB CONTENT */}
-//           <TabsContent
-//             value="networking"
-//             className="space-y-20 animate-in fade-in-50 slide-in-from-bottom-5 duration-500"
-//           >
-//             {/* Categories */}
-//             <div className="space-y-8">
-//               <div className="max-w-3xl mx-auto text-center">
-//                 <Title
-//                   title="Explore Categories"
-//                   description="Discover your next ride — from elegant sedans to powerful superbikes"
-//                 />
-//               </div>
-//               <div className="px-0 sm:px-4">
-//                 <PrimaryCarousel
-//                   items={vehicleCategories}
-//                   responsive={{
-//                     mobile: 2,
-//                     tablet: 3,
-//                     desktop: 4,
-//                   }}
-//                   className="w-full"
-//                   renderItem={(category) => (
-//                     <div className="w-full h-full">
-//                       <CategorySection key={category.id} items={category} />
-//                     </div>
-//                   )}
-//                 />
-//               </div>
-//             </div>
-//           </TabsContent>
-
-//           {/* MARKETPLACE TAB CONTENT */}
-//           <TabsContent
-//             value="marketplace"
-//             className="space-y-20 animate-in fade-in-50 slide-in-from-bottom-5 duration-500"
-//           >
-//             {/* Marketplace Categories */}
-//             <div className="space-y-8">
-//               <div className="max-w-3xl mx-auto text-center">
-//                 <Title
-//                   title="Explore Shops & Categories"
-//                   description="Explore our marketplace of automotive clubs and find your perfect match."
-//                 />
-//               </div>
-//               <div className="px-0 sm:px-4">
-//                 <PrimaryCarousel
-//                   items={markeptlaceCatgegoryies}
-//                   responsive={{
-//                     mobile: 2,
-//                     tablet: 3,
-//                     desktop: 4,
-//                   }}
-//                   className="w-full"
-//                   renderItem={(category) => (
-//                     <div className="w-full h-full">
-//                       <CategorySection key={category.id} items={category} />
-//                     </div>
-//                   )}
-//                 />
-//               </div>
-//             </div>
-//           </TabsContent>
-//         </Tabs>
-
-//         {/* Clubs Carousel */}
-//         <div className="space-y-8">
-//           <RegistureClubBanner
-//             title="Join the Club Network"
-//             description="Whether you’re looking to register your own club or discover new ones, we’ve got you covered."
-//             ctaButton1="Register Club"
-//             ctaButton2="Find a Club"
-//             cardData={cardDataNetworking}
-//           />
-//           <div className="max-w-5xl mt-20 mx-auto px-6">
-//             {/* Sections Heading */}
-//             <Title
-//               title="Explore Products"
-//               description="expore our marketplace of automotive clubs and find your perfect match."
-//             />
-//           </div>
-//           <div className="px-4  mb-10 sm:px-6 md:px-12 lg:px-20 pt-0 pb-0">
-//             <PrimaryCarousel
-//               items={marketplaceProducts}
-//               className="w-full"
-//               responsive={{
-//                 mobile: 2,
-//                 tablet: 2,
-//                 desktop: 4,
-//               }}
-//               renderItem={(product) => (
-//                 <div className="w-full h-full">
-//                   <ProductCard product={product} />
-//                 </div>
-//               )}
-//             />
-//           </div>
-//         </div>
-
-//         <FeaturedSection />
-//         <Title
-//           title="Discover Clubs"
-//           description="Explore our thriving network of automotive clubs — from off-roaders
-//             to superbikes."
-//         />
-
-//         <div className="px-0 sm:px-4">
-//           <PrimaryCarousel
-//             items={clubs}
-//             responsive={{
-//               mobile: 1,
-//               tablet: 2,
-//               desktop: 3,
-//             }}
-//             renderItem={(club) => <ClubCard club={club} />}
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Home;
-import React from "react";
-import NotFound from "./not-found";
+import getFirebaseToken from "@/ulity/getFirebaseToken";
 
 function home() {
-  return <NotFound />;
+  async function handleSubmit() {
+    const url = "https://onboard-fr7tieqywq-uc.a.run.app";
+
+    const data = {
+      onBoardType: "marketplace",
+      storeTitle: "Tedfsdfsst Store",
+      email: "teststore@example.com",
+      contactNumber: "+123456789",
+      address: "123 Test Street",
+      selectCategory: ["electronics", "gadgets"],
+      overview: "A dummy store for testing the onboarding API.",
+      location: {
+        province: "Test Province",
+        city: "Test City",
+        area: "Test Area",
+      },
+      completed: false,
+      whatsappNumber: "+123456789",
+      contactMethod: "email",
+      websiteLink: "https://example.com",
+      facebook: "https://facebook.com/teststore",
+      instagram: "https://instagram.com/teststore",
+      tiktok: "https://tiktok.com/@teststore",
+    };
+
+    try {
+      // Get Firebase authentication token
+      const { token } = await getFirebaseToken();
+
+      if (!token) {
+        alert("Please sign in first!");
+        return;
+      }
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+      console.log("Response:", result);
+      alert("Submitted! Check console for response.");
+    } catch (err) {
+      console.error("Error submitting:", err);
+      alert("Error submitting. Check console.");
+    }
+  }
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="bg-white p-8 rounded-lg shadow-md text-center">
+        <h1 className="text-2xl font-bold mb-4">Test Onboarding API</h1>
+        <p className="mb-6">
+          Click the button below to test the onboarding API with dummy data.
+        </p>
+        <button
+          onClick={handleSubmit}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Submit Test Data
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default home;
