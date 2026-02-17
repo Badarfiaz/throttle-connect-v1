@@ -1,11 +1,10 @@
 "use client";
 
+import { ONBOARD_URL } from "@/lib/config";
 import getFirebaseToken from "@/ulity/getFirebaseToken";
 
 function home() {
   async function handleSubmit() {
-    const url = "https://onboard-fr7tieqywq-uc.a.run.app";
-
     const data = {
       onBoardType: "marketplace",
       storeTitle: "Tedfsdfsst Store",
@@ -37,7 +36,7 @@ function home() {
         return;
       }
 
-      const res = await fetch(url, {
+      const res = await fetch(ONBOARD_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
