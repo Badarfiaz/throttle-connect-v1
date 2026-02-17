@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -12,40 +12,37 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import type { FieldConfig, Option } from "./formFields";
+import type {
+  FieldValues,
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 
 type SocialSelectorProps = {
   options: Option[];
-  multiple?: boolean;
+  value?: Record<string, string>;
   onChange?: (value: Record<string, string>) => void;
 };
 
-function SocialSelector({
-  options,
-  onChange,
-}: SocialSelectorProps) {
-  const [selected, setSelected] = useState<Record<string, string>>({});
+function SocialSelector({ options, value, onChange }: SocialSelectorProps) {
+  const selected = value ?? {};
 
   const handleSelect = (value: string) => {
-    setSelected((prev) => {
-      const newSelected = { ...prev };
+    const newSelected = { ...selected };
 
-      if (value in newSelected) {
-        delete newSelected[value];
-      } else {
-        newSelected[value] = "";
-      }
+    if (value in newSelected) {
+      delete newSelected[value];
+    } else {
+      newSelected[value] = "";
+    }
 
-      onChange?.(newSelected);
-      return newSelected;
-    });
+    onChange?.(newSelected);
   };
 
   const handleUrlChange = (platform: string, url: string) => {
-    setSelected((prev) => {
-      const updated = { ...prev, [platform]: url };
-      onChange?.(updated);
-      return updated;
-    });
+    const updated = { ...selected, [platform]: url };
+    onChange?.(updated);
   };
 
   return (
@@ -99,11 +96,27 @@ function SocialSelector({
 
 type RegistrationInputFieldProps = {
   field: FieldConfig;
+  register: UseFormRegister<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
+  watch: UseFormWatch<FieldValues>;
 };
 
 export default function RegistrationInputField({
   field,
+  register,
+  setValue,
+  watch,
 }: RegistrationInputFieldProps) {
+  useEffect(() => {
+    if (field.type === "select" || field.type === "social") {
+      register(field.name, { required: field.required });
+    }
+  }, [field.name, field.required, field.type, register]);
+
+  const selectValue = watch(field.name) as string | undefined;
+  const socialValue =
+    (watch(field.name) as Record<string, string> | undefined) ?? {};
+
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm font-medium">
@@ -112,7 +125,15 @@ export default function RegistrationInputField({
       </label>
 
       {field.type === "select" && field.options && (
-        <Select>
+        <Select
+          value={selectValue || undefined}
+          onValueChange={(value) =>
+            setValue(field.name, value, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }
+        >
           <SelectTrigger>
             <SelectValue placeholder={field.placeholder} />
           </SelectTrigger>
@@ -127,14 +148,22 @@ export default function RegistrationInputField({
       )}
 
       {field.type === "textarea" && (
-        <Textarea placeholder={field.placeholder} />
+        <Textarea
+          placeholder={field.placeholder}
+          {...register(field.name, { required: field.required })}
+        />
       )}
 
       {field.type === "social" && field.options && (
         <SocialSelector
           options={field.options}
-          multiple={field.multiple ?? true}
-          onChange={(value) => console.log("Selected social URLs:", value)}
+          value={socialValue}
+          onChange={(value) =>
+            setValue(field.name, value, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }
         />
       )}
 
@@ -150,6 +179,7 @@ export default function RegistrationInputField({
                   : "text"
           }
           placeholder={field.placeholder}
+          {...register(field.name, { required: field.required })}
         />
       )}
     </div>
