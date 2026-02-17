@@ -4,6 +4,7 @@ export type User = {
   id: string;
   email: string;
   name?: string;
+  completed?: boolean;
 };
 
 export type UserInput = {
