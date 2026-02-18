@@ -3,13 +3,17 @@
 import { useForm } from "react-hook-form";
 import Title from "@/components/shared/Title";
 import { Button } from "@/components/ui/button";
+import { useOnboardStep } from "@/hooks/useOnboardStep";
 import ShopSetup from "./ShopSetup";
 import ShopDetails from "./ShopDetails";
 import SocialFields from "./SocialFields";
 import React from "react";
 
-export default function MarketplaceRegistration() {
+export default function MarketplaceRegistration({}) {
   const [currentStep, setCurrentStep] = React.useState(0);
+  const [collectedData, setCollectedData] = React.useState<
+    Record<string, unknown>
+  >({});
 
   const forms = [
     useForm(), // Step 1
@@ -24,10 +28,26 @@ export default function MarketplaceRegistration() {
   ];
 
   const currentForm = forms[currentStep];
+  const { submitStep, submitting } = useOnboardStep({
+    pageType: "marketplace",
+  });
 
-  const onNext = currentForm.handleSubmit((data) => {
-    console.log(`STEP ${currentStep + 1} DATA:`, data);
-    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+  const onNext = currentForm.handleSubmit(async (data) => {
+    const mergedData = { ...collectedData, ...data };
+    const completed = currentStep === steps.length - 1;
+
+    setCollectedData(mergedData);
+
+    try {
+      const result = await submitStep(mergedData, { completed });
+      console.log("Response:", result);
+
+      if (!completed) {
+        setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+      }
+    } catch (error) {
+      console.error("Error submitting:", error);
+    }
   });
 
   const onPrevious = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
@@ -51,7 +71,7 @@ export default function MarketplaceRegistration() {
             Previous
           </Button>
 
-          <Button onClick={onNext}>
+          <Button onClick={onNext} disabled={submitting}>
             {currentStep === steps.length - 1 ? "Submit" : "Next"}
           </Button>
         </div>
