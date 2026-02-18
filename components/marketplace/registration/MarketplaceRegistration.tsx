@@ -5,6 +5,9 @@ import { shopDetailsFields, shopSetupFields, socialFields } from "./formFields";
 import RegistrationInputField from "./RegistrationInputField";
 import Title from "@/components/shared/Title";
 import { Button } from "@/components/ui/button";
+import ShopSetup from "./ShopSetup";
+import ShopDetails from "./ShopDetails";
+import SocialFields from "./SocialFields";
 
 type MarketplaceRegistrationValues = Record<
   string,
@@ -33,50 +36,9 @@ export default function MarketplaceRegistration() {
         <Title title="Marketplace Registration" />
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Shop Setup</h2>
-            <div className="grid gap-5">
-              {shopSetupFields.map((field) => (
-                <RegistrationInputField
-                  key={field.name}
-                  field={field}
-                  register={form.register}
-                  setValue={form.setValue}
-                  watch={form.watch}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Shop Details</h2>
-            <div className="grid gap-5">
-              {shopDetailsFields.map((field) => (
-                <RegistrationInputField
-                  key={field.name}
-                  field={field}
-                  register={form.register}
-                  setValue={form.setValue}
-                  watch={form.watch}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Social & Contact</h2>
-            <div className="grid gap-5">
-              {socialFields.map((field) => (
-                <RegistrationInputField
-                  key={field.name}
-                  field={field}
-                  register={form.register}
-                  setValue={form.setValue}
-                  watch={form.watch}
-                />
-              ))}
-            </div>
-          </div>
+          <ShopSetup form={form} />
+          <ShopDetails form={form} />
+          <SocialFields form={form} />
 
           <Button
             type="submit"
