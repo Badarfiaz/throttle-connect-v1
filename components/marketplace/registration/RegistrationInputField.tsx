@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectTrigger,
@@ -10,14 +10,16 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 import type { FieldConfig, Option } from "./formFields";
-import type {
-  FieldValues,
-  UseFormRegister,
-  UseFormSetValue,
-  UseFormWatch,
-} from "react-hook-form";
+import type { UseFormReturn } from "react-hook-form";
 
 type SocialSelectorProps = {
   options: Option[];
@@ -93,7 +95,73 @@ function SocialSelector({ options, value, onChange }: SocialSelectorProps) {
     </div>
   );
 }
-import { UseFormReturn } from "react-hook-form";
+
+type MultiSelectDropdownProps = {
+  options: Option[];
+  value?: string[];
+  onChange?: (value: string[]) => void;
+  placeholder?: string;
+};
+
+function MultiSelectDropdown({
+  options,
+  value,
+  onChange,
+  placeholder,
+}: MultiSelectDropdownProps) {
+  const selected = Array.isArray(value) ? value : [];
+  const selectedLabels = options
+    .filter((option) => selected.includes(option.value))
+    .map((option) => option.label);
+
+  const triggerLabel =
+    selectedLabels.length > 0 ? selectedLabels.join(", ") : placeholder;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="w-full justify-between font-normal"
+        >
+          <span
+            className={cn(
+              "truncate",
+              selectedLabels.length === 0 && "text-muted-foreground",
+            )}
+          >
+            {triggerLabel || "Select options"}
+          </span>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-[var(--radix-dropdown-menu-trigger-width)]"
+        sideOffset={6}
+      >
+        {options.map((option) => {
+          const isChecked = selected.includes(option.value);
+          return (
+            <DropdownMenuCheckboxItem
+              key={option.value}
+              checked={isChecked}
+              onCheckedChange={(checked) => {
+                const shouldAdd = checked === true;
+                const nextValues = shouldAdd
+                  ? Array.from(new Set([...selected, option.value]))
+                  : selected.filter((item) => item !== option.value);
+                onChange?.(nextValues);
+              }}
+              onSelect={(event) => event.preventDefault()}
+            >
+              {option.label}
+            </DropdownMenuCheckboxItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 type RegistrationInputFieldProps = {
   field: FieldConfig;
@@ -106,8 +174,16 @@ export default function RegistrationInputField({
 }: RegistrationInputFieldProps) {
   const { register, setValue, watch } = form;
 
-  const selectValue = watch(field.name);
-  const socialValue = watch(field.name) || {};
+  const watchedValue = watch(field.name);
+  const selectValue = Array.isArray(watchedValue)
+    ? undefined
+    : (watchedValue as string | undefined);
+  const multiSelectValue = Array.isArray(watchedValue)
+    ? watchedValue
+    : watchedValue
+      ? [watchedValue as string]
+      : [];
+  const socialValue = (watchedValue as Record<string, string> | undefined) ?? {};
 
   return (
     <div className="flex flex-col gap-2">
@@ -117,7 +193,7 @@ export default function RegistrationInputField({
       </label>
 
       {/* ===== SELECT FIELD ===== */}
-      {field.type === "select" && field.options && (
+      {field.type === "select" && field.options && !field.multiple && (
         <Select
           value={selectValue}
           onValueChange={(value) => {
@@ -136,6 +212,17 @@ export default function RegistrationInputField({
             ))}
           </SelectContent>
         </Select>
+      )}
+
+      {field.type === "select" && field.options && field.multiple && (
+        <MultiSelectDropdown
+          options={field.options}
+          value={multiSelectValue}
+          placeholder={field.placeholder}
+          onChange={(value) =>
+            setValue(field.name, value, { shouldValidate: true })
+          }
+        />
       )}
 
       {/* ===== TEXTAREA ===== */}

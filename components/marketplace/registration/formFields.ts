@@ -51,6 +51,7 @@ export const shopDetailsFields: FieldConfig[] = [
     placeholder: "Select business type",
     type: "select",
     required: true,
+    multiple: true,
     options: [
       { label: "Garage", value: "garage" },
       { label: "Workshop", value: "workshop" },
