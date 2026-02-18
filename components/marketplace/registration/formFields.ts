@@ -64,9 +64,13 @@ export const shopDetailsFields: FieldConfig[] = [
     placeholder: "Write a brief shop description",
     type: "textarea",
   },
-  { name: "province", label: "Province", placeholder: "Enter province" },
-  { name: "city", label: "City", placeholder: "Enter city" },
-  { name: "area", label: "Area", placeholder: "Enter area" },
+  {
+    name: "location.province",
+    label: "Province",
+    placeholder: "Enter province",
+  },
+  { name: "location.city", label: "City", placeholder: "Enter city" },
+  { name: "location.area", label: "Area", placeholder: "Enter area" },
 ];
 
 export const socialFields: FieldConfig[] = [
