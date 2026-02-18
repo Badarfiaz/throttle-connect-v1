@@ -3,25 +3,10 @@
 import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import type { FieldConfig, Option } from "./formFields";
-import type {
-  FieldValues,
-  UseFormRegister,
-  UseFormSetValue,
-  UseFormWatch,
-} from "react-hook-form";
-
-/* ============================= */
-/* SOCIAL SELECTOR COMPONENT     */
-/* ============================= */
+import type { FieldValues, UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from "react-hook-form";
 
 type SocialSelectorProps = {
   options: Option[];
@@ -34,13 +19,8 @@ function SocialSelector({ options, value, onChange }: SocialSelectorProps) {
 
   const handleSelect = (platform: string) => {
     const updated = { ...selected };
-
-    if (platform in updated) {
-      delete updated[platform];
-    } else {
-      updated[platform] = "";
-    }
-
+    if (platform in updated) delete updated[platform];
+    else updated[platform] = "";
     onChange?.(updated);
   };
 
@@ -51,37 +31,27 @@ function SocialSelector({ options, value, onChange }: SocialSelectorProps) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-3">
-        {options.map((option) => {
-          const isActive = option.value in selected;
-
-          return (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => handleSelect(option.value)}
-              className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium border transition-all",
-                isActive
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-muted text-muted-foreground border-border"
-              )}
-            >
-              {option.label}
-            </button>
-          );
-        })}
+        {options.map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => handleSelect(opt.value)}
+            className={cn(
+              "px-4 py-2 rounded-full text-sm font-medium border transition-all",
+              opt.value in selected ? "bg-primary text-primary-foreground border-primary" : "bg-muted text-muted-foreground border-border"
+            )}
+          >
+            {opt.label}
+          </button>
+        ))}
       </div>
 
       {Object.keys(selected).map((platform) => (
-        <div key={platform}>
-          <label className="text-sm font-medium mb-1">
-            {platform} URL
-          </label>
+        <div key={platform} className="flex flex-col">
+          <label className="text-sm font-medium mb-1">{platform} URL</label>
           <Input
             value={selected[platform]}
-            onChange={(e) =>
-              handleUrlChange(platform, e.target.value)
-            }
+            onChange={(e) => handleUrlChange(platform, e.target.value)}
             placeholder={`Enter ${platform} URL`}
           />
         </div>
@@ -90,168 +60,102 @@ function SocialSelector({ options, value, onChange }: SocialSelectorProps) {
   );
 }
 
-/* ============================= */
-/* MAIN COMPONENT                */
-/* ============================= */
-
 type Props = {
   field: FieldConfig;
   register: UseFormRegister<FieldValues>;
   setValue: UseFormSetValue<FieldValues>;
   watch: UseFormWatch<FieldValues>;
+  errors?: FieldErrors<FieldValues>;
 };
 
-export default function RegistrationInputField({
-  field,
-  register,
-  setValue,
-  watch,
-}: Props) {
-  /* ============================= */
-  /* REGISTER CUSTOM FIELD TYPES   */
-  /* ============================= */
-
+export default function RegistrationInputField({ field, register, setValue, watch, errors }: Props) {
   useEffect(() => {
     if (field.type === "multiselect") {
       register(field.name, {
-        required: field.required,
-        validate: (value) =>
-          !field.required ||
-          (Array.isArray(value) && value.length > 0),
+        required: field.required ? `${field.label} is required` : false,
+        validate: (value) => !field.required || (Array.isArray(value) && value.length > 0) || `${field.label} is required`,
       });
     }
-
     if (field.type === "social") {
-      register(field.name, { required: field.required });
+      register(field.name, {
+        required: field.required ? `${field.label} is required` : false,
+      });
     }
   }, [field.name, field.required, field.type, register]);
 
   const multiValue = (watch(field.name) as string[]) || [];
   const selectValue = watch(field.name) as string | undefined;
-  const socialValue =
-    (watch(field.name) as Record<string, string>) || {};
+  const socialValue = (watch(field.name) as Record<string, string>) || {};
+  const fieldError = errors?.[field.name];
 
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm font-medium">
         {field.label}
-        {field.required && (
-          <span className="text-red-500 ml-1">*</span>
-        )}
+        {field.required && <span className="text-red-500 ml-1">*</span>}
       </label>
 
-      {/* ============================= */}
-      {/* MULTI SELECT (Business Type)  */}
-      {/* ============================= */}
       {field.type === "multiselect" && field.options && (
         <div className="flex flex-wrap gap-2">
-          {field.options.map((option) => {
-            const isSelected = multiValue.includes(option.value);
-
+          {field.options.map((opt) => {
+            const isSelected = multiValue.includes(opt.value);
             const toggleOption = () => {
-              const updated = isSelected
-                ? multiValue.filter((v) => v !== option.value)
-                : [...multiValue, option.value];
-
-              setValue(field.name, updated, {
-                shouldDirty: true,
-                shouldValidate: true,
-              });
+              const updated = isSelected ? multiValue.filter((v) => v !== opt.value) : [...multiValue, opt.value];
+              setValue(field.name, updated, { shouldDirty: true, shouldValidate: true });
             };
-
             return (
               <button
-                key={option.value}
+                key={opt.value}
                 type="button"
                 onClick={toggleOption}
                 className={cn(
                   "px-4 py-2 rounded-full text-sm font-medium border transition-all",
-                  isSelected
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-muted text-muted-foreground border-border"
+                  isSelected ? "bg-primary text-primary-foreground border-primary" : "bg-muted text-muted-foreground border-border",
+                  fieldError && "border-red-500"
                 )}
               >
-                {option.label}
+                {opt.label}
               </button>
             );
           })}
         </div>
       )}
 
-      {/* ============================= */}
-      {/* NORMAL SELECT (Single)       */}
-      {/* ============================= */}
       {field.type === "select" && field.options && (
-        <Select
-          value={selectValue || undefined}
-          onValueChange={(value) =>
-            setValue(field.name, value, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          }
-        >
-          <SelectTrigger>
+        <Select value={selectValue || undefined} onValueChange={(v) => setValue(field.name, v, { shouldDirty: true, shouldValidate: true })}>
+          <SelectTrigger className={cn(fieldError && "border-red-500")}>
             <SelectValue placeholder={field.placeholder} />
           </SelectTrigger>
           <SelectContent>
-            {field.options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
+            {field.options.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
       )}
 
-      {/* ============================= */}
-      {/* TEXTAREA                     */}
-      {/* ============================= */}
-      {field.type === "textarea" && (
-        <Textarea
-          placeholder={field.placeholder}
-          {...register(field.name, {
-            required: field.required,
-          })}
-        />
-      )}
+      {field.type === "textarea" && <Textarea placeholder={field.placeholder} className={cn(fieldError && "border-red-500")} {...register(field.name, { required: field.required ? `${field.label} is required` : false })} />}
 
-      {/* ============================= */}
-      {/* SOCIAL SELECTOR              */}
-      {/* ============================= */}
       {field.type === "social" && field.options && (
-        <SocialSelector
-          options={field.options}
-          value={socialValue}
-          onChange={(value) =>
-            setValue(field.name, value, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          }
-        />
+        <div className={cn(fieldError && "border border-red-500 p-3 rounded-md")}>
+          <SocialSelector options={field.options} value={socialValue} onChange={(v) => setValue(field.name, v, { shouldDirty: true, shouldValidate: true })} />
+        </div>
       )}
 
-      {/* ============================= */}
-      {/* DEFAULT INPUT                */}
-      {/* ============================= */}
       {(field.type === "input" || !field.type) && (
         <Input
           type={
-            field.keyboardType === "email-address"
-              ? "email"
-              : field.keyboardType === "phone-pad"
-              ? "tel"
-              : field.keyboardType === "numeric"
-              ? "number"
-              : "text"
+            field.keyboardType === "email-address" ? "email" :
+            field.keyboardType === "phone-pad" ? "tel" :
+            field.keyboardType === "numeric" ? "number" : "text"
           }
           placeholder={field.placeholder}
-          {...register(field.name, {
-            required: field.required,
-          })}
+          className={cn(fieldError && "border-red-500")}
+          {...register(field.name, { required: field.required ? `${field.label} is required` : false })}
         />
       )}
+
+      {fieldError && <p className="text-sm text-red-500">{fieldError.message as string}</p>}
     </div>
   );
 }
