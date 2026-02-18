@@ -19,6 +19,10 @@ import type {
   UseFormWatch,
 } from "react-hook-form";
 
+/* ============================= */
+/* SOCIAL SELECTOR COMPONENT     */
+/* ============================= */
+
 type SocialSelectorProps = {
   options: Option[];
   value?: Record<string, string>;
@@ -28,41 +32,38 @@ type SocialSelectorProps = {
 function SocialSelector({ options, value, onChange }: SocialSelectorProps) {
   const selected = value ?? {};
 
-  const handleSelect = (value: string) => {
-    const newSelected = { ...selected };
+  const handleSelect = (platform: string) => {
+    const updated = { ...selected };
 
-    if (value in newSelected) {
-      delete newSelected[value];
+    if (platform in updated) {
+      delete updated[platform];
     } else {
-      newSelected[value] = "";
+      updated[platform] = "";
     }
 
-    onChange?.(newSelected);
+    onChange?.(updated);
   };
 
   const handleUrlChange = (platform: string, url: string) => {
-    const updated = { ...selected, [platform]: url };
-    onChange?.(updated);
+    onChange?.({ ...selected, [platform]: url });
   };
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-3">
         {options.map((option) => {
-          const isActive = Object.prototype.hasOwnProperty.call(
-            selected,
-            option.value,
-          );
+          const isActive = option.value in selected;
+
           return (
             <button
               key={option.value}
               type="button"
               onClick={() => handleSelect(option.value)}
               className={cn(
-                "px-4 py-2 rounded-full text-sm font-medium transition-all border",
+                "px-4 py-2 rounded-full text-sm font-medium border transition-all",
                 isActive
                   ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-muted text-muted-foreground border-border hover:bg-accent",
+                  : "bg-muted text-muted-foreground border-border"
               )}
             >
               {option.label}
@@ -74,27 +75,26 @@ function SocialSelector({ options, value, onChange }: SocialSelectorProps) {
       {Object.keys(selected).map((platform) => (
         <div key={platform}>
           <label className="text-sm font-medium mb-1">
-            {platform === "other" ? "Other URL" : `${platform} URL`}
+            {platform} URL
           </label>
           <Input
-            placeholder={`Enter ${platform === "other" ? "your URL" : platform + " URL"}`}
             value={selected[platform]}
-            onChange={(e) => handleUrlChange(platform, e.target.value)}
-            required
+            onChange={(e) =>
+              handleUrlChange(platform, e.target.value)
+            }
+            placeholder={`Enter ${platform} URL`}
           />
         </div>
       ))}
-
-      {Object.keys(selected).length === 0 && (
-        <p className="text-red-500 text-sm">
-          Please select at least one platform
-        </p>
-      )}
     </div>
   );
 }
 
-type RegistrationInputFieldProps = {
+/* ============================= */
+/* MAIN COMPONENT                */
+/* ============================= */
+
+type Props = {
   field: FieldConfig;
   register: UseFormRegister<FieldValues>;
   setValue: UseFormSetValue<FieldValues>;
@@ -106,24 +106,81 @@ export default function RegistrationInputField({
   register,
   setValue,
   watch,
-}: RegistrationInputFieldProps) {
+}: Props) {
+  /* ============================= */
+  /* REGISTER CUSTOM FIELD TYPES   */
+  /* ============================= */
+
   useEffect(() => {
-    if (field.type === "select" || field.type === "social") {
+    if (field.type === "multiselect") {
+      register(field.name, {
+        required: field.required,
+        validate: (value) =>
+          !field.required ||
+          (Array.isArray(value) && value.length > 0),
+      });
+    }
+
+    if (field.type === "social") {
       register(field.name, { required: field.required });
     }
   }, [field.name, field.required, field.type, register]);
 
+  const multiValue = (watch(field.name) as string[]) || [];
   const selectValue = watch(field.name) as string | undefined;
   const socialValue =
-    (watch(field.name) as Record<string, string> | undefined) ?? {};
+    (watch(field.name) as Record<string, string>) || {};
 
   return (
     <div className="flex flex-col gap-2">
       <label className="text-sm font-medium">
         {field.label}
-        {field.required && <span className="text-red-500 ml-1">*</span>}
+        {field.required && (
+          <span className="text-red-500 ml-1">*</span>
+        )}
       </label>
 
+      {/* ============================= */}
+      {/* MULTI SELECT (Business Type)  */}
+      {/* ============================= */}
+      {field.type === "multiselect" && field.options && (
+        <div className="flex flex-wrap gap-2">
+          {field.options.map((option) => {
+            const isSelected = multiValue.includes(option.value);
+
+            const toggleOption = () => {
+              const updated = isSelected
+                ? multiValue.filter((v) => v !== option.value)
+                : [...multiValue, option.value];
+
+              setValue(field.name, updated, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+            };
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={toggleOption}
+                className={cn(
+                  "px-4 py-2 rounded-full text-sm font-medium border transition-all",
+                  isSelected
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-muted text-muted-foreground border-border"
+                )}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ============================= */}
+      {/* NORMAL SELECT (Single)       */}
+      {/* ============================= */}
       {field.type === "select" && field.options && (
         <Select
           value={selectValue || undefined}
@@ -147,13 +204,21 @@ export default function RegistrationInputField({
         </Select>
       )}
 
+      {/* ============================= */}
+      {/* TEXTAREA                     */}
+      {/* ============================= */}
       {field.type === "textarea" && (
         <Textarea
           placeholder={field.placeholder}
-          {...register(field.name, { required: field.required })}
+          {...register(field.name, {
+            required: field.required,
+          })}
         />
       )}
 
+      {/* ============================= */}
+      {/* SOCIAL SELECTOR              */}
+      {/* ============================= */}
       {field.type === "social" && field.options && (
         <SocialSelector
           options={field.options}
@@ -167,19 +232,24 @@ export default function RegistrationInputField({
         />
       )}
 
+      {/* ============================= */}
+      {/* DEFAULT INPUT                */}
+      {/* ============================= */}
       {(field.type === "input" || !field.type) && (
         <Input
           type={
             field.keyboardType === "email-address"
               ? "email"
               : field.keyboardType === "phone-pad"
-                ? "tel"
-                : field.keyboardType === "numeric"
-                  ? "number"
-                  : "text"
+              ? "tel"
+              : field.keyboardType === "numeric"
+              ? "number"
+              : "text"
           }
           placeholder={field.placeholder}
-          {...register(field.name, { required: field.required })}
+          {...register(field.name, {
+            required: field.required,
+          })}
         />
       )}
     </div>

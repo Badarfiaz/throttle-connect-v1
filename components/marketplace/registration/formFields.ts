@@ -1,5 +1,3 @@
-import { steps } from "framer-motion";
-
 export type Option = {
   label: string;
   value: string;
@@ -10,7 +8,7 @@ export type FieldConfig = {
   label: string;
   placeholder?: string;
   required?: boolean;
-  type?: "input" | "textarea" | "select" | "social";
+  type?: "input" | "textarea" | "select" | "multiselect" | "social";
   keyboardType?: "default" | "phone-pad" | "numeric" | "email-address";
   options?: Option[];
   multiple?: boolean;
@@ -18,7 +16,7 @@ export type FieldConfig = {
 
 export const shopSetupFields: FieldConfig[] = [
   {
-    name: "title",
+    name: "storeTitle", // ✅ renamed
     label: "Shop Name",
     placeholder: "Enter your shop title",
     required: true,
@@ -49,7 +47,7 @@ export const shopDetailsFields: FieldConfig[] = [
     name: "businessType",
     label: "Business Type",
     placeholder: "Select business type",
-    type: "select",
+    type: "multiselect", // ✅ changed to multiselect
     required: true,
     options: [
       { label: "Garage", value: "garage" },
@@ -63,16 +61,30 @@ export const shopDetailsFields: FieldConfig[] = [
     placeholder: "Write a brief shop description",
     type: "textarea",
   },
-  { name: "province", label: "Province", placeholder: "Enter province" },
-  { name: "city", label: "City", placeholder: "Enter city" },
-  { name: "area", label: "Area", placeholder: "Enter area" },
+
+  // ✅ nested location object
+  {
+    name: "location.province",
+    label: "Province",
+    placeholder: "Enter province",
+  },
+  {
+    name: "location.city",
+    label: "City",
+    placeholder: "Enter city",
+  },
+  {
+    name: "location.area",
+    label: "Area",
+    placeholder: "Enter area",
+  },
 ];
 
 export const socialFields: FieldConfig[] = [
   {
     name: "contactMethod",
     label: "Preferred Contact Method",
-    type: "select",
+    type: "select", // single select
     placeholder: "Select contact method",
     required: true,
     options: [
@@ -84,7 +96,7 @@ export const socialFields: FieldConfig[] = [
   {
     name: "socialPlatforms",
     label: "Select Social Platforms",
-    type: "social",
+    type: "social", // multi object selector
     multiple: true,
     options: [
       { label: "Website", value: "website" },
