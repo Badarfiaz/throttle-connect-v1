@@ -1,7 +1,10 @@
 import React from "react";
 import { shopDetailsFields } from "./formFields";
 import RegistrationInputField from "./RegistrationInputField";
-function ShopDetails() {
+type ShopDetailsProps = {
+  form: any; // You can replace 'any' with the specific type from react-hook-form if needed
+};
+function ShopDetails({ form }: ShopDetailsProps) {
   const handleSubmit = () => {
     // Handle form submission logic here
   };
@@ -10,7 +13,7 @@ function ShopDetails() {
       <h2 className="text-lg font-semibold mb-4">Shop Details</h2>
       <div className="grid gap-5">
         {shopDetailsFields.map((field) => (
-          <RegistrationInputField key={field.name} field={field} />
+          <RegistrationInputField key={field.name} field={field} form={form} />
         ))}
       </div>
     </div>

@@ -93,18 +93,21 @@ function SocialSelector({ options, value, onChange }: SocialSelectorProps) {
     </div>
   );
 }
+import { UseFormReturn } from "react-hook-form";
 
 type RegistrationInputFieldProps = {
   field: FieldConfig;
+  form: UseFormReturn<any>; // ⬅ IMPORTANT: receive form instance
 };
-
-import { useState } from "react";
 
 export default function RegistrationInputField({
   field,
+  form,
 }: RegistrationInputFieldProps) {
-  const [selectValue, setSelectValue] = useState<string>("");
-  const [socialValue, setSocialValue] = useState<Record<string, string>>({});
+  const { register, setValue, watch } = form;
+
+  const selectValue = watch(field.name);
+  const socialValue = watch(field.name) || {};
 
   return (
     <div className="flex flex-col gap-2">
@@ -113,16 +116,18 @@ export default function RegistrationInputField({
         {field.required && <span className="text-red-500 ml-1">*</span>}
       </label>
 
+      {/* ===== SELECT FIELD ===== */}
       {field.type === "select" && field.options && (
         <Select
-          value={selectValue || undefined}
+          value={selectValue}
           onValueChange={(value) => {
-            setSelectValue(value);
+            setValue(field.name, value, { shouldValidate: true });
           }}
         >
           <SelectTrigger>
             <SelectValue placeholder={field.placeholder} />
           </SelectTrigger>
+
           <SelectContent>
             {field.options.map((option) => (
               <SelectItem key={option.value} value={option.value}>
@@ -133,18 +138,26 @@ export default function RegistrationInputField({
         </Select>
       )}
 
+      {/* ===== TEXTAREA ===== */}
       {field.type === "textarea" && (
-        <Textarea placeholder={field.placeholder} />
+        <Textarea
+          placeholder={field.placeholder}
+          {...register(field.name, { required: field.required })}
+        />
       )}
 
+      {/* ===== SOCIAL SELECTOR ===== */}
       {field.type === "social" && field.options && (
         <SocialSelector
           options={field.options}
           value={socialValue}
-          onChange={setSocialValue}
+          onChange={(value) =>
+            setValue(field.name, value, { shouldValidate: true })
+          }
         />
       )}
 
+      {/* ===== INPUT FIELD ===== */}
       {(field.type === "input" || !field.type) && (
         <Input
           type={
@@ -157,6 +170,7 @@ export default function RegistrationInputField({
                   : "text"
           }
           placeholder={field.placeholder}
+          {...register(field.name, { required: field.required })}
         />
       )}
     </div>

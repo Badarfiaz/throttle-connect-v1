@@ -1,20 +1,18 @@
 import React from "react";
-import { shopSetupFields } from "./formFields";
 import RegistrationInputField from "./RegistrationInputField";
-
-function ShopSetup() {
-  const handleSubmit = () => {
-    // Handle form submission logic here
-  };
+import { shopSetupFields } from "./formFields";
+type ShopSetupProps = {
+  form: any; // You can replace 'any' with the specific type from react-hook-form if needed
+};
+function ShopSetup({ form }: ShopSetupProps) {
   return (
-    <div>
+    <form className="grid gap-5">
       <h2 className="text-lg font-semibold mb-4">Shop Setup</h2>
-      <div className="grid gap-5">
-        {shopSetupFields.map((field) => (
-          <RegistrationInputField key={field.name} field={field} />
-        ))}
-      </div>
-    </div>
+
+      {shopSetupFields.map((field) => (
+        <RegistrationInputField key={field.name} field={field} form={form} />
+      ))}
+    </form>
   );
 }
 
