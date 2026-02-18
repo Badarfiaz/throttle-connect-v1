@@ -2,11 +2,11 @@
 
 import { useForm } from "react-hook-form";
 import Title from "@/components/shared/Title";
-import { Button } from "@/components/ui/button";
 import { useOnboardStep } from "@/hooks/useOnboardStep";
 import ShopSetup from "./ShopSetup";
 import ShopDetails from "./ShopDetails";
 import SocialFields from "./SocialFields";
+import StepNavigationButtons from "./StepNavigationButtons";
 import React from "react";
 
 export default function MarketplaceRegistration({}) {
@@ -62,19 +62,13 @@ export default function MarketplaceRegistration({}) {
         {currentStep === 1 && <ShopDetails form={currentForm} />}
         {currentStep === 2 && <SocialFields form={currentForm} />}
 
-        <div className="flex justify-end mt-6 gap-4">
-          <Button
-            variant="outline"
-            onClick={onPrevious}
-            disabled={currentStep === 0}
-          >
-            Previous
-          </Button>
-
-          <Button onClick={onNext} disabled={submitting}>
-            {currentStep === steps.length - 1 ? "Submit" : "Next"}
-          </Button>
-        </div>
+        <StepNavigationButtons
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onPrevious={onPrevious}
+          onNext={onNext}
+          submitting={submitting}
+        />
       </div>
     </div>
   );
