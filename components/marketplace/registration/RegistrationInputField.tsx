@@ -96,9 +96,9 @@ function SocialSelector({ options, value, onChange }: SocialSelectorProps) {
 
 type RegistrationInputFieldProps = {
   field: FieldConfig;
-  register: UseFormRegister<FieldValues>;
-  setValue: UseFormSetValue<FieldValues>;
-  watch: UseFormWatch<FieldValues>;
+  register?: UseFormRegister<FieldValues>;
+  setValue?: UseFormSetValue<FieldValues>;
+  watch?: UseFormWatch<FieldValues>;
 };
 
 export default function RegistrationInputField({
@@ -109,13 +109,15 @@ export default function RegistrationInputField({
 }: RegistrationInputFieldProps) {
   useEffect(() => {
     if (field.type === "select" || field.type === "social") {
-      register(field.name, { required: field.required });
+      if (register) {
+        register(field.name, { required: field.required });
+      }
     }
   }, [field.name, field.required, field.type, register]);
 
-  const selectValue = watch(field.name) as string | undefined;
+  const selectValue = watch ? (watch(field.name) as string | undefined) : undefined;
   const socialValue =
-    (watch(field.name) as Record<string, string> | undefined) ?? {};
+    watch ? ((watch(field.name) as Record<string, string> | undefined) ?? {}) : {};
 
   return (
     <div className="flex flex-col gap-2">
@@ -127,12 +129,14 @@ export default function RegistrationInputField({
       {field.type === "select" && field.options && (
         <Select
           value={selectValue || undefined}
-          onValueChange={(value) =>
-            setValue(field.name, value, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          }
+          onValueChange={(value) => {
+            if (setValue) {
+              setValue(field.name, value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+            }
+          }}
         >
           <SelectTrigger>
             <SelectValue placeholder={field.placeholder} />
@@ -150,7 +154,7 @@ export default function RegistrationInputField({
       {field.type === "textarea" && (
         <Textarea
           placeholder={field.placeholder}
-          {...register(field.name, { required: field.required })}
+          {...(register ? register(field.name, { required: field.required }) : {})}
         />
       )}
 
@@ -158,12 +162,14 @@ export default function RegistrationInputField({
         <SocialSelector
           options={field.options}
           value={socialValue}
-          onChange={(value) =>
-            setValue(field.name, value, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          }
+          onChange={(value) => {
+            if (setValue) {
+              setValue(field.name, value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+            }
+          }}
         />
       )}
 
@@ -179,7 +185,7 @@ export default function RegistrationInputField({
                   : "text"
           }
           placeholder={field.placeholder}
-          {...register(field.name, { required: field.required })}
+          {...(register ? register(field.name, { required: field.required }) : {})}
         />
       )}
     </div>

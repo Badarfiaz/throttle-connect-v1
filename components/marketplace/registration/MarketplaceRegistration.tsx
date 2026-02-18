@@ -2,51 +2,46 @@
 
 import { useForm } from "react-hook-form";
 import { shopDetailsFields, shopSetupFields, socialFields } from "./formFields";
-import RegistrationInputField from "./RegistrationInputField";
 import Title from "@/components/shared/Title";
 import { Button } from "@/components/ui/button";
 import ShopSetup from "./ShopSetup";
 import ShopDetails from "./ShopDetails";
 import SocialFields from "./SocialFields";
-
-type MarketplaceRegistrationValues = Record<
-  string,
-  string | Record<string, string>
->;
+import React from "react";
 
 export default function MarketplaceRegistration() {
-  const allFields = [...shopSetupFields, ...shopDetailsFields, ...socialFields];
-  const defaultValues = allFields.reduce<MarketplaceRegistrationValues>(
-    (acc, field) => {
-      acc[field.name] = field.type === "social" ? {} : "";
-      return acc;
-    },
-    {},
-  );
+  const [currentStep, setCurrentStep] = React.useState(0);
 
-  const form = useForm<MarketplaceRegistrationValues>({ defaultValues });
-
-  const onSubmit = (values: MarketplaceRegistrationValues) => {
-    console.log("Marketplace registration submitted:", values);
-  };
+  const steps = [
+    { name: "Shop Setup", key: 1 },
+    { name: "Shop Details", key: 2 },
+    { name: "Social & Contact", key: 3 },
+  ];
 
   return (
     <div className="min-h-screen bg-background flex justify-center py-10 px-4">
       <div className="w-full max-w-3xl bg-card shadow-xl rounded-2xl p-8">
         <Title title="Marketplace Registration" />
-
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
-          <ShopSetup form={form} />
-          <ShopDetails form={form} />
-          <SocialFields form={form} />
-
+        {currentStep === 0 && <ShopSetup />}
+        {currentStep === 1 && <ShopDetails />}
+        {currentStep === 2 && <SocialFields />}
+        <div className="flex justify-end mt-6 gap-4">
           <Button
-            type="submit"
-            className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition"
+            variant="outline"
+            onClick={() => setCurrentStep((prev) => Math.max(prev - 1, 0))}
+            disabled={currentStep === 0}
           >
-            Register Marketplace
+            Previous
           </Button>
-        </form>
+          <Button
+            onClick={() =>
+              setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
+            }
+            disabled={currentStep === steps.length - 1}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
