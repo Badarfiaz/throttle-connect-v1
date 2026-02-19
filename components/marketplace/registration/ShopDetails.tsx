@@ -7,7 +7,6 @@ type ShopDetailsProps = {
 function ShopDetails({ form }: ShopDetailsProps) {
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4">Shop Details</h2>
       <div className="grid gap-5">
         {shopDetailsFields.map((field) => (
           <RegistrationInputField key={field.name} field={field} form={form} />

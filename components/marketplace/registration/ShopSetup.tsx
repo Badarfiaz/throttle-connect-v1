@@ -7,8 +7,6 @@ type ShopSetupProps = {
 function ShopSetup({ form }: ShopSetupProps) {
   return (
     <form className="grid gap-5">
-      <h2 className="text-lg font-semibold mb-4">Shop Setup</h2>
-
       {shopSetupFields.map((field) => (
         <RegistrationInputField key={field.name} field={field} form={form} />
       ))}

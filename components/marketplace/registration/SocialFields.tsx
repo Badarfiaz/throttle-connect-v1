@@ -7,7 +7,6 @@ type SocialFieldsProps = {
 function SocialFields({ form }: SocialFieldsProps) {
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-4">Social & Contact</h2>
       <div className="grid gap-5">
         {socialFields.map((field) => (
           <RegistrationInputField key={field.name} field={field} form={form} />
