@@ -43,9 +43,22 @@ const LoginModal: FC<LoginModalProps> = ({
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const form = e.target as HTMLFormElement;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+    const confirmPassword = (form.elements.namedItem("confirmPassword") as HTMLInputElement)?.value;
+
+    // PASSWORD MATCH VALIDATION
+    if (mode === "signup" && password !== confirmPassword) {
+      setAlertMessage("Passwords do not match!");
+      setAlertType("error");
+      setAlertOpen(true);
+      return; // stop form submission
+    }
+
     try {
-      await handleSubmit(e); // original logic
-      setAlertMessage("Logged in / Account created successfully!");
+      await handleSubmit(e); // original login/signup logic
+      setAlertMessage(mode === "login" ? "Logged in successfully!" : "Account created successfully!");
       setAlertType("success");
       setAlertOpen(true);
     } catch (err) {
@@ -90,7 +103,7 @@ const LoginModal: FC<LoginModalProps> = ({
             <TabsContent value={mode}>
               <form onSubmit={onSubmit} className="space-y-4">
                 {mode === "signup" && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <InputGroup label="Full Name *" id="name" type="text" />
                     <div className="flex flex-col space-y-2">
                       <Label htmlFor="phone">Phone Number *</Label>
@@ -112,22 +125,15 @@ const LoginModal: FC<LoginModalProps> = ({
 
                 <InputGroup label="Email *" id="email" type="email" />
                 <InputGroup label="Password *" id="password" type="password" />
-                {mode === "signup" && (
-                  <InputGroup label="Confirm Password *" id="confirmPassword" type="password" />
-                )}
+                {mode === "signup" && <InputGroup label="Confirm Password *" id="confirmPassword" type="password" />}
 
                 {mode === "signup" && (
                   <div className="flex items-start space-x-2 text-sm">
                     <input type="checkbox" required />
                     <p>
                       I agree to the{" "}
-                      <span className="text-blue-600 underline cursor-pointer">
-                        Terms & Conditions
-                      </span>{" "}
-                      and{" "}
-                      <span className="text-blue-600 underline cursor-pointer">
-                        Privacy Policy
-                      </span>.
+                      <span className="text-blue-600 underline cursor-pointer">Terms & Conditions</span> and{" "}
+                      <span className="text-blue-600 underline cursor-pointer">Privacy Policy</span>.
                     </p>
                   </div>
                 )}
