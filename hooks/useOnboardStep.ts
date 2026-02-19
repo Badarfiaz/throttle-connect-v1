@@ -12,7 +12,12 @@ type UseOnboardStepOptions = {
   pageType: OnboardPageType;
 };
 
+export const allowedTypes: OnboardPageType[] = ["marketplace", "networking"];
 export const useOnboardStep = ({ pageType }: UseOnboardStepOptions) => {
+  if (!allowedTypes.includes(pageType)) {
+    throw new Error("Invalid onBoardType");
+  }
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,7 +39,7 @@ export const useOnboardStep = ({ pageType }: UseOnboardStepOptions) => {
           pageType,
           onBoardType: pageType,
         };
-
+        console.log("payload", payload);
         const res = await fetch(ONBOARD_URL, {
           method: "POST",
           headers: {

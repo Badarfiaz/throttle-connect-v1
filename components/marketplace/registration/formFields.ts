@@ -67,10 +67,21 @@ export const shopDetailsFields: FieldConfig[] = [
   {
     name: "location.province",
     label: "Province",
+    required: true,
     placeholder: "Enter province",
   },
-  { name: "location.city", label: "City", placeholder: "Enter city" },
-  { name: "location.area", label: "Area", placeholder: "Enter area" },
+  {
+    name: "location.city",
+    label: "City",
+    required: true,
+    placeholder: "Enter city",
+  },
+  {
+    name: "location.area",
+    label: "Area",
+    required: true,
+    placeholder: "Enter area",
+  },
 ];
 
 export const socialFields: FieldConfig[] = [
