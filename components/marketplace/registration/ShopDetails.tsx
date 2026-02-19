@@ -5,9 +5,6 @@ type ShopDetailsProps = {
   form: any; // You can replace 'any' with the specific type from react-hook-form if needed
 };
 function ShopDetails({ form }: ShopDetailsProps) {
-  const handleSubmit = () => {
-    // Handle form submission logic here
-  };
   return (
     <div>
       <h2 className="text-lg font-semibold mb-4">Shop Details</h2>
