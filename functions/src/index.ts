@@ -1,9 +1,12 @@
-import { onRequest } from "firebase-functions/https";
+import { onRequest } from "firebase-functions/v2/https";
 import { withCors } from "../utils/withcors";
-// Make sure the path is correct and the file exists; adjust if needed:
+
 import { admin, verifyToken } from "../lib/firebase";
 const db = admin.firestore();
 const currentDate = new Date();
+type OnboardPageType = "marketplace" | "networking";
+
+const allowedTypes: OnboardPageType[] = ["marketplace", "networking"];
 
 export const onboard = onRequest(
   withCors(async (req, res) => {
@@ -16,25 +19,28 @@ export const onboard = onRequest(
         res.status(405).json({ success: false, message: "Method Not Allowed" });
         return;
       }
-
       const { onBoardType } = req.body;
-      if (onBoardType === "marketplace") {
-        const dataToSave = {
-          ...req.body,
-          ownerUid: uid, // currect user's UID as owner
-          createdAt: currentDate,
-        };
 
-        await db.collection("marketplaceStores").doc(uid).set(dataToSave); // Using UID as document ID for easy retrieval but incorrect
-
-        res.status(201).json({
-          success: true,
-          message: "Marketplace store onboarded successfully.",
-        });
-        return;
+      if (!allowedTypes.includes(onBoardType)) {
+        throw new Error(
+          "Invalid onBoardType. Allowed: marketplace, networking",
+        );
       }
+      const dataToSave = {
+        ...req.body,
+        ownerUid: uid, // currect user's UID as owner
+        createdAt: currentDate,
+      };
+      const COLLECTION_NAME =
+        onBoardType === "marketplace" ? "marketplaceStores" : "builderProfiles";
 
-      res.status(400).json({ success: false, message: "Invalid onBoardType" });
+      await db.collection(COLLECTION_NAME).doc(uid).set(dataToSave);
+
+      res.status(201).json({
+        success: true,
+        message: "Marketplace store onboarded successfully.",
+      });
+      return;
     } catch (error) {
       console.error("Error in onboarding function:", error);
       res
