@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import AnimatedStep from "../../shared/registration/AnimatedStep";
@@ -57,10 +57,27 @@ export default function MarketplaceRegistration({}) {
   const [collectedData, setCollectedData] = useState<Record<string, unknown>>(
     marketplaceStore || {},
   );
+  const marketplaceData = useAppSelector((state) => state.marketplace.store);
+  console.log("marketplace data", marketplaceData);
 
   // One form instance per step to manage validation independently
-  const forms = [useForm(), useForm(), useForm()];
+  // Initialize forms with default values from Redux store
+  const forms = [
+    useForm({ defaultValues: marketplaceStore || {} }),
+    useForm({ defaultValues: marketplaceStore || {} }),
+    useForm({ defaultValues: marketplaceStore || {} }),
+  ];
   const currentForm = forms[currentStep];
+
+  // Update form values when marketplaceStore changes or when step changes
+  useEffect(() => {
+    if (marketplaceStore && !marketplaceStore.completed) {
+      // Reset all forms with the store data if registration is not completed
+      forms.forEach((form) => {
+        form.reset(marketplaceStore);
+      });
+    }
+  }, [marketplaceStore]);
 
   const { submitStep, submitting } = useOnboardStep({
     pageType: "marketplace",
@@ -103,6 +120,7 @@ export default function MarketplaceRegistration({}) {
     setDirection(-1);
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
+
   return (
     <div className={RegistrationContainerStyles}>
       <div className={RegistrationCardStyles}>
