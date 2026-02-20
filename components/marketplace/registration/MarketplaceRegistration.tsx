@@ -2,8 +2,20 @@
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import AnimatedStep from "../../shared/registration/AnimatedStep";
 import { useOnboardStep } from "@/hooks/useOnboardStep";
+import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
+import { setMarketplace } from "@/app/redux/features/marketplaceSlice";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import ShopSetup from "./ShopSetup";
 import ShopDetails from "./ShopDetails";
 import SocialFields from "./SocialFields";
@@ -35,10 +47,15 @@ const steps = [
 ];
 
 export default function MarketplaceRegistration({}) {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const marketplaceStore = useAppSelector((state) => state.marketplace.store);
+
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(0); // For slide animation direction
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [collectedData, setCollectedData] = useState<Record<string, unknown>>(
-    {},
+    marketplaceStore || {},
   );
 
   // One form instance per step to manage validation independently
@@ -55,6 +72,14 @@ export default function MarketplaceRegistration({}) {
 
     setCollectedData(mergedData);
 
+    // Dispatch to marketplace slice on every step
+    dispatch(
+      setMarketplace({
+        ...mergedData,
+        completed: isLastStep,
+      }),
+    );
+
     try {
       if (isLastStep) {
         console.log("Final Submission:", mergedData);
@@ -65,6 +90,9 @@ export default function MarketplaceRegistration({}) {
       if (!isLastStep) {
         setDirection(1);
         setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+      } else {
+        // Registration completed, show success modal
+        setIsSuccessOpen(true);
       }
     } catch (error) {
       console.error("Error submitting step:", error);
@@ -105,6 +133,32 @@ export default function MarketplaceRegistration({}) {
           />
         </div>
       </div>
+
+      <Dialog open={isSuccessOpen} onOpenChange={setIsSuccessOpen}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Registration Complete</DialogTitle>
+            <DialogDescription>
+              Your marketplace registration has been submitted successfully.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              className="w-full sm:w-auto"
+              onClick={() => router.push("/marketplace")}
+            >
+              Go to Marketplace
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full sm:w-auto"
+              onClick={() => setIsSuccessOpen(false)}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

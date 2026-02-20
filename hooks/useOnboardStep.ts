@@ -1,6 +1,9 @@
 import { useCallback, useState } from "react";
 import { ONBOARD_URL } from "@/lib/config";
 import getFirebaseToken from "@/ulity/getFirebaseToken";
+import { useAppDispatch } from "@/app/redux/hooks";
+import { updateUserOnboarding } from "@/app/redux/features/authSlice";
+import { setMarketplace } from "@/app/redux/features/marketplaceSlice";
 
 type OnboardPageType = "marketplace" | "networking";
 
@@ -18,6 +21,7 @@ export const useOnboardStep = ({ pageType }: UseOnboardStepOptions) => {
     throw new Error("Invalid onBoardType");
   }
 
+  const dispatch = useAppDispatch();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,6 +44,21 @@ export const useOnboardStep = ({ pageType }: UseOnboardStepOptions) => {
           onBoardType: pageType,
         };
         console.log("payload", payload);
+
+        // Dispatch to global state immediately (optimistic update)
+        if (pageType === "marketplace") {
+          dispatch(setMarketplace(payload));
+        }
+
+        // Update user onboarding state
+        dispatch(
+          updateUserOnboarding({
+            pageType,
+            data: data,
+            completed: options.completed,
+          }),
+        );
+
         const res = await fetch(ONBOARD_URL, {
           method: "POST",
           headers: {
@@ -68,7 +87,7 @@ export const useOnboardStep = ({ pageType }: UseOnboardStepOptions) => {
         setSubmitting(false);
       }
     },
-    [pageType],
+    [pageType, dispatch],
   );
 
   return { submitStep, submitting, error };

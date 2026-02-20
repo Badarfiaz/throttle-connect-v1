@@ -61,10 +61,16 @@ const HeaderPrimary: FC = () => {
 
   // 🔹 NEW: Auto-open registration page for new users
   useEffect(() => {
-  if (isAuthed && user && !user.completed) {
-    router.replace("/registration");
-  }
-}, [isAuthed, user]);
+    const isMarketplaceComplete = !!user?.marketplace?.completed;
+    const isOnRegistrationFlow =
+      pathname === "/registration" ||
+      pathname?.startsWith("/marketplace/registration") ||
+      pathname?.startsWith("/networking/registration");
+
+    if (isAuthed && user && !isMarketplaceComplete && !isOnRegistrationFlow) {
+      router.replace("/registration");
+    }
+  }, [isAuthed, user, router, pathname]);
 
   return (
     <header className="sticky top-0 z-50 w-full bg-[#f8fcff]/80 backdrop-blur-md shadow-sm">

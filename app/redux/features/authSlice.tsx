@@ -5,6 +5,14 @@ export type User = {
   email: string;
   name?: string;
   completed?: boolean;
+  marketplace?: {
+    completed: boolean;
+    [key: string]: any;
+  };
+  networking?: {
+    completed: boolean;
+    [key: string]: any;
+  };
 };
 
 export type UserInput = {
@@ -46,10 +54,27 @@ const authSlice = createSlice({
       state.isAuthenticated = !!action.payload;
       state.isLoading = false;
     },
+    updateUserOnboarding: (
+      state,
+      action: PayloadAction<{
+        pageType: "marketplace" | "networking";
+        data: any;
+        completed: boolean;
+      }>,
+    ) => {
+      if (state.user) {
+        const { pageType, data, completed } = action.payload;
+        state.user[pageType] = {
+          ...data,
+          completed,
+        };
+      }
+    },
   },
 });
 
 // ================== Exports ==================
-export const { logout, clearError, setUser } = authSlice.actions;
+export const { logout, clearError, setUser, updateUserOnboarding } =
+  authSlice.actions;
 
 export default authSlice.reducer;

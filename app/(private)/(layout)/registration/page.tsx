@@ -1,17 +1,26 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import OnboardingCard from '@/components/shared/OnboardingCard';
+import React, { use } from "react";
+import Link from "next/link";
+import OnboardingCard from "@/components/shared/OnboardingCard";
+import { useAppSelector } from "@/app/redux/hooks";
 
 export default function RegistrationPage() {
+  const auth = useAppSelector((state) => state.auth);
+  const marketplaceStoreCompleted = useAppSelector(
+    (state) => state.marketplace.store?.completed,
+  );
+  const userMarketplaceCompleted = auth?.user?.marketplace?.completed;
+
+  console.log("marketplaceData from store:", marketplaceStoreCompleted);
+  console.log("marketplaceData from user:", userMarketplaceCompleted);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white px-6 py-20">
-
       {/* Heading */}
       <section className="text-center max-w-3xl mx-auto mb-16">
         <h1 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4">
-          Get Started with{' '}
+          Get Started with{" "}
           <span className="text-primary">Throttle Connect</span>
         </h1>
         <p className="text-lg text-muted-foreground">
@@ -32,10 +41,10 @@ export default function RegistrationPage() {
           title="Register as Marketplace Vendor"
           description="Sell automotive parts, accessories, and tools to verified buyers across Pakistan."
           benefits={[
-            'List your products',
-            'Manage orders easily',
-            'Increase brand visibility',
-            'Connect with verified buyers',
+            "List your products",
+            "Manage orders easily",
+            "Increase brand visibility",
+            "Connect with verified buyers",
           ]}
           buttonText="Register as Vendor"
           link="/marketplace/registration"
@@ -46,10 +55,10 @@ export default function RegistrationPage() {
           title="Join Automotive Networking"
           description="Connect with car & bike enthusiasts, clubs, events, and mechanics."
           benefits={[
-            'Join or create clubs',
-            'Participate in events',
-            'Post discussions & updates',
-            'Connect with mechanics',
+            "Join or create clubs",
+            "Participate in events",
+            "Post discussions & updates",
+            "Connect with mechanics",
           ]}
           buttonText="Join Networking"
           link="/networking/registration"
@@ -58,9 +67,7 @@ export default function RegistrationPage() {
 
       {/* Continue as Guest */}
       <div className="text-center mt-20">
-        <p className="text-sm text-muted-foreground mb-2">
-          Just exploring?
-        </p>
+        <p className="text-sm text-muted-foreground mb-2">Just exploring?</p>
         <Link
           href="/"
           className="
@@ -72,7 +79,6 @@ export default function RegistrationPage() {
           Continue as Guest →
         </Link>
       </div>
-
     </div>
   );
 }
