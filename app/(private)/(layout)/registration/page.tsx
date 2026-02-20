@@ -1,19 +1,28 @@
 "use client";
 
-import React, { use } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import OnboardingCard from "@/components/shared/OnboardingCard";
 import { useAppSelector } from "@/app/redux/hooks";
 
+import { AlertDialogShared } from "@/components/shared/AlertDialogShared";
+
 export default function RegistrationPage() {
-  const auth = useAppSelector((state) => state.auth);
   const marketplaceStoreCompleted = useAppSelector(
     (state) => state.marketplace.store?.completed,
   );
-  const userMarketplaceCompleted = auth?.user?.marketplace?.completed;
+  const [isMarketplaceCompletedOpen, setIsMarketplaceCompletedOpen] =
+    useState(false);
 
-  console.log("marketplaceData from store:", marketplaceStoreCompleted);
-  console.log("marketplaceData from user:", userMarketplaceCompleted);
+  const isMarketplaceCompleted = Boolean(marketplaceStoreCompleted);
+  console.log("Marketplace completed status:", isMarketplaceCompleted);
+  const handleMarketplaceClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
+    if (!isMarketplaceCompleted) return;
+    event.preventDefault();
+    setIsMarketplaceCompletedOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white px-6 py-20">
@@ -48,6 +57,7 @@ export default function RegistrationPage() {
           ]}
           buttonText="Register as Vendor"
           link="/marketplace/registration"
+          onButtonClick={handleMarketplaceClick}
         />
 
         <OnboardingCard
@@ -79,6 +89,14 @@ export default function RegistrationPage() {
           Continue as Guest →
         </Link>
       </div>
+      <AlertDialogShared
+        isOpen={isMarketplaceCompletedOpen}
+        onOpenChange={setIsMarketplaceCompletedOpen}
+        dialogTitle="Already registured as marketplace vendor"
+        dialogDescription="You have already completed the marketplace vendor registration. Please proceed to the marketplace to manage your store or explore other features."
+        routeLink="/marketplace"
+        btnLabel="Go to marketplace"
+      />
     </div>
   );
 }

@@ -11,6 +11,7 @@ interface OnboardingCardProps {
   benefits: string[];
   buttonText: string;
   link: string;
+  onButtonClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 export default function OnboardingCard({
@@ -20,6 +21,7 @@ export default function OnboardingCard({
   benefits,
   buttonText,
   link,
+  onButtonClick,
 }: OnboardingCardProps) {
   return (
     <div
@@ -68,7 +70,7 @@ export default function OnboardingCard({
 
         {/* Button */}
         <div className="mt-6">
-          <Link href={link}>
+          <Link href={link} onClick={onButtonClick}>
             <SharedButton
               label={buttonText}
               size="lg"
