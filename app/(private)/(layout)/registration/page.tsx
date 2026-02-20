@@ -52,7 +52,7 @@ export default function RegistrationPage() {
             'Connect with mechanics',
           ]}
           buttonText="Join Networking"
-          link="/networking/registration"
+          link="/networking/Club-Registration"
         />
       </section>
 

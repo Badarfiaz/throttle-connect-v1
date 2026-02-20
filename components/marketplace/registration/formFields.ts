@@ -16,6 +16,35 @@ export type FieldConfig = {
   multiple?: boolean;
 };
 
+// ---------------- Reusable Social Fields ----------------
+export const createSocialFields = (prefix: string = ""): FieldConfig[] => [
+  {
+    name: prefix ? `${prefix}.contactMethod` : "contactMethod",
+    label: "Preferred Contact Method",
+    type: "select",
+    placeholder: "Select contact method",
+    required: true,
+    options: [
+      { label: "WhatsApp", value: "whatsapp" },
+      { label: "Phone Call", value: "call" },
+      { label: "Email", value: "email" },
+    ],
+  },
+  {
+    name: prefix ? `${prefix}.socialPlatforms` : "socialPlatforms",
+    label: "Select Social Platforms",
+    type: "social",
+    multiple: true,
+    options: [
+      { label: "Website", value: "website" },
+      { label: "LinkedIn", value: "linkedin" },
+      { label: "Instagram", value: "instagram" },
+      { label: "Other", value: "other" },
+    ],
+  },
+];
+
+// ---------------- Shop Fields ----------------
 export const shopSetupFields: FieldConfig[] = [
   {
     name: "title",
@@ -84,29 +113,37 @@ export const shopDetailsFields: FieldConfig[] = [
   },
 ];
 
-export const socialFields: FieldConfig[] = [
+export const shopSocialFields = createSocialFields();
+
+// ---------------- Club Fields ----------------
+export const clubSetupFields: FieldConfig[] = [
   {
-    name: "contactMethod",
-    label: "Preferred Contact Method",
-    type: "select",
-    placeholder: "Select contact method",
+    name: "clubName",
+    label: "Club Name",
+    placeholder: "Enter your club name",
     required: true,
-    options: [
-      { label: "WhatsApp", value: "whatsapp" },
-      { label: "Phone Call", value: "call" },
-      { label: "Email", value: "email" },
-    ],
   },
   {
-    name: "socialPlatforms",
-    label: "Select Social Platforms",
-    type: "social",
-    multiple: true,
-    options: [
-      { label: "Website", value: "website" },
-      { label: "LinkedIn", value: "linkedin" },
-      { label: "Instagram", value: "instagram" },
-      { label: "Other", value: "other" },
-    ],
+    name: "city",
+    label: "City",
+    placeholder: "Enter city",
+    required: true,
   },
 ];
+
+export const clubDetailsFields: FieldConfig[] = [
+  {
+    name: "clubType",
+    label: "Club Type",
+    placeholder: "Enter club type",
+    required: true,
+  },
+  {
+    name: "description",
+    label: "Description",
+    placeholder: "Write a brief description",
+    type: "textarea",
+  },
+];
+
+export const clubSocialFields = createSocialFields("club");

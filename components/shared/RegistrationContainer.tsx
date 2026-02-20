@@ -1,18 +1,16 @@
 import React from "react";
 import MarketplaceRegistration from "../marketplace/registration/MarketplaceRegistration";
+import NetworkingRegistration from "../marketplace/registration/NetworkingRegistration";
+
 type RegistrationContainerProps = {
   type: "marketplace" | "networking";
 };
-function RegistrationContainer({ type }: RegistrationContainerProps) {
+
+export default function RegistrationContainer({ type }: RegistrationContainerProps) {
   return (
     <div>
-      {type === "marketplace" ? (
-        <MarketplaceRegistration />
-      ) : (
-        <div>Networking Registration Form -- pending </div>
-      )}
+      {type === "marketplace" && <MarketplaceRegistration />}
+      {type === "networking" && <NetworkingRegistration />}
     </div>
   );
 }
-
-export default RegistrationContainer;
