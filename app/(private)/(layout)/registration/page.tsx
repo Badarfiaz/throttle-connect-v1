@@ -8,13 +8,12 @@ import { useAppSelector } from "@/app/redux/hooks";
 import { AlertDialogShared } from "@/components/shared/AlertDialogShared";
 
 export default function RegistrationPage() {
-  const marketplaceStoreCompleted = useAppSelector(
-    (state) => state.marketplace.store?.completed,
-  );
+  const marketplaceCompleted = useAppSelector((state) => state.auth.user);
+  console.log("marketplaceCompleted:", marketplaceCompleted);
   const [isMarketplaceCompletedOpen, setIsMarketplaceCompletedOpen] =
     useState(false);
 
-  const isMarketplaceCompleted = Boolean(marketplaceStoreCompleted);
+  const isMarketplaceCompleted = Boolean(marketplaceCompleted);
   console.log("Marketplace completed status:", isMarketplaceCompleted);
   const handleMarketplaceClick = (
     event: React.MouseEvent<HTMLAnchorElement>,

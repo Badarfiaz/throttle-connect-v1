@@ -64,6 +64,7 @@ const authSlice = createSlice({
     ) => {
       if (state.user) {
         const { pageType, data, completed } = action.payload;
+        console.log("payload", action.payload);
         state.user[pageType] = {
           ...data,
           completed,

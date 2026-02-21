@@ -3,12 +3,12 @@ import { useState, useCallback } from "react";
 import { useAppSelector } from "@/app/redux/hooks";
 
 export function useMarketplaceCompletedDialog() {
-  const marketplaceStoreCompleted = useAppSelector(
-    (state) => state.marketplace.store?.completed,
+  const marketplaceCompleted = useAppSelector(
+    (state) => state.auth.user?.marketplace?.completed,
   );
   const [isMarketplaceCompletedOpen, setIsMarketplaceCompletedOpen] =
     useState(false);
-  const isMarketplaceCompleted = Boolean(marketplaceStoreCompleted);
+  const isMarketplaceCompleted = Boolean(marketplaceCompleted);
 
   const handleMarketplaceClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {

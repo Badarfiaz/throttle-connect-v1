@@ -5,8 +5,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import AnimatedStep from "../../shared/registration/AnimatedStep";
 import { useOnboardStep } from "@/hooks/useOnboardStep";
-import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
-import { setMarketplace } from "@/app/redux/features/marketplaceSlice";
+import { useAppSelector } from "@/app/redux/hooks";
 import {
   Dialog,
   DialogContent,
@@ -48,36 +47,31 @@ const steps = [
 
 export default function MarketplaceRegistration({}) {
   const router = useRouter();
-  const dispatch = useAppDispatch();
-  const marketplaceStore = useAppSelector((state) => state.marketplace.store);
+  const marketplace = useAppSelector((state) => state.auth.user?.marketplace);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(0); // For slide animation direction
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [collectedData, setCollectedData] = useState<Record<string, unknown>>(
-    marketplaceStore || {},
+    marketplace || {},
   );
-  const marketplaceData = useAppSelector((state) => state.marketplace.store);
-  console.log("marketplace data", marketplaceData);
-
   // One form instance per step to manage validation independently
-  // Initialize forms with default values from Redux store
+  // Initialize forms with default values from auth user marketplace data
   const forms = [
-    useForm({ defaultValues: marketplaceStore || {} }),
-    useForm({ defaultValues: marketplaceStore || {} }),
-    useForm({ defaultValues: marketplaceStore || {} }),
+    useForm({ defaultValues: marketplace || {} }),
+    useForm({ defaultValues: marketplace || {} }),
+    useForm({ defaultValues: marketplace || {} }),
   ];
   const currentForm = forms[currentStep];
 
-  // Update form values when marketplaceStore changes or when step changes
   useEffect(() => {
-    if (marketplaceStore && !marketplaceStore.completed) {
-      // Reset all forms with the store data if registration is not completed
+    if (marketplace && !marketplace.completed) {
       forms.forEach((form) => {
-        form.reset(marketplaceStore);
+        form.reset(marketplace);
       });
+      setCollectedData(marketplace);
     }
-  }, [marketplaceStore]);
+  }, [marketplace]);
 
   const { submitStep, submitting } = useOnboardStep({
     pageType: "marketplace",
@@ -88,14 +82,6 @@ export default function MarketplaceRegistration({}) {
     const isLastStep = currentStep === steps.length - 1;
 
     setCollectedData(mergedData);
-
-    // Dispatch to marketplace slice on every step
-    dispatch(
-      setMarketplace({
-        ...mergedData,
-        completed: isLastStep,
-      }),
-    );
 
     try {
       if (isLastStep) {
