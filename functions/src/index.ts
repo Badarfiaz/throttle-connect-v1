@@ -1,12 +1,43 @@
 import { onRequest } from "firebase-functions/v2/https";
 import { withCors } from "../utils/withcors";
-
+import marketplaceStoreResolvers from "./graphql/marketplaceStore/resolvers";
+import express from "express";
+import cors from "cors";
 import { admin, verifyToken } from "../lib/firebase";
+import marketplaceStoreTypeDefs from "./graphql/marketplaceStore/typeDefs";
 const db = admin.firestore();
+const app = express();
+app.use(cors({ origin: true }));
+app.use(express.json());
+
 const currentDate = new Date();
 type OnboardPageType = "marketplace" | "networking";
 
 const allowedTypes: OnboardPageType[] = ["marketplace", "networking"];
+
+async function startApolloServer() {
+  const { mergeTypeDefs, mergeResolvers } =
+    await import("@graphql-tools/merge");
+  const { makeExecutableSchema } = await import("@graphql-tools/schema");
+  const typeDefs = mergeTypeDefs([marketplaceStoreTypeDefs]);
+  const resolvers = mergeResolvers([marketplaceStoreResolvers]);
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  return schema;
+}
+import { GraphQLSchema } from "graphql";
+let mainServerPromise: Promise<GraphQLSchema> | null = null;
+
+async function ensureMainServer(): Promise<GraphQLSchema> {
+  if (!mainServerPromise) {
+    mainServerPromise = startApolloServer();
+  }
+  return mainServerPromise;
+}
+export const fetcher = onRequest(async (req, res) => {
+  await ensureMainServer();
+  return withCors(app)(req as any, res as any);
+});
+
 
 export const onboard = onRequest(
   withCors(async (req, res) => {
