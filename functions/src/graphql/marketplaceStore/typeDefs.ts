@@ -19,12 +19,11 @@ const marketplaceStoreTypeDefs = /* GraphQL */ `
     pageType: String
     ownerUid: ID
     completed: Boolean
-    topRated: Boolean
     createdAt: String
   }
 
   type Query {
-    marketplaceStores(topRated: Boolean): [MarketplaceStore!]!
+    marketplaceStores: [MarketplaceStore!]!
   }
 `;
 

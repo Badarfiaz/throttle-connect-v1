@@ -1,14 +1,9 @@
 import { onRequest } from "firebase-functions/v2/https";
 import { withCors } from "../utils/withcors";
 import marketplaceStoreResolvers from "./graphql/marketplaceStore/resolvers";
-import express from "express";
-import cors from "cors";
 import { admin, verifyToken } from "../lib/firebase";
 import marketplaceStoreTypeDefs from "./graphql/marketplaceStore/typeDefs";
 const db = admin.firestore();
-const app = express();
-app.use(cors({ origin: true }));
-app.use(express.json());
 
 const currentDate = new Date();
 type OnboardPageType = "marketplace" | "networking";
@@ -33,11 +28,31 @@ async function ensureMainServer(): Promise<GraphQLSchema> {
   }
   return mainServerPromise;
 }
-export const fetcher = onRequest(async (req, res) => {
-  await ensureMainServer();
-  return withCors(app)(req as any, res as any);
-});
 
+export const fetcher = onRequest(
+  withCors(async (req, res) => {
+    try {
+      // Verify the user's token and get uid
+      const uid = await verifyToken(req, res, { optional: false });
+      if (!uid) return;
+
+      const schema = await ensureMainServer();
+      const { createHandler } = await import("graphql-http/lib/use/express");
+
+      const handler = createHandler({
+        schema,
+        context: async () => ({ uid }), // Pass uid in context
+      });
+
+      await handler(req, res, () => {});
+    } catch (error) {
+      console.error("Error in fetcher function:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error" });
+    }
+  }),
+);
 
 export const onboard = onRequest(
   withCors(async (req, res) => {

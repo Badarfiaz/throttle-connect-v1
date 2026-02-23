@@ -17,13 +17,14 @@ const normalizeCreatedAt = (value: unknown) => {
 
 const marketplaceStoreResolvers = {
   Query: {
-    marketplaceStores: async (_: any, { topRated }: { topRated?: boolean }) => {
+    marketplaceStores: async (_: any, __: any, context: { uid: string }) => {
+      const { uid } = context;
+
       let ref = db
         .collection("marketplaceStores")
+        .where("ownerUid", "==", uid)
         .where("completed", "==", true);
-      if (typeof topRated === "boolean") {
-        ref = ref.where("topRated", "==", topRated);
-      }
+
       const snapshot = await ref.get();
 
       if (snapshot.empty) return [];

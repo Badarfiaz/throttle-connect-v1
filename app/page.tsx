@@ -1,74 +1,96 @@
 "use client";
-
-import { ONBOARD_URL } from "@/lib/config";
+import { Button } from "@/components/ui/button";
+import { FETCHER_URL } from "@/lib/config";
 import getFirebaseToken from "@/ulity/getFirebaseToken";
+import React, { useState } from "react";
 
-function home() {
-  async function handleSubmit() {
-    const data = {
-      onBoardType: "marketplace",
-      storeTitle: "Tedfsdfsst Store",
-      email: "teststore@example.com",
-      contactNumber: "+123456789",
-      address: "123 Test Street",
-      selectCategory: ["electronics", "gadgets"],
-      overview: "A dummy store for testing the onboarding API.",
-      location: {
-        province: "Test Province",
-        city: "Test City",
-        area: "Test Area",
-      },
-      completed: false,
-      whatsappNumber: "+123456789",
-      contactMethod: "email",
-      websiteLink: "https://example.com",
-      facebook: "https://facebook.com/teststore",
-      instagram: "https://instagram.com/teststore",
-      tiktok: "https://tiktok.com/@teststore",
-    };
+const TEST_QUERY = `{
+  marketplaceStores {
+    id
+    title
+    address
+    businessType
+    completed
+    contactMethod
+    createdAt
+    email
+    location { area city province }
+    onBoardType
+    overview
+    ownerUid
+    pageType
+    phone
+  }
+}`;
+
+function Page() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleTest = async () => {
+    setLoading(true);
+    setError(null);
+    setData(null);
 
     try {
-      // Get Firebase authentication token
+      // Get Firebase auth token
       const { token } = await getFirebaseToken();
-
+      console.log(token);
       if (!token) {
-        alert("Please sign in first!");
+        setError("Not authenticated. Please log in first.");
+        setLoading(false);
         return;
       }
 
-      const res = await fetch(ONBOARD_URL, {
+      const res = await fetch(FETCHER_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ query: TEST_QUERY }),
       });
 
       const result = await res.json();
-      console.log("Response:", result);
-      alert("Submitted! Check console for response.");
+      console.log("marketplaceStores data:", result);
+
+      if (result.errors) {
+        setError(JSON.stringify(result.errors, null, 2));
+      } else {
+        setData(result.data);
+      }
     } catch (err) {
-      console.error("Error submitting:", err);
-      alert("Error submitting. Check console.");
+      console.error("Error fetching marketplaceStores:", err);
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md text-center">
-        <h1 className="text-2xl font-bold mb-4">Test Onboarding API</h1>
-        <p className="mb-6">
-          Click the button below to test the onboarding API with dummy data.
-        </p>
-        <button
-          onClick={handleSubmit}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Submit Test Data
-        </button>
-      </div>
+    <div className="p-8">
+      <Button onClick={handleTest} disabled={loading}>
+        {loading ? "Loading..." : "Test Fetch marketplaceStores"}
+      </Button>
+
+      {error && (
+        <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <h3 className="font-bold">Error:</h3>
+          <pre className="whitespace-pre-wrap">{error}</pre>
+        </div>
+      )}
+
+      {data && (
+        <div className="mt-4 p-4 bg-green-100 border border-green-400 rounded">
+          <h3 className="font-bold mb-2">Marketplace Stores Data:</h3>
+          <pre className="whitespace-pre-wrap overflow-auto max-h-96">
+            {JSON.stringify(data, null, 2)}
+          </pre>
+        </div>
+      )}
     </div>
   );
 }
 
-export default home;
+export default Page;
