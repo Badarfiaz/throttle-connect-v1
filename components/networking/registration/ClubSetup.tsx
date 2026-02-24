@@ -1,5 +1,5 @@
 import React from "react";
-import RegistrationInputField from "./RegistrationInputField";
+import RegistrationInputField from "../../marketplace/registration/RegistrationInputField";
 import { clubSetupFields } from "./formFields";
 
 type ClubSetupProps = {

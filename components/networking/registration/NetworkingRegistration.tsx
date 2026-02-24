@@ -11,7 +11,7 @@ import { RegistrationCardStyles, RegistrationContainerStyles } from "@/component
 
 import ClubSetup from "./ClubSetup";
 import ClubDetails from "./ClubDetails";
-import SocialFields from "./SocialFields"; // reusable component
+import SocialFields from "../../marketplace/registration/SocialFields"; // reusable component
 
 // Step definitions
 const steps = [

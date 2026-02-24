@@ -1,6 +1,6 @@
 import React from "react";
 import MarketplaceRegistration from "../marketplace/registration/MarketplaceRegistration";
-import NetworkingRegistration from "../marketplace/registration/NetworkingRegistration";
+import NetworkingRegistration from "../networking/registration/NetworkingRegistration";
 
 type RegistrationContainerProps = {
   type: "marketplace" | "networking";
