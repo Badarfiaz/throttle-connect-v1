@@ -1,5 +1,3 @@
-import { steps } from "framer-motion";
-
 export type Option = {
   label: string;
   value: string;
@@ -46,31 +44,10 @@ export const createSocialFields = (prefix: string = ""): FieldConfig[] => [
 
 // ---------------- Shop Fields ----------------
 export const shopSetupFields: FieldConfig[] = [
-  {
-    name: "title",
-    label: "Shop Name",
-    placeholder: "Enter your shop title",
-    required: true,
-  },
-  {
-    name: "email",
-    label: "Official Email",
-    placeholder: "Enter email",
-    required: true,
-    keyboardType: "email-address",
-  },
-  {
-    name: "phone",
-    label: "Phone Number",
-    placeholder: "Enter phone number",
-    required: true,
-    keyboardType: "phone-pad",
-  },
-  {
-    name: "address",
-    label: "Shop Address",
-    placeholder: "Enter shop address",
-  },
+  { name: "title", label: "Shop Name", placeholder: "Enter your shop title", required: true },
+  { name: "email", label: "Official Email", placeholder: "Enter email", required: true, keyboardType: "email-address" },
+  { name: "phone", label: "Phone Number", placeholder: "Enter phone number", required: true, keyboardType: "phone-pad" },
+  { name: "address", label: "Shop Address", placeholder: "Enter shop address" },
 ];
 
 export const shopDetailsFields: FieldConfig[] = [
@@ -87,60 +64,42 @@ export const shopDetailsFields: FieldConfig[] = [
       { label: "Spare Parts", value: "spare-parts" },
     ],
   },
-  {
-    name: "overview",
-    label: "Shop Overview",
-    placeholder: "Write a brief shop description",
-    type: "textarea",
-  },
-  {
-    name: "location.province",
-    label: "Province",
-    required: true,
-    placeholder: "Enter province",
-  },
-  {
-    name: "location.city",
-    label: "City",
-    required: true,
-    placeholder: "Enter city",
-  },
-  {
-    name: "location.area",
-    label: "Area",
-    required: true,
-    placeholder: "Enter area",
-  },
+  { name: "overview", label: "Shop Overview", placeholder: "Write a brief shop description", type: "textarea" },
+  { name: "location.province", label: "Province", required: true, placeholder: "Enter province" },
+  { name: "location.city", label: "City", required: true, placeholder: "Enter city" },
+  { name: "location.area", label: "Area", required: true, placeholder: "Enter area" },
 ];
 
 export const shopSocialFields = createSocialFields();
 
 // ---------------- Club Fields ----------------
+
+// Club Setup (basic info only)
 export const clubSetupFields: FieldConfig[] = [
-  {
-    name: "clubName",
-    label: "Club Name",
-    placeholder: "Enter your club name",
-    required: true,
-  },
-  {
-    name: "city",
-    label: "City",
-    placeholder: "Enter city",
-    required: true,
-  },
+  { name: "name", label: "Full Name", placeholder: "Enter your full name", required: true },
+  { name: "email", label: "Email", placeholder: "Enter email address", required: true, keyboardType: "email-address" },
+  { name: "phone", label: "Phone Number", placeholder: "Enter phone number", required: true, keyboardType: "phone-pad" },
+  { name: "clubName", label: "Club Name", placeholder: "Enter your club name", required: true },
+  { name: "city", label: "City", placeholder: "Enter city", required: true },
 ];
 
+// Club Details (includes clubType + description)
 export const clubDetailsFields: FieldConfig[] = [
   {
     name: "clubType",
     label: "Club Type",
-    placeholder: "Enter club type",
+    type: "select",
+    placeholder: "Select club type",
     required: true,
+    options: [
+      { label: "🏍 Bike Club", value: "bike" },
+      { label: "🚗 Car Club", value: "car" },
+      { label: "🌟 Other", value: "other" },
+    ],
   },
   {
     name: "description",
-    label: "Description",
+    label: "Club Description",
     placeholder: "Write a brief description",
     type: "textarea",
   },

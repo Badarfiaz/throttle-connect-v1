@@ -2,7 +2,11 @@ import React from "react";
 import RegistrationInputField from "./RegistrationInputField";
 import { clubSetupFields } from "./formFields";
 
-function ClubSetup({ form }: { form: any }) {
+type ClubSetupProps = {
+  form: any;
+};
+
+function ClubSetup({ form }: ClubSetupProps) {
   return (
     <div className="grid gap-5">
       {clubSetupFields.map((field) => (
