@@ -28,6 +28,7 @@ const HeaderPrimary: FC = () => {
   const ismarkeptlaceCompleted = useMarketplaceStore({
     isCompleted: true,
   });
+  console.log("ismarkeptlaceCompleted", ismarkeptlaceCompleted);
   const { data: marketplaceStores, fetchMarketplaceStores } =
     ismarkeptlaceCompleted;
 
