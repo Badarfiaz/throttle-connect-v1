@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { FETCHER_URL } from "@/lib/config";
 import getFirebaseToken from "@/ulity/getFirebaseToken";
+import type { MarketplaceStore } from "@/types/marketplace";
 
 const MARKETPLACE_STORES_QUERY = `{
   marketplaceStores {
@@ -26,27 +27,6 @@ const MARKETPLACE_COMPLETED_QUERY = `{
     completed
   }
 }`;
-
-export type MarketplaceStore = {
-  id?: string;
-  title?: string;
-  address?: string;
-  businessType?: string;
-  completed: boolean;
-  contactMethod?: string | null;
-  createdAt?: string | null;
-  email?: string | null;
-  location?: {
-    area?: string | null;
-    city?: string | null;
-    province?: string | null;
-  } | null;
-  onBoardType?: string | null;
-  overview?: string | null;
-  ownerUid?: string | null;
-  pageType?: string | null;
-  phone?: string | null;
-};
 
 type UseMarketplaceStoreOptions = {
   isCompleted?: boolean;
