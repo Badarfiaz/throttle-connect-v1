@@ -1,78 +1,30 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { FETCHER_URL } from "@/lib/config";
-import getFirebaseToken from "@/ulity/getFirebaseToken";
+import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
 import React, { useState } from "react";
 
-const TEST_QUERY = `{
-  marketplaceStores {
-    id
-    title
-    address
-    businessType
-    completed
-    contactMethod
-    createdAt
-    email
-    location { area city province }
-    onBoardType
-    overview
-    ownerUid
-    pageType
-    phone
-  }
-}`;
-
 function Page() {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleTest = async () => {
-    setLoading(true);
-    setError(null);
-    setData(null);
-
-    try {
-      // Get Firebase auth token
-      const { token } = await getFirebaseToken();
-      console.log(token);
-      if (!token) {
-        setError("Not authenticated. Please log in first.");
-        setLoading(false);
-        return;
-      }
-
-      const res = await fetch(FETCHER_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ query: TEST_QUERY }),
-      });
-
-      const result = await res.json();
-      console.log("marketplaceStores data:", result);
-
-      if (result.errors) {
-        setError(JSON.stringify(result.errors, null, 2));
-      } else {
-        setData(result.data);
-      }
-    } catch (err) {
-      console.error("Error fetching marketplaceStores:", err);
-      setError(err instanceof Error ? err.message : "Unknown error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [completedOnly, setCompletedOnly] = useState(false);
+  const { data, loading, error, fetchMarketplaceStores } = useMarketplaceStore({
+    isCompleted: true,
+  });
 
   return (
     <div className="p-8">
-      <Button onClick={handleTest} disabled={loading}>
-        {loading ? "Loading..." : "Test Fetch marketplaceStores"}
-      </Button>
+      <div className="flex items-center gap-4">
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={completedOnly}
+            onChange={(e) => setCompletedOnly(e.target.checked)}
+          />
+          Completed only
+        </label>
+
+        <Button onClick={fetchMarketplaceStores} disabled={loading}>
+          {loading ? "Loading..." : "Test Fetch marketplaceStores"}
+        </Button>
+      </div>
 
       {error && (
         <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
