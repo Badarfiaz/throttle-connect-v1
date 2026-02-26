@@ -20,7 +20,6 @@ function HeaderProfile({ email, avatar, logout }: headerProfileProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex items-center gap-2 cursor-pointer">
-            <span className="text-sm font-medium">{email}</span>
             <Avatar className="border border-[#19376D]/30">
               <AvatarFallback className="bg-[#19376D] text-white font-semibold">
                 {avatar}

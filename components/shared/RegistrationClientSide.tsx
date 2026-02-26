@@ -1,21 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import OnboardingCard from "@/components/shared/OnboardingCard";
 import { AlertDialogShared } from "@/components/shared/AlertDialogShared";
 import { useAppSelector } from "@/app/redux/hooks";
+import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
 
 export default function RegistrationClientSide() {
-  const marketplaceCompleted = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector((state) => state.auth.user);
   const [isMarketplaceCompletedOpen, setIsMarketplaceCompletedOpen] =
     useState(false);
 
-  const isMarketplaceCompleted = Boolean(marketplaceCompleted);
+  const ismarkeptlaceCompleted = useMarketplaceStore({
+    isCompleted: true,
+  });
+
+  const { data: marketplaceStores, fetchMarketplaceStores } =
+    ismarkeptlaceCompleted;
+
+  useEffect(() => {
+    if (!user) return;
+    fetchMarketplaceStores().catch(() => undefined);
+  }, [user, fetchMarketplaceStores]);
+
+  const hasMarketplaceCompleted = Boolean(
+    marketplaceStores?.some((store) => store?.completed) ||
+      user?.marketplace?.completed,
+  );
 
   const handleMarketplaceClick = (
     event: React.MouseEvent<HTMLAnchorElement>,
   ) => {
-    if (!isMarketplaceCompleted) return;
+    if (!hasMarketplaceCompleted) return;
     event.preventDefault();
     setIsMarketplaceCompletedOpen(true);
   };

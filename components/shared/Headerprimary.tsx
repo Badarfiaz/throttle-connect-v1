@@ -5,13 +5,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { shallowEqual, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { useAppDispatch } from "@/app/redux/hooks";
 import type { RootState } from "@/app/redux/store";
 import Togglenav from "./Togglenav";
 import HeaderProfile from "./HeaderProfile";
 import LoginModal from "./LoginModal";
 import { auth } from "@/firebase";
 import { useAuthHandlers } from "@/hooks/useAuthHandlers";
+import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
 
 type AuthMode = "login" | "signup";
 
@@ -24,6 +24,22 @@ const HeaderPrimary: FC = () => {
 
   const user = useSelector((s: RootState) => s.auth.user, shallowEqual);
   const isAuthed = !!user?.email;
+
+  const ismarkeptlaceCompleted = useMarketplaceStore({
+    isCompleted: true,
+  });
+  const { data: marketplaceStores, fetchMarketplaceStores } =
+    ismarkeptlaceCompleted;
+
+  useEffect(() => {
+    if (!isAuthed) return;
+    if (pathname !== "/marketplace") return;
+    fetchMarketplaceStores().catch(() => undefined);
+  }, [isAuthed, pathname, fetchMarketplaceStores]);
+
+  const hasMarketplaceCompleted = Boolean(
+    marketplaceStores?.some((store) => store?.completed),
+  );
 
   const avatarLetter = useMemo(
     () => (isAuthed ? user!.email.trim().charAt(0).toUpperCase() : "?"),
@@ -59,19 +75,6 @@ const HeaderPrimary: FC = () => {
     });
   }, []);
 
-  // // 🔹 NEW: Auto-open registration page for new users
-  // useEffect(() => {
-  //   const isMarketplaceComplete = !!user?.marketplace?.completed;
-  //   const isOnRegistrationFlow =
-  //     pathname === "/registration" ||
-  //     pathname?.startsWith("/marketplace/registration") ||
-  //     pathname?.startsWith("/networking/registration");
-
-  //   if (isAuthed && user && !isMarketplaceComplete && !isOnRegistrationFlow) {
-  //     router.replace("/registration");
-  //   }
-  // }, [isAuthed, user, router, pathname]);
-
   return (
     <header className="sticky top-0 z-50 w-full bg-[#f8fcff]/80 backdrop-blur-md shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
@@ -95,6 +98,15 @@ const HeaderPrimary: FC = () => {
             </Link>
           ))}
           <Togglenav pathname={pathname} />
+          {pathname === "/marketplace" && hasMarketplaceCompleted && (
+            <button
+              type="button"
+              onClick={() => router.push("/marketplace/dashboard")}
+              className="rounded-md bg-[#19376D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B2447] transition-colors"
+            >
+              Dashboard
+            </button>
+          )}
         </nav>
 
         {/* Auth Section */}
