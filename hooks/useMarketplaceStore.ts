@@ -2,31 +2,10 @@ import { useCallback, useMemo, useState } from "react";
 import { FETCHER_URL } from "@/lib/config";
 import getFirebaseToken from "@/ulity/getFirebaseToken";
 import type { MarketplaceStore } from "@/types/marketplace";
-
-const MARKETPLACE_STORES_QUERY = `{
-  marketplaceStores {
-    id
-    title
-    address
-    businessType
-    completed
-    contactMethod
-    createdAt
-    email
-    location { area city province }
-    onBoardType
-    overview
-    ownerUid
-    pageType
-    phone
-  }
-}`;
-
-const MARKETPLACE_COMPLETED_QUERY = `{
-  marketplaceStores {
-    completed
-  }
-}`;
+import {
+  MARKETPLACE_COMPLETED_QUERY,
+  MARKETPLACE_STORES_QUERY,
+} from "@/app/graphql/marketplace";
 
 type UseMarketplaceStoreOptions = {
   isCompleted?: boolean;
