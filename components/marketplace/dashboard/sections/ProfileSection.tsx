@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import type { MarketplaceStore } from "@/types/marketplace";
 import StoreIdentityCard from "./profile/StoreIdentityCard";
 import StoreLogoCard from "./profile/StoreLogoCard";
@@ -19,6 +24,46 @@ type ProfileSectionProps = {
   locationLabel: string;
   storeInitials: string;
   staticProfile: StaticProfile;
+  onUpdateStore?: (
+    id: string,
+    input: Record<string, unknown>,
+  ) => Promise<MarketplaceStore | null>;
+  updating?: boolean;
+  updateError?: string | null;
+};
+
+type ProfileFormValues = {
+  title: string;
+  email: string;
+  phone: string;
+  address: string;
+  businessType: string[];
+  overview: string;
+  location: {
+    province: string;
+    city: string;
+    area: string;
+  };
+  contactMethod: string;
+  socialPlatforms: Record<string, string>;
+};
+
+const normalizeBusinessType = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.filter(Boolean);
+  }
+  if (typeof value === "string" && value.trim().length > 0) {
+    return [value];
+  }
+  return [];
+};
+
+const normalizeSocialPlatforms = (
+  store: MarketplaceStore | null,
+): Record<string, string> => {
+  const raw = (store as { socialPlatforms?: Record<string, string> | null })
+    ?.socialPlatforms;
+  return raw && typeof raw === "object" ? raw : {};
 };
 
 export default function ProfileSection({
@@ -27,21 +72,93 @@ export default function ProfileSection({
   userId,
   storeInitials,
   staticProfile,
+  onUpdateStore,
+  updating,
+  updateError,
 }: ProfileSectionProps) {
+  const defaultValues = useMemo<ProfileFormValues>(
+    () => ({
+      title: store?.title ?? "",
+      email: store?.email ?? userEmail ?? "",
+      phone: store?.phone ?? "",
+      address: store?.address ?? "",
+      businessType: normalizeBusinessType(store?.businessType),
+      overview: store?.overview ?? "",
+      location: {
+        province: store?.location?.province ?? "",
+        city: store?.location?.city ?? "",
+        area: store?.location?.area ?? "",
+      },
+      contactMethod: store?.contactMethod ?? "",
+      socialPlatforms: normalizeSocialPlatforms(store),
+    }),
+    [store, userEmail],
+  );
+
+  const form = useForm<ProfileFormValues>({ defaultValues });
+
+  useEffect(() => {
+    form.reset(defaultValues);
+  }, [defaultValues, form]);
+
+  const handleSave = form.handleSubmit(async (values) => {
+    if (!store?.id) {
+      toast.error("Store not available", {
+        description: "We couldn't find a store to update.",
+      });
+      return;
+    }
+    if (!onUpdateStore) {
+      toast.error("Update unavailable", {
+        description: "Please refresh and try again.",
+      });
+      return;
+    }
+
+    const input = {
+      title: values.title?.trim() ?? "",
+      email: values.email ?? "",
+      phone: values.phone ?? "",
+      address: values.address ?? "",
+      businessType: Array.isArray(values.businessType)
+        ? values.businessType.filter(Boolean)
+        : [],
+      overview: values.overview ?? "",
+      location: values.location ?? {},
+      contactMethod: values.contactMethod ?? "",
+    };
+
+    try {
+      await onUpdateStore(store.id, input);
+      toast.success("Profile updated", {
+        description: "Your store details have been saved.",
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Update failed.";
+      toast.error("Update failed", { description: message });
+    }
+  });
+
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
-        <StoreIdentityCard store={store} userEmail={userEmail} />
+        <StoreIdentityCard form={form} onSave={handleSave} saving={updating} />
         <StoreLogoCard
+          form={form}
           store={store}
           storeInitials={storeInitials}
           staticProfile={staticProfile}
+          onUpdateStore={onUpdateStore}
         />
       </div>
 
-      <ContactLocationCard store={store} />
+      <ContactLocationCard form={form} />
 
       <StoreMetadataCard store={store} userId={userId} />
+
+      {updateError ? (
+        <p className="text-sm text-red-600">{updateError}</p>
+      ) : null}
     </div>
   );
 }

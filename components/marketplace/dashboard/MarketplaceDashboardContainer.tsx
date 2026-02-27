@@ -23,6 +23,9 @@ const MarketplaceDashboardContainer = () => {
     navItems,
     products,
     staticProfile,
+    updateMarketplaceStore,
+    updating,
+    updateError,
   } = useMarketplaceDashboard();
 
   return (
@@ -59,6 +62,9 @@ const MarketplaceDashboardContainer = () => {
           locationLabel={locationLabel}
           storeInitials={storeInitials}
           staticProfile={staticProfile}
+          onUpdateStore={updateMarketplaceStore}
+          updating={updating}
+          updateError={updateError}
         />
       )}
 

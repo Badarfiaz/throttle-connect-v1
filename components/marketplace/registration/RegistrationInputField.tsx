@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+"use client";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -100,7 +101,6 @@ type MultiSelectDropdownProps = {
   value?: string[];
   onChange?: (value: string[]) => void;
   placeholder?: string;
-  className?: string;
 };
 
 function MultiSelectDropdown({
@@ -108,7 +108,6 @@ function MultiSelectDropdown({
   value,
   onChange,
   placeholder,
-  className,
 }: MultiSelectDropdownProps) {
   const selected = Array.isArray(value) ? value : [];
   const selectedLabels = options
@@ -123,7 +122,7 @@ function MultiSelectDropdown({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className={cn("w-full justify-between font-normal", className)}
+          className="w-full justify-between font-normal"
         >
           <span
             className={cn(
@@ -166,76 +165,16 @@ function MultiSelectDropdown({
 
 type RegistrationInputFieldProps = {
   field: FieldConfig;
-  form?: UseFormReturn<any>;
-  isDashboard?: boolean;
-  defaultValue?: string;
-  defaultValues?: string[];
+  form?: UseFormReturn<any>; // ⬅ IMPORTANT: receive form instance
 };
 
 export default function RegistrationInputField({
   field,
   form,
-  isDashboard,
-  defaultValue,
-  defaultValues,
 }: RegistrationInputFieldProps) {
-  const [selectVal, setSelectVal] = useState<string>(defaultValue ?? "");
-  const [multiVal, setMultiVal] = useState<string[]>(
-    defaultValues ?? (defaultValue ? [defaultValue] : []),
-  );
+  const { register, setValue, watch } = form || {};
 
-  // Sync when props arrive after initial mount (e.g. async store load)
-  useEffect(() => {
-    if (defaultValue !== undefined) setSelectVal(defaultValue);
-  }, [defaultValue]);
-
-  useEffect(() => {
-    if (defaultValues !== undefined) {
-      setMultiVal(defaultValues);
-    } else if (defaultValue) {
-      setMultiVal([defaultValue]);
-    }
-  }, [defaultValues, defaultValue]);
-
-  if (isDashboard) {
-    return (
-      <div className="flex flex-col gap-2">
-        <label className="text-xs font-semibold uppercase text-slate-500">
-          {field.label}
-        </label>
-        {field.type === "textarea" ? (
-          <Textarea className="mt-2" defaultValue={defaultValue} />
-        ) : field.type === "select" && field.options && !field.multiple ? (
-          <Select value={selectVal} onValueChange={setSelectVal}>
-            <SelectTrigger className="mt-2">
-              <SelectValue placeholder={field.placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-              {field.options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        ) : field.type === "select" && field.options && field.multiple ? (
-          <MultiSelectDropdown
-            className="mt-2"
-            options={field.options}
-            value={multiVal}
-            onChange={setMultiVal}
-            placeholder={field.placeholder}
-          />
-        ) : (
-          <Input className="mt-2" defaultValue={defaultValue} />
-        )}
-      </div>
-    );
-  }
-
-  const { register, setValue, watch } = form!;
-
-  const watchedValue = watch(field.name);
+  const watchedValue = watch ? watch(field.name) : undefined;
   const selectValue = Array.isArray(watchedValue)
     ? undefined
     : (watchedValue as string | undefined);
@@ -259,7 +198,7 @@ export default function RegistrationInputField({
         <Select
           value={selectValue}
           onValueChange={(value) => {
-            setValue(field.name, value, { shouldValidate: true });
+            setValue && setValue(field.name, value, { shouldValidate: true });
           }}
         >
           <SelectTrigger>
@@ -282,7 +221,7 @@ export default function RegistrationInputField({
           value={multiSelectValue}
           placeholder={field.placeholder}
           onChange={(value) =>
-            setValue(field.name, value, { shouldValidate: true })
+            setValue && setValue(field.name, value, { shouldValidate: true })
           }
         />
       )}
@@ -291,7 +230,7 @@ export default function RegistrationInputField({
       {field.type === "textarea" && (
         <Textarea
           placeholder={field.placeholder}
-          {...register(field.name, { required: field.required })}
+          {...(register ? register(field.name, { required: field.required }) : {})}
         />
       )}
 
@@ -301,7 +240,7 @@ export default function RegistrationInputField({
           options={field.options}
           value={socialValue}
           onChange={(value) =>
-            setValue(field.name, value, { shouldValidate: true })
+            setValue && setValue(field.name, value, { shouldValidate: true })
           }
         />
       )}
@@ -319,7 +258,7 @@ export default function RegistrationInputField({
                   : "text"
           }
           placeholder={field.placeholder}
-          {...register(field.name, { required: field.required })}
+          {...(register ? register(field.name, { required: field.required }) : {})}
         />
       )}
     </div>

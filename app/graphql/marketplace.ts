@@ -8,6 +8,7 @@ export const MARKETPLACE_STORES_QUERY = `{
     contactMethod
     createdAt
     email
+    logoUrl
     location { area city province }
     onBoardType
     overview
@@ -22,3 +23,25 @@ export const MARKETPLACE_COMPLETED_QUERY = `{
     completed
   }
 }`;
+
+export const UPDATE_MARKETPLACE_STORE_MUTATION = `
+  mutation UpdateMarketplaceStore($id: ID!, $input: UpdateMarketplaceStoreInput!) {
+    updateMarketplaceStore(id: $id, input: $input) {
+      id
+      title
+      address
+      businessType
+      completed
+      contactMethod
+      createdAt
+      email
+      logoUrl
+      location { area city province }
+      onBoardType
+      overview
+      ownerUid
+      pageType
+      phone
+    }
+  }
+`;

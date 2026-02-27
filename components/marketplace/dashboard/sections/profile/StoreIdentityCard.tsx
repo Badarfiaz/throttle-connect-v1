@@ -1,17 +1,18 @@
 import { Button } from "@/components/ui/button";
-import type { MarketplaceStore } from "@/types/marketplace";
 import {
   shopSetupFields,
   type FieldConfig,
 } from "@/components/marketplace/registration/formFields";
 import RegistrationInputField from "@/components/marketplace/registration/RegistrationInputField";
+import type { UseFormReturn } from "react-hook-form";
 
 type Props = {
-  store: MarketplaceStore | null;
-  userEmail?: string | null;
+  form?: UseFormReturn<any>;
+  onSave?: () => void;
+  saving?: boolean;
 };
 
-export default function StoreIdentityCard({ store, userEmail }: Props) {
+export default function StoreIdentityCard({ form, onSave, saving }: Props) {
   const fields: FieldConfig[] = [...shopSetupFields];
 
   return (
@@ -25,30 +26,21 @@ export default function StoreIdentityCard({ store, userEmail }: Props) {
             Update your public-facing details.
           </p>
         </div>
-        <Button size="sm" variant="outline">
-          Save changes
+        <Button
+          size="sm"
+          variant="outline"
+          type="button"
+          onClick={onSave}
+          disabled={saving}
+        >
+          {saving ? "Saving..." : "Save changes"}
         </Button>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        {fields.map((field) => {
-          const value =
-            store?.[field.name as keyof MarketplaceStore] ??
-            (field.name === "email"
-              ? userEmail
-              : field.name === "phone"
-                ? (store?.phone ?? "")
-                : "");
-
-          return (
-            <RegistrationInputField
-              key={field.name}
-              field={field}
-              isDashboard
-              defaultValue={value as string}
-            />
-          );
-        })}
+        {fields.map((field) => (
+          <RegistrationInputField key={field.name} field={field} form={form} />
+        ))}
       </div>
     </div>
   );

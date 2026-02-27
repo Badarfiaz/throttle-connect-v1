@@ -16,8 +16,15 @@ export const useMarketplaceDashboard = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>("profile");
   const user = useAppSelector((state) => state.auth.user);
 
-  const { data: marketplaceStores, loading, error, fetchMarketplaceStores } =
-    useMarketplaceStore();
+  const {
+    data: marketplaceStores,
+    loading,
+    error,
+    fetchMarketplaceStores,
+    updateMarketplaceStore,
+    updating,
+    updateError,
+  } = useMarketplaceStore();
 
   useEffect(() => {
     if (!user) return;
@@ -37,8 +44,11 @@ export const useMarketplaceDashboard = () => {
     setActiveTab,
     loading,
     error,
+    updating,
+    updateError,
     navItems: marketplaceNavItems,
     products: sampleProducts,
     staticProfile,
+    updateMarketplaceStore,
   };
 };

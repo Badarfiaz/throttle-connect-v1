@@ -5,6 +5,12 @@ const marketplaceStoreTypeDefs = /* GraphQL */ `
     province: String
   }
 
+  input MarketplaceLocationInput {
+    area: String
+    city: String
+    province: String
+  }
+
   type MarketplaceStore {
     id: ID!
     title: String
@@ -14,6 +20,7 @@ const marketplaceStoreTypeDefs = /* GraphQL */ `
     contactMethod: String
     phone: String
     email: String
+    logoUrl: String
     location: MarketplaceLocation
     onBoardType: String
     pageType: String
@@ -22,8 +29,29 @@ const marketplaceStoreTypeDefs = /* GraphQL */ `
     createdAt: String
   }
 
+  input UpdateMarketplaceStoreInput {
+    title: String
+    overview: String
+    address: String
+    businessType: [String!]
+    contactMethod: String
+    phone: String
+    email: String
+    logoUrl: String
+    location: MarketplaceLocationInput
+    onBoardType: String
+    pageType: String
+  }
+
   type Query {
     marketplaceStores: [MarketplaceStore!]!
+  }
+
+  type Mutation {
+    updateMarketplaceStore(
+      id: ID!
+      input: UpdateMarketplaceStoreInput!
+    ): MarketplaceStore!
   }
 `;
 
