@@ -1,5 +1,3 @@
-import { steps } from "framer-motion";
-
 export type Option = {
   label: string;
   value: string;
@@ -16,6 +14,35 @@ export type FieldConfig = {
   multiple?: boolean;
 };
 
+// ---------------- Reusable Social Fields ----------------
+export const createSocialFields = (prefix: string = ""): FieldConfig[] => [
+  {
+    name: prefix ? `${prefix}.contactMethod` : "contactMethod",
+    label: "Preferred Contact Method",
+    type: "select",
+    placeholder: "Select contact method",
+    required: true,
+    options: [
+      { label: "WhatsApp", value: "whatsapp" },
+      { label: "Phone Call", value: "call" },
+      { label: "Email", value: "email" },
+    ],
+  },
+  {
+    name: prefix ? `${prefix}.socialPlatforms` : "socialPlatforms",
+    label: "Select Social Platforms",
+    type: "social",
+    multiple: true,
+    options: [
+      { label: "Website", value: "website" },
+      { label: "LinkedIn", value: "linkedin" },
+      { label: "Instagram", value: "instagram" },
+      { label: "Other", value: "other" },
+    ],
+  },
+];
+
+// ---------------- Shop Setup ----------------
 export const shopSetupFields: FieldConfig[] = [
   {
     name: "title",
@@ -44,6 +71,7 @@ export const shopSetupFields: FieldConfig[] = [
   },
 ];
 
+// ---------------- Shop Details ----------------
 export const shopDetailsFields: FieldConfig[] = [
   {
     name: "businessType",
@@ -84,29 +112,5 @@ export const shopDetailsFields: FieldConfig[] = [
   },
 ];
 
-export const socialFields: FieldConfig[] = [
-  {
-    name: "contactMethod",
-    label: "Preferred Contact Method",
-    type: "select",
-    placeholder: "Select contact method",
-    required: true,
-    options: [
-      { label: "WhatsApp", value: "whatsapp" },
-      { label: "Phone Call", value: "call" },
-      { label: "Email", value: "email" },
-    ],
-  },
-  {
-    name: "socialPlatforms",
-    label: "Select Social Platforms",
-    type: "social",
-    multiple: true,
-    options: [
-      { label: "Website", value: "website" },
-      { label: "LinkedIn", value: "linkedin" },
-      { label: "Instagram", value: "instagram" },
-      { label: "Other", value: "other" },
-    ],
-  },
-];
+// ---------------- Shop Social ----------------
+export const shopSocialFields = createSocialFields();

@@ -1,19 +1,20 @@
 import React from "react";
-import { socialFields } from "./formFields";
+import { createSocialFields } from "./formFields";
 import RegistrationInputField from "./RegistrationInputField";
+
 type SocialFieldsProps = {
-  form: any; // You can replace 'any' with the specific type from react-hook-form if needed
+  form: any;
+  prefix?: string; // optional prefix
 };
-function SocialFields({ form }: SocialFieldsProps) {
+
+export default function SocialFields({ form, prefix }: SocialFieldsProps) {
+  const socialFields = createSocialFields(prefix);
+
   return (
-    <div>
-      <div className="grid gap-5">
-        {socialFields.map((field) => (
-          <RegistrationInputField key={field.name} field={field} form={form} />
-        ))}
-      </div>
+    <div className="grid gap-5">
+      {socialFields.map((field) => (
+        <RegistrationInputField key={field.name} field={field} form={form} />
+      ))}
     </div>
   );
 }
-
-export default SocialFields;

@@ -1,13 +1,5 @@
-import RegistureFormClub from "@/components/forms/RegistureFormClub"
+import RegistrationContainer from "@/components/shared/RegistrationContainer";
 
- 
- 
-function page() {
-  return (
-    <div>
-      <RegistureFormClub/>
-    </div>
-  )
+export default function ClubRegistrationPage() {
+  return <RegistrationContainer type="networking" />;
 }
-
-export default page
