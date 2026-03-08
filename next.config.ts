@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  turbopack: {},
   webpack: (config, { isServer }) => {
     // Exclude functions directory from Next.js build
     config.watchOptions = {
