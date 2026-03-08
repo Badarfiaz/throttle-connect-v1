@@ -1,12 +1,11 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { MarketplaceStore } from "@/types/marketplace";
 import { socialFields } from "@/components/marketplace/registration/formFields";
 import RegistrationInputField from "@/components/marketplace/registration/RegistrationInputField";
-import { storage } from "@/firebase";
+import { uploadImage } from "@/ulity/imageUpload";
 import type { UseFormReturn } from "react-hook-form";
 
 type StaticProfile = {
@@ -63,30 +62,13 @@ export default function StoreLogoCard({
       return;
     }
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Invalid file", {
-        description: "Please upload an image file.",
-      });
-      event.target.value = "";
-      return;
-    }
-
-    const maxSizeMb = 5;
-    if (file.size > maxSizeMb * 1024 * 1024) {
-      toast.error("File too large", {
-        description: `Please upload an image under ${maxSizeMb}MB.`,
-      });
-      event.target.value = "";
-      return;
-    }
-
     setUploading(true);
     try {
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const filePath = `marketplaceStores/${ownerId}/logo/${Date.now()}-${safeName}`;
-      const fileRef = ref(storage, filePath);
-      await uploadBytes(fileRef, file);
-      const logoUrl = await getDownloadURL(fileRef);
+      const { url: logoUrl } = await uploadImage(file, {
+        ownerId,
+        folder: "logo",
+        maxSizeMb: 5,
+      });
 
       await onUpdateStore(store.id, { logoUrl });
 
