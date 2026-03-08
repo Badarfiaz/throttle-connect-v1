@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "@/app/redux/hooks";
 import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
+import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
 import {
   DashboardTab,
   marketplaceNavItems,
-  sampleProducts,
   staticProfile,
   getLocationLabel,
   getStoreInitials,
@@ -26,10 +26,18 @@ export const useMarketplaceDashboard = () => {
     updateError,
   } = useMarketplaceStore();
 
+  const {
+    products,
+    loading: productsLoading,
+    error: productsError,
+    fetchProducts,
+  } = useMarketplaceProducts();
+
   useEffect(() => {
     if (!user) return;
     fetchMarketplaceStores().catch(() => undefined);
-  }, [user, fetchMarketplaceStores]);
+    fetchProducts().catch(() => undefined);
+  }, [user, fetchMarketplaceStores, fetchProducts]);
 
   const store = marketplaceStores?.[0] ?? null;
   const locationLabel = useMemo(() => getLocationLabel(store), [store]);
@@ -47,8 +55,11 @@ export const useMarketplaceDashboard = () => {
     updating,
     updateError,
     navItems: marketplaceNavItems,
-    products: sampleProducts,
+    products: products ?? [],
+    productsLoading,
+    productsError,
     staticProfile,
     updateMarketplaceStore,
+    fetchProducts,
   };
 };

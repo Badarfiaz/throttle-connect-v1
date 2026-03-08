@@ -14,12 +14,20 @@ async function startApolloServer() {
   const { mergeTypeDefs, mergeResolvers } =
     await import("@graphql-tools/merge");
   const { makeExecutableSchema } = await import("@graphql-tools/schema");
-  const typeDefs = mergeTypeDefs([marketplaceStoreTypeDefs]);
-  const resolvers = mergeResolvers([marketplaceStoreResolvers]);
+  const typeDefs = mergeTypeDefs([
+    marketplaceStoreTypeDefs,
+    marketplaceProductsTypeDefs,
+  ]);
+  const resolvers = mergeResolvers([
+    marketplaceStoreResolvers,
+    marketplaceProductsResolvers,
+  ]);
   const schema = makeExecutableSchema({ typeDefs, resolvers });
   return schema;
 }
 import { GraphQLSchema } from "graphql";
+import marketplaceProductsTypeDefs from "./graphql/marketplaceProducts/typeDef";
+import marketplaceProductsResolvers from "./graphql/marketplaceProducts/resolvers";
 let mainServerPromise: Promise<GraphQLSchema> | null = null;
 
 async function ensureMainServer(): Promise<GraphQLSchema> {

@@ -1,16 +1,34 @@
 "use client";
 
-import React from "react";
 import { DashboardContainer } from "@/components/shared/DashboardContainer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useMarketplaceDashboard } from "@/hooks/useMarketplaceDashboard";
+import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
 import type { DashboardTab } from "@/ulity/marketplaceDashboard";
 import ProfileSection from "@/components/marketplace/dashboard/sections/ProfileSection";
 import ProductsSection from "@/components/marketplace/dashboard/sections/ProductsSection";
 import AddProductSection from "@/components/marketplace/dashboard/sections/AddProductSection";
+import { useState } from "react";
+
+type MarketplaceProduct = {
+  id: string;
+  ownerUid: string;
+  productName: string;
+  imageurl?: {
+    ref: string;
+    url: string;
+  };
+  stock: number;
+  price: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
 
 const MarketplaceDashboardContainer = () => {
+  const [editingProduct, setEditingProduct] =
+    useState<MarketplaceProduct | null>(null);
+
   const {
     user,
     store,
@@ -22,11 +40,31 @@ const MarketplaceDashboardContainer = () => {
     error,
     navItems,
     products,
+    productsLoading,
+    productsError,
     staticProfile,
     updateMarketplaceStore,
     updating,
     updateError,
+    fetchProducts,
   } = useMarketplaceDashboard();
+
+  const { deleteProduct, deleting } = useMarketplaceProducts();
+
+  const handleEditProduct = (product: MarketplaceProduct) => {
+    setEditingProduct(product);
+    setActiveTab("add-product");
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    await deleteProduct(productId);
+  };
+
+  const handleBackToProducts = () => {
+    setEditingProduct(null);
+    setActiveTab("products");
+    fetchProducts().catch(() => undefined);
+  };
 
   return (
     <DashboardContainer
@@ -71,12 +109,23 @@ const MarketplaceDashboardContainer = () => {
       {activeTab === "products" && (
         <ProductsSection
           products={products}
-          onAddProduct={() => setActiveTab("add-product")}
+          loading={productsLoading}
+          error={productsError}
+          onAddProduct={() => {
+            setEditingProduct(null);
+            setActiveTab("add-product");
+          }}
+          onEditProduct={handleEditProduct}
+          onDeleteProduct={handleDeleteProduct}
+          deleting={deleting}
         />
       )}
 
       {activeTab === "add-product" && (
-        <AddProductSection onBack={() => setActiveTab("products")} />
+        <AddProductSection
+          onBack={handleBackToProducts}
+          editProduct={editingProduct}
+        />
       )}
     </DashboardContainer>
   );
