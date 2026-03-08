@@ -22,7 +22,7 @@ const MobileBottomNav = () => {
     {
       label: "Add",
       icon: Plus,
-      href: "/add",
+      href: "/marketplace/dashboard",
       isSpecial: true,
     },
     {
