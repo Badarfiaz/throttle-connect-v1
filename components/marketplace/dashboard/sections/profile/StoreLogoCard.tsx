@@ -3,10 +3,10 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { MarketplaceStore } from "@/types/marketplace";
-import { socialFields } from "@/components/marketplace/registration/formFields";
 import RegistrationInputField from "@/components/marketplace/registration/RegistrationInputField";
 import { uploadImage } from "@/ulity/imageUpload";
 import type { UseFormReturn } from "react-hook-form";
+import { createSocialFields } from "@/components/marketplace/registration/formFields";
 
 type StaticProfile = {
   website: string;
@@ -36,6 +36,7 @@ export default function StoreLogoCard({
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const socialFields = createSocialFields();
 
   const handleLogoClick = () => {
     fileInputRef.current?.click();
