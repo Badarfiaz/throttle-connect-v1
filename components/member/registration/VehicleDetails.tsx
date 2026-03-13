@@ -1,0 +1,19 @@
+import React from "react";
+import type { UseFormReturn } from "react-hook-form";
+import RegistrationInputField from "@/components/marketplace/registration/RegistrationInputField";
+import { vehicleFields } from "./formFields";
+import type { MemberProfile } from "./types";
+
+type VehicleDetailsProps = {
+  form: UseFormReturn<MemberProfile>;
+};
+
+export default function VehicleDetails({ form }: VehicleDetailsProps) {
+  return (
+    <div className="grid gap-5">
+      {vehicleFields.map((field) => (
+        <RegistrationInputField key={field.name} field={field} form={form} />
+      ))}
+    </div>
+  );
+}

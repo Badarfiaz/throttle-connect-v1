@@ -6,21 +6,30 @@ type SidebarRegistrationProps = {
     name: string;
     description: string;
   }[];
+  title?: string;
+  subtitle?: string;
+  supportNote?: string;
 };
 
 import { Check } from "lucide-react";
-function SidebarRegistration({ currentStep, steps }: SidebarRegistrationProps) {
+function SidebarRegistration({
+  currentStep,
+  steps,
+  title = "Marketplace",
+  subtitle = "Setup your store",
+  supportNote = "Contact support if you have trouble setting up your store.",
+}: SidebarRegistrationProps) {
   return (
     <div className="w-full md:w-1/3 bg-primary/5 p-8 flex flex-col justify-between relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-        <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] bg-gradient-to-br from-primary via-transparent to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] bg-linear-to-br from-primary via-transparent to-transparent rounded-full blur-3xl" />
       </div>
 
       <div className="z-10 w-full">
         <div className="mb-10 text-center md:text-left">
-          <h1 className="text-2xl font-bold text-primary">Marketplace</h1>
-          <p className="text-muted-foreground text-sm mt-1">Setup your store</p>
+          <h1 className="text-2xl font-bold text-primary">{title}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{subtitle}</p>
         </div>
 
         {/* Vertical Stepper for Desktop */}
@@ -34,7 +43,7 @@ function SidebarRegistration({ currentStep, steps }: SidebarRegistrationProps) {
                 {/* Step Line */}
                 {index !== steps.length - 1 && (
                   <div
-                    className={`absolute left-[15px] top-8 w-[2px] h-[calc(100%+24px)] -z-10 transition-colors duration-500 ${isCompleted ? "bg-primary" : "bg-border"}`}
+                    className={`absolute left-3.75 top-8 w-0.5 h-[calc(100%+24px)] -z-10 transition-colors duration-500 ${isCompleted ? "bg-primary" : "bg-border"}`}
                   />
                 )}
 
@@ -99,7 +108,7 @@ function SidebarRegistration({ currentStep, steps }: SidebarRegistrationProps) {
       <div className="mt-auto hidden md:block z-10">
         <div className="p-4 bg-background/50 backdrop-blur-sm rounded-xl border border-border/50 text-xs text-muted-foreground">
           <p className="font-medium text-foreground mb-1">Need Help?</p>
-          <p>Contact support if you have trouble setting up your store.</p>
+          <p>{supportNote}</p>
         </div>
       </div>
     </div>
