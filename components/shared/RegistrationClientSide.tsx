@@ -71,7 +71,7 @@ export default function RegistrationClientSide() {
             "Connect with mechanics",
           ]}
           buttonText="Join Networking"
-          link="/networking/Club-Registration"
+          link="/networking/registration"
         />
       </section>
 

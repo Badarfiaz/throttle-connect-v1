@@ -64,7 +64,7 @@ const HeaderPrimary: FC = () => {
       { href: "/", label: "Home" },
       { href: "/blogs", label: "News" },
       { href: "/contact", label: "Contact Us" },
-      { href: "/registration", label: "Registration" }, // FIXED lowercase route
+      { href: "/list-your-business", label: "Registration" }, // FIXED lowercase route
     ],
     [],
   );
