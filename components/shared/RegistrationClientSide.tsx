@@ -25,7 +25,7 @@ export default function RegistrationClientSide() {
 
   const hasMarketplaceCompleted = Boolean(
     marketplaceStores?.some((store) => store?.completed) ||
-      user?.marketplace?.completed,
+    user?.marketplace?.completed,
   );
 
   const handleMarketplaceClick = (
@@ -71,7 +71,7 @@ export default function RegistrationClientSide() {
             "Connect with mechanics",
           ]}
           buttonText="Join Networking"
-          link="/networking/registration"
+          link="/networking/Club-Registration"
         />
       </section>
 
