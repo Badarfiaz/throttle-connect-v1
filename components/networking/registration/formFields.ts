@@ -14,34 +14,6 @@ export type FieldConfig = {
   multiple?: boolean;
 };
 
-// ---------------- Reusable Social Fields ----------------
-export const createSocialFields = (): FieldConfig[] => [
-  {
-    name: "contactMethod",
-    label: "Preferred Contact Method",
-    type: "select",
-    placeholder: "Select contact method",
-    required: true,
-    options: [
-      { label: "WhatsApp", value: "whatsapp" },
-      { label: "Phone Call", value: "call" },
-      { label: "Email", value: "email" },
-    ],
-  },
-  {
-    name: "socialPlatforms",
-    label: "Select Social Platforms",
-    type: "social",
-    multiple: true,
-    options: [
-      { label: "Website", value: "website" },
-      { label: "LinkedIn", value: "linkedin" },
-      { label: "Instagram", value: "instagram" },
-      { label: "Other", value: "other" },
-    ],
-  },
-];
-
 // ---------------- Club Setup ----------------
 export const clubSetupFields: FieldConfig[] = [
   {
@@ -99,6 +71,3 @@ export const clubDetailsFields: FieldConfig[] = [
     type: "textarea",
   },
 ];
-
-// ---------------- Club Social ----------------
-export const clubSocialFields = createSocialFields();

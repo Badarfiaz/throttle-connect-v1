@@ -15,9 +15,9 @@ export type FieldConfig = {
 };
 
 // ---------------- Reusable Social Fields ----------------
-export const createSocialFields = (prefix: string = ""): FieldConfig[] => [
+export const socialFields: FieldConfig[] = [
   {
-    name: prefix ? `${prefix}.contactMethod` : "contactMethod",
+    name: "contactMethod",
     label: "Preferred Contact Method",
     type: "select",
     placeholder: "Select contact method",
@@ -29,7 +29,7 @@ export const createSocialFields = (prefix: string = ""): FieldConfig[] => [
     ],
   },
   {
-    name: prefix ? `${prefix}.socialPlatforms` : "socialPlatforms",
+    name: "socialPlatforms",
     label: "Select Social Platforms",
     type: "social",
     multiple: true,
@@ -113,4 +113,3 @@ export const shopDetailsFields: FieldConfig[] = [
 ];
 
 // ---------------- Shop Social ----------------
-export const shopSocialFields = createSocialFields();

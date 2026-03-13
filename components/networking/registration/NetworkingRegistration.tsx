@@ -7,7 +7,10 @@ import { useOnboardStep } from "@/hooks/useOnboardStep";
 import SidebarRegistration from "@/components/shared/registration/SidebarRegistration";
 import StepNavigationButtons from "../../shared/registration/StepNavigationButtons";
 import RegistrationHeader from "@/components/shared/registration/RegistrationHeader";
-import { RegistrationCardStyles, RegistrationContainerStyles } from "@/components/shared/registration/registrationStyles";
+import {
+  RegistrationCardStyles,
+  RegistrationContainerStyles,
+} from "@/components/shared/registration/registrationStyles";
 
 import ClubSetup from "./ClubSetup";
 import ClubDetails from "./ClubDetails";
@@ -15,9 +18,21 @@ import SocialFields from "../../marketplace/registration/SocialFields"; // reusa
 
 // Step definitions
 const steps = [
-  { key: 0, name: "Club Setup", description: "Basic information about your club" },
-  { key: 1, name: "Club Details", description: "Tell us about your club activities" },
-  { key: 2, name: "Social & Contact", description: "How members can reach you" },
+  {
+    key: 0,
+    name: "Club Setup",
+    description: "Basic information about your club",
+  },
+  {
+    key: 1,
+    name: "Club Details",
+    description: "Tell us about your club activities",
+  },
+  {
+    key: 2,
+    name: "Social & Contact",
+    description: "How members can reach you",
+  },
 ];
 
 export default function NetworkingRegistration() {
@@ -75,7 +90,9 @@ export default function NetworkingRegistration() {
                   {completed ? (
                     // ✅ Thank You Screen without any button
                     <div className="text-center py-20">
-                      <h2 className="text-3xl font-bold mb-4">Thank you for registering!</h2>
+                      <h2 className="text-3xl font-bold mb-4">
+                        Thank you for registering!
+                      </h2>
                       <p className="text-muted-foreground mb-6">
                         Your club registration has been successfully submitted.
                       </p>
@@ -84,7 +101,7 @@ export default function NetworkingRegistration() {
                     <>
                       {currentStep === 0 && <ClubSetup form={currentForm} />}
                       {currentStep === 1 && <ClubDetails form={currentForm} />}
-                      {currentStep === 2 && <SocialFields form={currentForm} prefix="club" />}
+                      {currentStep === 2 && <SocialFields form={currentForm} />}
                     </>
                   )}
                 </div>

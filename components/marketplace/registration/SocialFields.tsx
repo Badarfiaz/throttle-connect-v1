@@ -1,15 +1,12 @@
 import React from "react";
-import { createSocialFields } from "./formFields";
 import RegistrationInputField from "./RegistrationInputField";
+import { socialFields } from "./formFields";
 
 type SocialFieldsProps = {
   form: any;
-  prefix?: string; // optional prefix
 };
 
-export default function SocialFields({ form, prefix }: SocialFieldsProps) {
-  const socialFields = createSocialFields(prefix);
-
+export default function SocialFields({ form }: SocialFieldsProps) {
   return (
     <div className="grid gap-5">
       {socialFields.map((field) => (
