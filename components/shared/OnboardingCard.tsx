@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import SharedButton from '@/components/shared/SharedButton';
+import React from "react";
+import Link from "next/link";
+import SharedButton from "@/components/shared/SharedButton";
 
 interface OnboardingCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  benefits: string[];
+  benefits?: string[];
   buttonText: string;
   link: string;
   onButtonClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
@@ -34,7 +34,6 @@ export default function OnboardingCard({
       "
     >
       <div className="flex flex-col h-full p-6">
-
         {/* Icon */}
         <div
           className="
@@ -49,24 +48,22 @@ export default function OnboardingCard({
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold text-foreground mb-2">
-          {title}
-        </h3>
+        <h3 className="text-xl font-bold text-foreground mb-2">{title}</h3>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground mb-4">
-          {description}
-        </p>
+        <p className="text-sm text-muted-foreground mb-4">{description}</p>
 
         {/* Benefits */}
-        <ul className="space-y-2 text-sm text-foreground flex-grow">
-          {benefits.map((item, index) => (
-            <li key={index} className="flex gap-2">
-              <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
-              {item}
-            </li>
-          ))}
-        </ul>
+        {benefits && (
+          <ul className="space-y-2 text-sm text-foreground flex-grow">
+            {benefits.map((item, index) => (
+              <li key={index} className="flex gap-2">
+                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
 
         {/* Button */}
         <div className="mt-6">
@@ -79,7 +76,6 @@ export default function OnboardingCard({
             />
           </Link>
         </div>
-
       </div>
     </div>
   );
