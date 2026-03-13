@@ -1,7 +1,6 @@
+import RegistrationContainer from "@/components/shared/RegistrationContainer";
 import React from "react";
 
-function MemberRegistration() {
-  return <div>MemberRegistration</div>;
+export default function Profile() {
+  return <RegistrationContainer type="member" />;
 }
-
-export default MemberRegistration;
