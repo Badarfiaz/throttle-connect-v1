@@ -7,7 +7,7 @@ export type MemberProfile = {
   profileImage: string;
   location: {
     city: string;
-    country: string;
+    area: string;
   };
   vehicle: {
     type: string;
