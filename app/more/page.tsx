@@ -13,6 +13,7 @@ import {
   Star,
   LayoutTemplate,
   LogOut,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -83,12 +84,17 @@ const MorePage = () => {
               {
                 label: "Personal",
                 icon: User,
-                href: "/profilePage",
+                href: "/profile",
               },
               {
-                label: "Explore",
-                icon: Compass,
-                href: "/explore",
+                label: "Registration",
+                icon: LayoutTemplate,
+                href: "/list-your-business",
+              },
+              {
+                label: "Settings",
+                icon: Settings,
+                href: "/settings",
               },
             ],
           },
@@ -130,7 +136,7 @@ const MorePage = () => {
               </div>
             </div>
 
-            <Link href="/profilePage" className="block w-full mb-6">
+            <Link href="/profile" className="block w-full mb-6">
               <Button className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/20 h-10 rounded-xl text-md font-semibold backdrop-blur-sm transition-all">
                 View Profile
               </Button>
