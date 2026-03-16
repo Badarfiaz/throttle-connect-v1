@@ -1,48 +1,53 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
-import React, { useState } from "react";
-
-function Page() {
-  const [completedOnly, setCompletedOnly] = useState(false);
-  const { data, loading, error, fetchMarketplaceStores } = useMarketplaceStore({
-    isCompleted: true,
-  });
-
+import React from 'react'
+type product = {
+  name: string
+  price: number
+  description: string
+  inStock: boolean
+} 
+const marketplace: product = {  
+  name: 'product1',
+  price: 0,
+  description: 'best product ever',
+  inStock: true
+}
+const network = {
+  name: 'network1',
+  price: 0, 
+  description: 'best network ever',
+  inStock: true
+}
+type headerprops = {
+  title?:string
+  age?:number
+  showTitle?:boolean
+data?: product
+ }
+function Header({title, age, showTitle = false, data}:headerprops) {
   return (
-    <div className="p-8">
-      <div className="flex items-center gap-4">
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={completedOnly}
-            onChange={(e) => setCompletedOnly(e.target.checked)}
-          />
-          Completed only
-        </label>
+    <div>
+      {showTitle && <h1 style={{ color: 'white' , background: 'red', marginTop: '100px' , padding: '20px' }}>
+        This is a header: {title}
+         <span style={{backgroundColor: 'yellow' , color: 'black' }}> Age: {age}</span></h1>} 
 
-        <Button onClick={fetchMarketplaceStores} disabled={loading}>
-          {loading ? "Loading..." : "Test Fetch marketplaceStores"}
-        </Button>
-      </div>
-
-      {error && (
-        <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          <h3 className="font-bold">Error:</h3>
-          <pre className="whitespace-pre-wrap">{error}</pre>
-        </div>
-      )}
-
-      {data && (
-        <div className="mt-4 p-4 bg-green-100 border border-green-400 rounded">
-          <h3 className="font-bold mb-2">Marketplace Stores Data:</h3>
-          <pre className="whitespace-pre-wrap overflow-auto max-h-96">
-            {JSON.stringify(data, null, 2)}
-          </pre>
-        </div>
-      )}
-    </div>
-  );
+      {data && <div>
+        <h2>{data.name}</h2>
+        <p>{data.description}</p>
+        <p>Price: ${data.price}</p>
+        <p>{data.inStock ? 'In Stock' : 'Out of Stock'}</p>
+      </div>}
+     </div>
+  )
 }
 
-export default Page;
+function page() {
+  return (
+    <div>
+      <Header title='Marketplace' age={25} showTitle data={marketplace}/>
+      <Header title='Network' age={30}  showTitle data={network}/>
+      
+    </div>
+  )
+}
+
+export default page
