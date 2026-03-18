@@ -11,6 +11,11 @@ export default function RegistrationClientSide() {
   const [isMarketplaceCompletedOpen, setIsMarketplaceCompletedOpen] =
     useState(false);
 
+  // ✅ NEW STATE (important)
+  const [dialogType, setDialogType] = useState<
+    "marketplace" | "networking"
+  >("marketplace");
+
   const marketplaceHook = useMarketplaceStore({
     isCompleted: true,
   });
@@ -28,26 +33,29 @@ export default function RegistrationClientSide() {
       user?.marketplace?.completed,
   );
 
-  const isNetworkCompleted = false;
+  const isNetworkCompleted = true;
 
   console.log("hasMarketplaceCompleted =>", hasMarketplaceCompleted);
 
-  
+  // ✅ FIXED
   const handleMarketplaceClick = (
     event: React.MouseEvent<HTMLAnchorElement>,
   ) => {
     if (!hasMarketplaceCompleted) return;
 
     event.preventDefault();
+    setDialogType("marketplace"); // 👈 important
     setIsMarketplaceCompletedOpen(true);
   };
 
+  // ✅ FIXED
   const handleNetworkClick = (
     event: React.MouseEvent<HTMLAnchorElement>,
   ) => {
     if (!isNetworkCompleted) return;
 
     event.preventDefault();
+    setDialogType("networking"); // 👈 important
     setIsMarketplaceCompletedOpen(true);
   };
 
@@ -100,13 +108,30 @@ export default function RegistrationClientSide() {
         />
       </section>
 
+      {/* ✅ DYNAMIC DIALOG FIX */}
       <AlertDialogShared
         isOpen={isMarketplaceCompletedOpen}
         onOpenChange={setIsMarketplaceCompletedOpen}
-        dialogTitle="Already registered as marketplace vendor"
-        dialogDescription="You have already completed the marketplace vendor registration. Please proceed to the marketplace to manage your store or explore other features."
-        routeLink="/marketplace"
-        btnLabel="Go to marketplace"
+        dialogTitle={
+          dialogType === "marketplace"
+            ? "Already registered as marketplace vendor"
+            : "Already registered in networking"
+        }
+        dialogDescription={
+          dialogType === "marketplace"
+            ? "You have already completed the marketplace vendor registration. Please proceed to the marketplace to manage your store or explore other features."
+            : "You have already joined networking. Please proceed to explore clubs, events, and connections."
+        }
+        routeLink={
+          dialogType === "marketplace"
+            ? "/marketplace"
+            : "/networking"
+        }
+        btnLabel={
+          dialogType === "marketplace"
+            ? "Go to marketplace"
+            : "Go to networking"
+        }
       />
     </>
   );
