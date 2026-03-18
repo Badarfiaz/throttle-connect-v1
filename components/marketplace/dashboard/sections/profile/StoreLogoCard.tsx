@@ -91,7 +91,10 @@ export default function StoreLogoCard({
         Add a brand mark to help buyers recognize your store.
       </p>
 
-      <div className="mt-6 flex items-center gap-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
+      {/* ✅ FIXED RESPONSIVE SECTION */}
+      <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
+        
+        {/* Logo */}
         {store?.logoUrl ? (
           <img
             src={store.logoUrl}
@@ -103,14 +106,20 @@ export default function StoreLogoCard({
             {storeInitials}
           </div>
         )}
-        <div>
-          <p className="text-sm font-semibold text-slate-900">
+
+        {/* Store Info */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-slate-900 truncate">
             {store?.title ?? "Throttle Auto Hub"}
           </p>
-          <p className="text-xs text-slate-500">Recommended 512x512px</p>
+          <p className="text-xs text-slate-500">
+            Recommended 512x512px
+          </p>
         </div>
+
+        {/* Button */}
         <Button
-          className="ml-auto"
+          className="w-full sm:w-auto"
           size="sm"
           variant="outline"
           type="button"
@@ -119,6 +128,8 @@ export default function StoreLogoCard({
         >
           {uploading ? "Uploading..." : "Upload Logo"}
         </Button>
+
+        {/* Hidden Input */}
         <input
           ref={fileInputRef}
           type="file"
@@ -128,6 +139,7 @@ export default function StoreLogoCard({
         />
       </div>
 
+      {/* Rest Form */}
       <div className="mt-6 grid gap-4">
         {socialFields.map((field) => (
           <RegistrationInputField key={field.name} field={field} form={form} />
@@ -138,22 +150,10 @@ export default function StoreLogoCard({
             Social Links
           </label>
           <div className="mt-2 grid gap-3 sm:grid-cols-2">
-            <Input
-              defaultValue={staticProfile.facebook}
-              placeholder="Facebook URL"
-            />
-            <Input
-              defaultValue={staticProfile.instagram}
-              placeholder="Instagram URL"
-            />
-            <Input
-              defaultValue={staticProfile.tiktok}
-              placeholder="TikTok URL"
-            />
-            <Input
-              defaultValue={staticProfile.whatsapp}
-              placeholder="WhatsApp URL"
-            />
+            <Input defaultValue={staticProfile.facebook} placeholder="Facebook URL" />
+            <Input defaultValue={staticProfile.instagram} placeholder="Instagram URL" />
+            <Input defaultValue={staticProfile.tiktok} placeholder="TikTok URL" />
+            <Input defaultValue={staticProfile.whatsapp} placeholder="WhatsApp URL" />
           </div>
         </div>
       </div>

@@ -11,12 +11,12 @@ export default function RegistrationClientSide() {
   const [isMarketplaceCompletedOpen, setIsMarketplaceCompletedOpen] =
     useState(false);
 
-  const ismarkeptlaceCompleted = useMarketplaceStore({
+  const marketplaceHook = useMarketplaceStore({
     isCompleted: true,
   });
 
   const { data: marketplaceStores, fetchMarketplaceStores } =
-    ismarkeptlaceCompleted;
+    marketplaceHook;
 
   useEffect(() => {
     if (!user) return;
@@ -25,13 +25,28 @@ export default function RegistrationClientSide() {
 
   const hasMarketplaceCompleted = Boolean(
     marketplaceStores?.some((store) => store?.completed) ||
-    user?.marketplace?.completed,
+      user?.marketplace?.completed,
   );
 
+  const isNetworkCompleted = false;
+
+  console.log("hasMarketplaceCompleted =>", hasMarketplaceCompleted);
+
+  
   const handleMarketplaceClick = (
     event: React.MouseEvent<HTMLAnchorElement>,
   ) => {
     if (!hasMarketplaceCompleted) return;
+
+    event.preventDefault();
+    setIsMarketplaceCompletedOpen(true);
+  };
+
+  const handleNetworkClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
+    if (!isNetworkCompleted) return;
+
     event.preventDefault();
     setIsMarketplaceCompletedOpen(true);
   };
@@ -72,6 +87,7 @@ export default function RegistrationClientSide() {
           ]}
           buttonText="Join Networking"
           link="/networking/registration"
+          onButtonClick={handleNetworkClick}
         />
 
         <OnboardingCard
@@ -87,7 +103,7 @@ export default function RegistrationClientSide() {
       <AlertDialogShared
         isOpen={isMarketplaceCompletedOpen}
         onOpenChange={setIsMarketplaceCompletedOpen}
-        dialogTitle="Already registured as marketplace vendor"
+        dialogTitle="Already registered as marketplace vendor"
         dialogDescription="You have already completed the marketplace vendor registration. Please proceed to the marketplace to manage your store or explore other features."
         routeLink="/marketplace"
         btnLabel="Go to marketplace"

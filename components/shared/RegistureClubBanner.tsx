@@ -45,12 +45,14 @@ const RegistureClubBanner = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <Link href="/networking/Club-Registration">
+              {/* ✅ ONLY CHANGE HERE */}
+              <Link href="/marketplace/registration">
                 <SharedButton
                   label={ctaButton1 || "Get Started"}
                   className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"
                 />
               </Link>
+
               <SharedButton
                 variant="outline"
                 label={ctaButton2 || "Learn More"}
@@ -59,7 +61,7 @@ const RegistureClubBanner = ({
             </AnimateMotion>
           </div>
 
-          {/* Right: Minimal Features List (No Big Cards) */}
+          {/* Right: Minimal Features List */}
           <div className="w-full  lg:w-auto flex-1 max-w-xl">
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-6">
               {cardData?.slice(0, 4).map((card, index) => {
