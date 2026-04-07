@@ -7,13 +7,13 @@ export const personalInfoFields: FieldConfig[] = [
     placeholder: "Enter full name",
     required: true,
   },
-  {
-    name: "email",
-    label: "Email",
-    placeholder: "Enter email address",
-    required: true,
-    keyboardType: "email-address",
-  },
+  // {
+  //   name: "email",
+  //   label: "Email",
+  //   placeholder: "Enter email address",
+  //   required: true,
+  //   keyboardType: "email-address",
+  // },
   {
     name: "phone",
     label: "Phone Number",
@@ -32,6 +32,13 @@ export const personalInfoFields: FieldConfig[] = [
     label: "Profile Image URL",
     placeholder: "https://example.com/avatar.jpg",
   },
+  {
+name:'province',
+label:'Province',
+placeholder:'Enter province',
+required:true,
+  }
+  ,
   {
     name: "city",
     label: "City",

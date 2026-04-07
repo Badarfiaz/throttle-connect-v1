@@ -5,6 +5,7 @@ import type { MemberProfile } from "@/components/member/registration/types";
 
 const mockMemberProfile: MemberProfile = {
   uid: "TCM-9245",
+  memberName: "Ahsan Baig",
   name: "Ahsan Baig",
   email: "ahsan.baig@throttleconnect.com",
   phone: "+92 333 1112233",
@@ -26,10 +27,7 @@ const mockMemberProfile: MemberProfile = {
       "https://images.unsplash.com/photo-1502872364588-894d7d6ddfab?auto=format&fit=crop&w=600&q=80",
     ],
   },
-  documents: {
-    drivingLicenseImage:
-      "https://cdn.throttleconnect.com/docs/licenses/tcm-9245-license.jpg",
-  },
+  drivingLicenseImage: "https://cdn.throttleconnect.com/docs/licenses/tcm-9245-license.jpg",
   emergencyContact: {
     name: "Hassan Baig",
     phone: "+92 321 9876543",

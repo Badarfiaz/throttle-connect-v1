@@ -52,12 +52,12 @@ export default function SafetyContactPanel({
                 Emergency Contact
               </p>
               <p className="text-lg font-bold text-foreground leading-tight">
-                {member.emergencyContact.name}
+                {member.emergencyContact?.name || "Not specified"}
               </p>
               <span className="text-xs text-muted-foreground">
                 Blood Group:{" "}
                 <span className="font-semibold text-destructive">
-                  {member.emergencyContact.bloodGroup || "N/A"}
+                  {member.emergencyContact?.bloodGroup || "N/A"}
                 </span>
               </span>
             </div>
@@ -68,7 +68,7 @@ export default function SafetyContactPanel({
               className="w-full sm:w-auto bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               <PhoneCall className="mr-2 h-4 w-4" />
-              Call {member.emergencyContact.phone}
+              Call {member.emergencyContact?.phone || "N/A"}
             </Button>
             <Button
               size="sm"

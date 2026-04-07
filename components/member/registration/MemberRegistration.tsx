@@ -23,6 +23,10 @@ import PersonalInfo from "./PersonalInfo";
 import VehicleDetails from "./VehicleDetails";
 import EmergencyDetails from "./EmergencyDetails";
 import { MemberProfile } from "./types";
+import { db, auth } from "@/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { toast } from "sonner";
+import { useAppSelector } from "@/app/redux/hooks";
 
 const steps = [
   {
@@ -41,23 +45,7 @@ const steps = [
     description: "Add documents and emergency contact",
   },
 ];
-
-const normalizeImages = (
-  value: MemberProfile["vehicle"]["images"],
-): string[] => {
-  if (Array.isArray(value)) {
-    return value.filter((item) => item && item.trim().length > 0);
-  }
-
-  if (typeof value === "string") {
-    return value
-      .split(/[\n,]/)
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
-  }
-
-  return [];
-};
+ 
 
 export default function MemberRegistration() {
   const [collectedData, setCollectedData] = useState<Record<string, any>>({});
@@ -65,6 +53,7 @@ export default function MemberRegistration() {
   const [direction, setDirection] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const user = useAppSelector((state) => state.auth.user);
   const forms: UseFormReturn<MemberProfile>[] = [
     useForm<MemberProfile>(),
     useForm<MemberProfile>(),
@@ -91,9 +80,60 @@ export default function MemberRegistration() {
 
     try {
       setSubmitting(true);
-      //   await new Promise((resolve) => setTimeout(resolve, 500));
-      console.log("Member onboarding payload:", mergedData);
+ 
+      if (!user) {
+        toast.error("Authentication required", {
+          description: "Please sign in to complete registration.",
+        });
+        return;
+      }
+
+      // Transform the form data to match the required Firebase structure
+      const memberData = {
+        userId: user.id,
+        memberName: mergedData.memberName || "",
+        phone: mergedData.phone || "",
+        whatsapp: mergedData.whatsapp || "",
+        location: {
+          city: mergedData.city || "",
+          province: mergedData.province || "",
+          area: mergedData.area || "",
+        },
+        vehicle: {
+          type: mergedData.vehicleType || "",
+          brand: mergedData.vehicleBrand || "",
+          model: mergedData.vehicleModel || "",
+          modelYear: mergedData.ModelYear || "",
+          images: mergedData.vehicleImages || "",
+        },
+        emergencyDetails: {
+          contactName: mergedData.emergencyContactName || "",
+          contactPhone: mergedData.emergencyContactPhone || "",
+          bloodGroup: mergedData.bloodGroup || "",
+        },
+        profileImage: mergedData.profileImage || "",
+        experienceYears: mergedData.experienceYears || "",
+        interests: mergedData.interests || [],
+        drivingLicenseImage: mergedData.drivingLicenseImage || "",
+        createdAt: new Date().toISOString(),
+      };
+
+      // Save to Firestore using userId as document ID
+      const memberDocRef = doc(db, "members", user.id);
+      await setDoc(memberDocRef, memberData);
+
+      console.log("Member onboarding payload saved to Firebase:", memberData);
+      
+      toast.success("Registration complete!", {
+        description: "Your member profile has been saved successfully.",
+      });
+      
       setIsSuccessOpen(true);
+    } catch (error) {
+      console.error("Error saving member data:", error);
+      toast.error("Registration failed", {
+        description: error instanceof Error ? error.message : "Please try again.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -136,10 +176,9 @@ export default function MemberRegistration() {
       <Dialog open={isSuccessOpen} onOpenChange={setIsSuccessOpen}>
         <DialogContent className="max-w-md rounded-2xl">
           <DialogHeader>
-            <DialogTitle>Member Profile Saved</DialogTitle>
+            <DialogTitle>Welcome to the Throttle connect!</DialogTitle>
             <DialogDescription>
-              We have captured your onboarding details locally. Backend
-              integration will wire this up soon.
+              Your member profile has been successfully saved!
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-3 sm:flex-row">

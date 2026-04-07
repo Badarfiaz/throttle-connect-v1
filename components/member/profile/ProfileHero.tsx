@@ -17,18 +17,19 @@ const statBlocks = (
   },
   {
     label: "Primary Ride",
-    value: member.vehicle.model || member.vehicle.brand,
-    helper: member.vehicle.brand,
+    value: member.vehicle?.model || member.vehicle?.brand || "Not specified",
+    helper: member.vehicle?.brand,
   },
   {
     label: "Interests",
-    value: `${member.interests.length}`,
+    value: `${member.interests?.length || 0}`,
     helper: "Active pursuits",
   },
 ];
 
 export default function ProfileHero({ member }: ProfileHeroProps) {
-  const initials = member.name
+  const displayName = member.memberName || member.name || "Member";
+  const initials = displayName
     .split(" ")
     .map((part) => part.charAt(0))
     .slice(0, 2)
@@ -83,14 +84,14 @@ export default function ProfileHero({ member }: ProfileHeroProps) {
               </Badge>
               <span className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
-                {member.location.city}, {member.location.area}
+                {member.location?.city || ""}, {member.location?.area || ""}
               </span>
             </div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-              {member.name}
+              {displayName}
             </h1>
             <p className="text-base text-muted-foreground">
-              Passionate {member.vehicle.type} rider focused on community rides
+              Passionate {member.vehicle?.type || "bike"} rider focused on community rides
               and safety-first adventures.
             </p>
             <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
