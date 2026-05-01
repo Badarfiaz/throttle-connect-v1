@@ -7,15 +7,17 @@ import { useState, useEffect } from "react";
 
 export default function RegistrationClientSide() {
   const user = useAppSelector((state) => state.auth.user);
+  console.log("USER DATA IN REGISTRATION CLIENT SIDE => ", user);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState<
-    "marketplace" | "networking" | null
+    "marketplace" | "networking" | "member" | null
   >(null);
-
   const isMarketplaceCompleted = user?.marketplace?.completed;
   const isNetworkingCompleted = user?.networking?.completed;
-
-  const getAlertContent = (type: "marketplace" | "networking" | null) => {
+  const isMemberProfileCompleted = user?.profileData?.completed;
+  const getAlertContent = (
+    type: "marketplace" | "networking" | "member" | null,
+  ) => {
     if (type === "marketplace") {
       return {
         title: "Already registered as marketplace vendor",
@@ -32,6 +34,15 @@ export default function RegistrationClientSide() {
           "You have already joined the automotive networking. Please proceed to the networking section to connect with enthusiasts, clubs, and events.",
         routeLink: "/networking",
         btnLabel: "Go to networking",
+      };
+    }
+    if (type === "member") {
+      return {
+        title: "Already registered as member",
+        description:
+          "You have already completed the member registration. Please proceed to your member dashboard to manage your profile or explore other features.",
+        routeLink: "/member-dashboard",
+        btnLabel: "Go to member dashboard",
       };
     }
     return {
@@ -59,6 +70,15 @@ export default function RegistrationClientSide() {
       setIsDialogOpen(true);
     }
   };
+
+  const handleMemberClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isMemberProfileCompleted) {
+      e.preventDefault();
+      setDialogType("member");
+      setIsDialogOpen(true);
+    }
+  };
+
   return (
     <>
       <section
@@ -105,6 +125,7 @@ export default function RegistrationClientSide() {
           benefits={["member"]}
           buttonText="Join as Member"
           link="/member-registration"
+          onButtonClick={handleMemberClick}
         />
       </section>
 

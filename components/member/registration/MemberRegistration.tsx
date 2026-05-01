@@ -14,7 +14,7 @@ import { AlertDialogShared } from "@/components/shared/AlertDialogShared";
 import PersonalInfo from "./PersonalInfo";
 import VehicleDetails from "./VehicleDetails";
 import EmergencyDetails from "./EmergencyDetails";
-import { db, auth } from "@/firebase";
+import { db } from "@/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { toast } from "sonner";
 import { useAppSelector } from "@/app/redux/hooks";
@@ -62,9 +62,13 @@ export default function MemberRegistration() {
   const handleNext = currentForm.handleSubmit(async (data) => {
     const mergedData = { ...collectedData, ...data };
     const isLastStep = currentStep === steps.length - 1;
+    const mergedDataWithCompletion: Partial<MemberRegistrationFormValues> = {
+      ...mergedData,
+      completed: isLastStep,
+    };
 
-    setCollectedData(mergedData);
-    console.log("mergedData", mergedData);
+    setCollectedData(mergedDataWithCompletion);
+    console.log("mergedData", mergedDataWithCompletion);
     console.log("collectedData", collectedData);
     if (!isLastStep) {
       setDirection(1);
@@ -86,6 +90,7 @@ export default function MemberRegistration() {
       // Map form values to the Firestore member document structure
       const memberData: MemberProfile = {
         userId: user.userId,
+        completed: mergedDataWithCompletion.completed ?? false,
         memberName: mergedData.memberName || "",
         phone: mergedData.phone || "",
         whatsapp: mergedData.whatsapp || "",
@@ -112,6 +117,7 @@ export default function MemberRegistration() {
         drivingLicenseImage:
           mergedData.drivingLicenseImage || mergedData.documents || "",
         createdAt: new Date().toISOString(),
+        ownerUid: user.userId,
       };
 
       // Save to Firestore using userId as document ID

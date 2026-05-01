@@ -1,7 +1,9 @@
-import React from "react";
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
-import type { MemberProfile } from "../registration/types";
+import { MemberProfile } from "@/types/member";
+import { useAppSelector } from "@/app/redux/hooks";
+import SafetyContactPanel from "./SafetyContactPanel";
 
 type ProfileHeroProps = {
   member: MemberProfile;
@@ -27,8 +29,10 @@ const statBlocks = (
   },
 ];
 
-export default function ProfileHero({ member }: ProfileHeroProps) {
-  const displayName = member.memberName || member.name || "Member";
+export default function ProfileHero() {
+  const user = useAppSelector((state) => state.auth.user);
+  const profileData = user?.profileData;
+  const displayName = profileData?.memberName || "Member Name unknown";
   const initials = displayName
     .split(" ")
     .map((part) => part.charAt(0))
@@ -55,11 +59,11 @@ export default function ProfileHero({ member }: ProfileHeroProps) {
       <div className="relative z-10 flex flex-col gap-10 p-6 lg:flex-row lg:items-center lg:p-10">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
           <div className="relative h-28 w-28 rounded-3xl border border-border/60 bg-muted/30 shadow-xl">
-            {member.profileImage ? (
+            {profileData?.profileImage ? (
               <div
                 className="h-full w-full rounded-3xl object-cover"
                 style={{
-                  backgroundImage: `url(${member.profileImage})`,
+                  backgroundImage: `url(${profileData?.profileImage})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                 }}
@@ -80,35 +84,36 @@ export default function ProfileHero({ member }: ProfileHeroProps) {
                 variant="secondary"
                 className="bg-muted text-muted-foreground"
               >
-                {member.uid}
+                {profileData?.uid}
               </Badge>
               <span className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
-                {member.location?.city || ""}, {member.location?.area || ""}
+                {profileData?.location?.city || ""},{" "}
+                {profileData?.location?.area || ""}
               </span>
             </div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight">
               {displayName}
             </h1>
             <p className="text-base text-muted-foreground">
-              Passionate {member.vehicle?.type || "bike"} rider focused on community rides
-              and safety-first adventures.
+              Passionate {profileData?.vehicle?.type || "bike"} rider focused on
+              community rides and safety-first adventures.
             </p>
             <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-primary" />
-                {member.email}
+                {profileData?.email}
               </span>
               <span className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-emerald-400" />
-                {member.phone}
+                {profileData?.phone}
               </span>
             </div>
           </div>
         </div>
 
         <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-3">
-          {statBlocks(member).map((block) => (
+          {(profileData ? statBlocks(profileData) : []).map((block) => (
             <div
               key={block.label}
               className="rounded-2xl border border-border/60 bg-muted/40 p-4 text-center shadow-lg"
@@ -126,6 +131,11 @@ export default function ProfileHero({ member }: ProfileHeroProps) {
           ))}
         </div>
       </div>
+      {profileData && (
+        <div className="w-full">
+          <SafetyContactPanel profileData={profileData} />
+        </div>
+      )}
     </section>
   );
 }

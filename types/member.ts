@@ -12,6 +12,7 @@ export type MemberEmergencyContact = {
   bloodGroup: string;
 };
 export type MemberRegistrationFormValues = {
+  completed?: boolean;
   memberName?: string;
   phone?: string;
   whatsapp?: string;
@@ -36,6 +37,8 @@ export type MemberRegistrationFormValues = {
 export type MemberProfile = {
   userId?: string;
   uid?: string;
+  ownerUid?: string;
+  completed?: boolean;
   memberName?: string;
   name?: string;
   email?: string;

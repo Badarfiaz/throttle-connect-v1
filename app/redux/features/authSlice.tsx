@@ -10,6 +10,7 @@ import {
 } from "@reduxjs/toolkit";
 import { User } from "@/types/CommonType";
 import { normalizeFirestoreStore } from "@/lib/utils";
+import { MemberProfile } from "@/types/member";
 
 export type UserInput = {
   email: string;
@@ -62,9 +63,12 @@ export const fetchNetworkingForUser = createAsyncThunk(
     return await getStoreData<NetworkingStore>("networkingStores", userId);
   },
 );
-const normalizeUser = (user: User): User => ({
-  ...user,
-});
+export const fetchUserProfileData = createAsyncThunk(
+  "auth/fetchUserProfileData",
+  async (userId: string) => {
+    return await getStoreData<MemberProfile>("members", userId);
+  },
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -80,7 +84,7 @@ const authSlice = createSlice({
     },
     setUser: (state, action: PayloadAction<User | null>) => {
       console.log("user set user payload", action.payload);
-      state.user = action.payload ? normalizeUser(action.payload) : null;
+      state.user = action.payload || null;
       state.isAuthenticated = !!action.payload;
       state.isLoading = false;
     },
@@ -115,6 +119,12 @@ const authSlice = createSlice({
         state.user.networking = action.payload;
       }
     });
+    builder.addCase(fetchUserProfileData.fulfilled, (state, action) => {
+      const userId = action.meta.arg;
+      if (state.user && state.user.userId === userId) {
+        state.user.profileData = action.payload;
+      }
+    });
   },
 });
 
@@ -134,6 +144,7 @@ authListenerMiddleware.startListening({
       await Promise.all([
         listenerApi.dispatch(fetchMarketplaceForUser(user.userId)),
         listenerApi.dispatch(fetchNetworkingForUser(user.userId)),
+        listenerApi.dispatch(fetchUserProfileData(user.userId)),
       ]);
     } catch (e) {
       // ignore errors; fetchMarketplaceForUser handles nulls

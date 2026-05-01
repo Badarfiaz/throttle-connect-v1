@@ -1,4 +1,5 @@
 import { MarketplaceStore } from "./marketplace";
+import { MemberProfile } from "./member";
 import { NetworkingStore } from "./networking";
 
 export type locationFields = {
@@ -50,4 +51,5 @@ export type User = {
   completed?: boolean;
   marketplace?: MarketplaceStore | null;
   networking?: NetworkingStore | null;
+  profileData?: MemberProfile | null;
 };

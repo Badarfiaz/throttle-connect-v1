@@ -1,7 +1,6 @@
-import React from "react";
 import ProfileHero from "@/components/member/profile/ProfileHero";
 import SafetyContactPanel from "@/components/member/profile/SafetyContactPanel";
-import type { MemberProfile } from "@/components/member/registration/types";
+import { MemberProfile } from "@/types/member";
 
 const mockMemberProfile: MemberProfile = {
   uid: "TCM-9245",
@@ -15,6 +14,7 @@ const mockMemberProfile: MemberProfile = {
   location: {
     city: "Karachi",
     area: "DHA Phase 6",
+    province: "Sindh",
   },
   vehicle: {
     type: "bike",
@@ -27,7 +27,8 @@ const mockMemberProfile: MemberProfile = {
       "https://images.unsplash.com/photo-1502872364588-894d7d6ddfab?auto=format&fit=crop&w=600&q=80",
     ],
   },
-  drivingLicenseImage: "https://cdn.throttleconnect.com/docs/licenses/tcm-9245-license.jpg",
+  drivingLicenseImage:
+    "https://cdn.throttleconnect.com/docs/licenses/tcm-9245-license.jpg",
   emergencyContact: {
     name: "Hassan Baig",
     phone: "+92 321 9876543",
@@ -42,13 +43,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-background text-white">
       <div className="mx-auto max-w-6xl space-y-8 px-4 pb-16 pt-12 md:px-8">
-        <ProfileHero member={mockMemberProfile} />
-
-        <div>
-          <div className="space-y-6">
-            <SafetyContactPanel member={mockMemberProfile} />
-          </div>
-        </div>
+        <ProfileHero />
       </div>
     </div>
   );
