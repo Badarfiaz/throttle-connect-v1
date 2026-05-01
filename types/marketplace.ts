@@ -17,3 +17,10 @@ export type MarketplaceStore = {
   pageType?: string | null;
   phone?: string | null;
 };
+
+export type MarketplaceStoreCard = {
+  id: string;
+  title?: string | null;
+  logoUrl?: string | null;
+  slugUrl?: string | null;
+};

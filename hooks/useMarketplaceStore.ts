@@ -1,36 +1,26 @@
-import { useCallback, useMemo, useState } from "react";
+"use client";
+import { useCallback, useState } from "react";
 import { FETCHER_URL } from "@/lib/config";
 import getFirebaseToken from "@/ulity/getFirebaseToken";
 import type { MarketplaceStore } from "@/types/marketplace";
 import {
-  MARKETPLACE_COMPLETED_QUERY,
   MARKETPLACE_STORES_QUERY,
   UPDATE_MARKETPLACE_STORE_MUTATION,
 } from "@/app/graphql/marketplace";
 
-type UseMarketplaceStoreOptions = {
-  isCompleted?: boolean;
-  iscompleted?: boolean;
+type UseMarketplaceStoreProps = {
+  query?: string;
+  isPublic?: boolean;
 };
-
-export const useMarketplaceStore = (
-  options: UseMarketplaceStoreOptions = {},
-) => {
-  const resolvedIsCompleted =
-    options.isCompleted ?? options.iscompleted ?? false;
+export const useMarketplaceStore = ({
+  query = MARKETPLACE_STORES_QUERY,
+  isPublic = false,
+}: UseMarketplaceStoreProps) => {
   const [data, setData] = useState<MarketplaceStore[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
-
-  const query = useMemo(
-    () =>
-      resolvedIsCompleted
-        ? MARKETPLACE_COMPLETED_QUERY
-        : MARKETPLACE_STORES_QUERY,
-    [resolvedIsCompleted],
-  );
 
   const fetchMarketplaceStores = useCallback(async () => {
     setLoading(true);
@@ -50,11 +40,11 @@ export const useMarketplaceStore = (
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ query: query }),
       });
 
       const result = await res.json();
-
+      console.log("Fetch Result marketplace store :", result);
       if (!res.ok || result.errors) {
         const message = result?.errors
           ? JSON.stringify(result.errors, null, 2)
@@ -62,7 +52,10 @@ export const useMarketplaceStore = (
         throw new Error(message);
       }
 
-      const stores = result?.data?.marketplaceStores ?? null;
+      const stores =
+        result?.data?.marketplaceStores ??
+        result?.data?.marketplaceAllStores ??
+        null;
       setData(stores);
 
       return stores as MarketplaceStore[] | null;
@@ -141,6 +134,5 @@ export const useMarketplaceStore = (
     updateError,
     fetchMarketplaceStores,
     updateMarketplaceStore,
-    query,
   };
 };

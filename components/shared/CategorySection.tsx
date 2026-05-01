@@ -4,13 +4,15 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import { vehicleCategoriesType } from "@/dummydata/networking";
 import CardLinkWrapper from "./CardLinkWapper";
+import { MarketplaceStoreCard } from "@/types/marketplace";
 
-interface CategorySectionProps {
-  items: vehicleCategoriesType;
-}
+type CategorySectionProps = {
+  items: MarketplaceStoreCard;
+};
 
 export default function CategorySection({ items }: CategorySectionProps) {
-  const link = `/networking/Club-list/${items?.categoryType}`;
+  console.log("CategorySection", items);
+  const link = `/networking/Club-list/${items?.slugUrl}`;
   return (
     <CardLinkWrapper link={link}>
       <HoverCard key={items?.id}>
@@ -21,8 +23,8 @@ export default function CategorySection({ items }: CategorySectionProps) {
           >
             <div className="relative w-full h-40 sm:h-44 md:h-48 overflow-hidden rounded-t-xl">
               <Image
-                src={items?.image || "/images/placeholder.webp"}
-                alt={items?.categoryType || "Unknown"}
+                src={items?.logoUrl || "/images/placeholder.webp"}
+                alt={"Unknown"}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -30,7 +32,7 @@ export default function CategorySection({ items }: CategorySectionProps) {
             </div>
             <CardHeader className="p-3 text-center">
               <CardTitle className="text-base font-semibold text-[#0B2447] group-hover:text-[#19376D] transition-colors">
-                {items?.categoryType || items?.shopName || "Unknown Category"}
+                {items?.title || "Unknown Category"}
               </CardTitle>
             </CardHeader>
           </Card>

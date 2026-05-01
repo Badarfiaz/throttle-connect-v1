@@ -18,6 +18,14 @@ export const MARKETPLACE_STORES_QUERY = `{
   }
 }`;
 
+export const MARKETPLACE_ALL_STORES_QUERY = `{
+  marketplaceAllStores {
+    id
+    title
+    logoUrl
+  }
+}`;
+
 export const MARKETPLACE_COMPLETED_QUERY = `{
   marketplaceStores {
     completed

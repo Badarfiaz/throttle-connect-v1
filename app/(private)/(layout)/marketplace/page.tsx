@@ -1,16 +1,42 @@
+"use client";
+import { useEffect, useMemo } from "react";
 import ProductCard from "@/components/marketplace/ProductCard";
-import CategorySection from "@/components/shared/CategorySection";
 import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
-import {
-  markeptlaceCatgegoryies,
-  marketplaceProducts,
-} from "@/dummydata/marketplace";
-import { cardDataMarketplace } from "@/dummydata/networking";
+import { useAppSelector } from "@/app/redux/hooks";
 
-function page() {
+import { marketplaceProducts } from "@/dummydata/marketplace";
+import { cardDataMarketplace } from "@/dummydata/networking";
+import { MARKETPLACE_ALL_STORES_QUERY } from "@/app/graphql/marketplace";
+import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
+import { MarketplaceStoreCard } from "@/types/marketplace";
+import CategorySection from "@/components/shared/CategorySection";
+
+function Page() {
+  const { data, loading, error, fetchMarketplaceStores } = useMarketplaceStore({
+    query: MARKETPLACE_ALL_STORES_QUERY,
+  });
+  const user = useAppSelector((state) => state.auth.user);
+  useEffect(() => {
+    if (user?.userId) {
+      fetchMarketplaceStores();
+    }
+  }, [user?.userId, fetchMarketplaceStores]);
+
+  console.log("STORcsdcE DATA ", data); // coorect
+  const storeCards: MarketplaceStoreCard[] = useMemo(
+    () =>
+      (data ?? []).map((store, index) => ({
+        id: store.id ?? `store-${index}`,
+        title: store.title,
+        logoUrl: store.logoUrl,
+        // slugUrl: store.slugUrl,
+      })),
+    [data],
+  );
+
   return (
     <div>
       <HeroSection
@@ -19,30 +45,67 @@ function page() {
         ctaText="Explore products"
         layout={2}
       />
+
       <div className="max-w-5xl mt-20 mx-auto px-6">
-        {/* Sections Heading */}
         <Title
-          title="Explore Products"
-          description="expore our marketplace of automotive clubs and find your perfect match."
+          title="Explore Stores"
+          description="Explore our marketplace of automotive stores and find your perfect match."
         />
       </div>
 
-      <div className="px-4 sm:px-6 md:px-12 lg:px-20 pt-0 pb-0">
-        <PrimaryCarousel
-          items={markeptlaceCatgegoryies}
-          responsive={{
-            mobile: 2,
-            tablet: 3,
-            desktop: 4,
-          }}
-          className="w-full"
-          renderItem={(category) => (
-            <div className="w-full h-full">
-              <CategorySection key={category.id} items={category} />
-            </div>
-          )}
-        />
+      <div className="px-4 sm:px-6 md:px-12 lg:px-20">
+        {loading ? (
+          <p className="py-10 text-center text-sm text-muted-foreground">
+            Loading stores...
+          </p>
+        ) : error ? (
+          <p className="py-10 text-center text-sm text-destructive">
+            Failed to load stores.
+          </p>
+        ) : storeCards.length > 0 ? (
+          <PrimaryCarousel
+            items={storeCards}
+            responsive={{
+              mobile: 2,
+              tablet: 3,
+              desktop: 4,
+            }}
+            className="w-full"
+            renderItem={(store) => (
+              // <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-border/60 bg-card p-4 text-center shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
+              //   <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-border/60 bg-muted/40 shadow-inner">
+              //     {store.logoUrl ? (
+              //       <img
+              //         src={store.logoUrl}
+              //         alt={store.title || "Store logo"}
+              //         className="h-full w-full object-cover"
+              //       />
+              //     ) : (
+              //       <span className="text-lg font-semibold text-foreground">
+              //         {(store.title || "Store")
+              //           .split(" ")
+              //           .filter(Boolean)
+              //           .slice(0, 2)
+              //           .map((part) => part.charAt(0))
+              //           .join("")
+              //           .toUpperCase()}
+              //       </span>
+              //     )}
+              //   </div>
+              //   <p className="mt-4 line-clamp-2 text-sm font-semibold text-foreground">
+              //     {store.title || "Untitled Store"}
+              //   </p>
+              // </div>
+              <CategorySection key={store.id} items={store} />
+            )}
+          />
+        ) : (
+          <p className="py-10 text-center text-sm text-muted-foreground">
+            No stores available right now.
+          </p>
+        )}
       </div>
+
       <RegistureClubBanner
         title="Join the Throttle Connect Marketplace"
         description="Whether you’re a seller looking to reach passionate enthusiasts or a buyer seeking unique products, our marketplace is your destination."
@@ -50,12 +113,13 @@ function page() {
         ctaButton2="Find a Club"
         cardData={cardDataMarketplace}
       />
+
       <Title
         title="Featured Products"
         description="Discover our handpicked selection of automotive products, curated for quality and performance."
       />
 
-      <div className="px-4  mb-10 sm:px-6 md:px-12 lg:px-20 pt-0 pb-0">
+      <div className="px-4 mb-10 sm:px-6 md:px-12 lg:px-20">
         <PrimaryCarousel
           items={marketplaceProducts}
           className="w-full"
@@ -65,7 +129,7 @@ function page() {
             desktop: 4,
           }}
           renderItem={(product) => (
-            <div className="w-full h-full">
+            <div key={product.id} className="w-full h-full">
               <ProductCard product={product} />
             </div>
           )}
@@ -75,4 +139,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

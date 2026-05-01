@@ -39,6 +39,23 @@ const marketplaceStoreResolvers = {
         };
       });
     },
+    marketplaceAllStores: async () => {
+      const snapshot = await db
+        .collection(COLLECTIONS.MARKETPLACE_STORES)
+        .where("completed", "==", true)
+        .get();
+
+      if (snapshot.empty) return [];
+
+      return snapshot.docs.map((doc) => {
+        const data = doc.data() as any;
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: normalizeCreatedAt(data?.createdAt),
+        };
+      });
+    },
   },
 
   Mutation: {
