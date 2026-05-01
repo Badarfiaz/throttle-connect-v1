@@ -92,6 +92,7 @@ export const useMarketplaceStore = ({
       const stores =
         result?.data?.marketplaceStores ??
         result?.data?.marketplaceAllStores ??
+        result?.data?.marketplaceStoreProfile ??
         null;
       setData(stores);
 
