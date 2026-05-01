@@ -4,9 +4,17 @@ import { Home, Store, Plus, HardHat, LayoutGrid, Network } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { useAppSelector } from "@/app/redux/hooks";
+import { fa } from "zod/v4/locales";
 
 const MobileBottomNav = () => {
   const pathname = usePathname();
+  const user = useAppSelector((state) => state.auth.user);
+  const isMarketplaceSeller = user?.marketplace?.completed;
+  const isNetworkingCompleted = user?.networking?.completed;
+  const addHref = isMarketplaceSeller
+    ? "/marketplace/dashboard"
+    : "/networking/dashboard";
 
   const navItems = [
     {
@@ -22,7 +30,7 @@ const MobileBottomNav = () => {
     {
       label: "Add",
       icon: Plus,
-      href: "/marketplace/dashboard",
+      href: addHref,
       isSpecial: true,
     },
     {
@@ -37,10 +45,17 @@ const MobileBottomNav = () => {
     },
   ];
 
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.label === "Add") {
+      return isMarketplaceSeller || isNetworkingCompleted;
+    }
+    return true;
+  });
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 block md:hidden bg-white border-t border-gray-200 px-4 py-2 pb-safe">
       <div className="flex justify-between items-end h-16 relative">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = pathname === item.href;
           const isSpecial = item.isSpecial;
 
