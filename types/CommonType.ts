@@ -8,7 +8,7 @@ export type locationFields = {
   province: string;
 };
 export type ContactMethod = "email" | "phone" | "whatsapp" | "social";
-
+export type allowedPageType = "marketplace" | "networking";
 export type SocialMediaPlatform =
   | "facebook"
   | "instagram"

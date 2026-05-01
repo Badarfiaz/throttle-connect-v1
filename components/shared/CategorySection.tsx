@@ -3,14 +3,23 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import CardLinkWrapper from "./CardLinkWapper";
 import { MarketplaceStoreCard } from "@/types/marketplace";
+import { allowedPageType } from "@/types/CommonType";
 
 type CategorySectionProps = {
   items: MarketplaceStoreCard;
+  pageType?: allowedPageType;
 };
 
-export default function CategorySection({ items }: CategorySectionProps) {
+export default function CategorySection({
+  items,
+  pageType,
+}: CategorySectionProps) {
   console.log("CategorySection", items);
-  const link = `/networking/Club-list/${items?.slugUrl}`;
+  const link = `${
+    pageType === "marketplace"
+      ? `/marketplace/storeProfile/${items?.slugUrl}`
+      : `/networking/Club-list/${items?.slugUrl}`
+  }`;
   return (
     <CardLinkWrapper link={link}>
       <HoverCard key={items?.id}>

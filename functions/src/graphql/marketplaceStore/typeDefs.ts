@@ -21,6 +21,7 @@ const marketplaceStoreTypeDefs = /* GraphQL */ `
     phone: String
     email: String
     logoUrl: String
+    slugUrl: String
     location: MarketplaceLocation
     onBoardType: String
     pageType: String

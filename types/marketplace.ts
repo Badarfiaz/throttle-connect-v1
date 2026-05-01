@@ -14,6 +14,7 @@ export type MarketplaceStore = {
   onBoardType?: string | null;
   overview?: string | null;
   ownerUid?: string | null;
+  slugUrl?: string | null;
   pageType?: string | null;
   phone?: string | null;
 };

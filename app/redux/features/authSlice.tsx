@@ -8,7 +8,7 @@ import {
   createAsyncThunk,
   createListenerMiddleware,
 } from "@reduxjs/toolkit";
-import { User } from "@/types/CommonType";
+import { allowedPageType, User } from "@/types/CommonType";
 import { normalizeFirestoreStore } from "@/lib/utils";
 import { MemberProfile } from "@/types/member";
 
@@ -91,7 +91,7 @@ const authSlice = createSlice({
     updateUserOnboarding: (
       state,
       action: PayloadAction<{
-        pageType: "marketplace" | "networking";
+        pageType: allowedPageType;
         data: any;
         completed: boolean;
       }>,

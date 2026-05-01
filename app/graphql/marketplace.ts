@@ -23,6 +23,7 @@ export const MARKETPLACE_ALL_STORES_QUERY = `{
     id
     title
     logoUrl
+    slugUrl
   }
 }`;
 

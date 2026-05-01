@@ -25,6 +25,7 @@ import {
   RegistrationCardStyles,
   RegistrationContainerStyles,
 } from "@/components/shared/registration/registrationStyles";
+import { makeSlugUrl } from "@/ulity/genrateSlugUrl";
 
 // Steps configuration
 const steps = [
@@ -78,7 +79,11 @@ export default function MarketplaceRegistration({}) {
   });
 
   const onNext = currentForm.handleSubmit(async (data) => {
-    const mergedData = { ...collectedData, ...data };
+    const mergedData = {
+      ...collectedData,
+      ...data,
+      slugUrl: makeSlugUrl(marketplace?.title as string) || "",
+    };
     const isLastStep = currentStep === steps.length - 1;
 
     setCollectedData(mergedData);

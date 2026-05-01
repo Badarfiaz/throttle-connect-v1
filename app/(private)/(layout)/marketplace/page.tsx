@@ -22,14 +22,14 @@ function Page() {
     fetchMarketplaceStores().catch(() => undefined);
   }, [fetchMarketplaceStores]);
 
-  console.log("STORcsdcE DATA ", data); // coorect
+  console.log("STORE DATA ", data); // coorect
   const storeCards: MarketplaceStoreCard[] = useMemo(
     () =>
       (data ?? []).map((store, index) => ({
         id: store.id ?? `store-${index}`,
         title: store.title,
         logoUrl: store.logoUrl,
-        // slugUrl: store.slugUrl,
+        slugUrl: store.slugUrl,
       })),
     [data],
   );
@@ -69,7 +69,11 @@ function Page() {
             }}
             className="w-full"
             renderItem={(store) => (
-              <CategorySection key={store.id} items={store} />
+              <CategorySection
+                pageType="marketplace"
+                key={store.id}
+                items={store}
+              />
             )}
           />
         ) : (
