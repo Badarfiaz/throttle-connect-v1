@@ -72,30 +72,6 @@ function Page() {
             }}
             className="w-full"
             renderItem={(store) => (
-              // <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-border/60 bg-card p-4 text-center shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
-              //   <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border border-border/60 bg-muted/40 shadow-inner">
-              //     {store.logoUrl ? (
-              //       <img
-              //         src={store.logoUrl}
-              //         alt={store.title || "Store logo"}
-              //         className="h-full w-full object-cover"
-              //       />
-              //     ) : (
-              //       <span className="text-lg font-semibold text-foreground">
-              //         {(store.title || "Store")
-              //           .split(" ")
-              //           .filter(Boolean)
-              //           .slice(0, 2)
-              //           .map((part) => part.charAt(0))
-              //           .join("")
-              //           .toUpperCase()}
-              //       </span>
-              //     )}
-              //   </div>
-              //   <p className="mt-4 line-clamp-2 text-sm font-semibold text-foreground">
-              //     {store.title || "Untitled Store"}
-              //   </p>
-              // </div>
               <CategorySection key={store.id} items={store} />
             )}
           />

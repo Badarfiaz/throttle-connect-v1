@@ -1,8 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
-import { vehicleCategoriesType } from "@/dummydata/networking";
 import CardLinkWrapper from "./CardLinkWapper";
 import { MarketplaceStoreCard } from "@/types/marketplace";
 

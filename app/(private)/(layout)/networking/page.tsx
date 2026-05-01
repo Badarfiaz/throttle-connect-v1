@@ -6,7 +6,11 @@ import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 
-import { cardDataNetworking, clubs, vehicleCategories } from "@/dummydata/networking";
+import {
+  cardDataNetworking,
+  clubs,
+  vehicleCategories,
+} from "@/dummydata/networking";
 
 function home() {
   return (
@@ -36,7 +40,7 @@ function home() {
           className="w-full"
           renderItem={(category) => (
             <div className="w-full h-full">
-              <CategorySection key={category.id} items={category} />
+              {/* <CategorySection key={category.id} items={category} /> */}
             </div>
           )}
         />
