@@ -1,19 +1,15 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-// ================== Types ==================
-export type User = {
-  id: string;
-  email: string;
-  name?: string;
-  completed?: boolean;
-  marketplace?: {
-    completed: boolean;
-    [key: string]: any;
-  };
-  networking?: {
-    completed: boolean;
-    [key: string]: any;
-  };
-};
+import { db } from "@/firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { MarketplaceStore } from "@/types/marketplace";
+import { NetworkingStore } from "@/types/networking";
+import {
+  createSlice,
+  PayloadAction,
+  createAsyncThunk,
+  createListenerMiddleware,
+} from "@reduxjs/toolkit";
+import { User } from "@/types/CommonType";
+import { normalizeFirestoreStore } from "@/lib/utils";
 
 export type UserInput = {
   email: string;
@@ -28,15 +24,48 @@ export type AuthState = {
   isAuthenticated: boolean;
 };
 
-// ================== Initial State ==================
 const initialState: AuthState = {
   user: null,
   isLoading: false,
   error: null,
   isAuthenticated: false,
 };
+const getStoreData = async <TStore extends { createdAt?: unknown }>(
+  collectionName: string,
+  userId: string,
+): Promise<TStore | null> => {
+  // Generic implementation for fetching a store document by ownerUid
+  const q = query(
+    collection(db, collectionName),
+    where("ownerUid", "==", userId),
+  );
+  const snapshot = await getDocs(q);
 
-// ================== Slice ==================
+  if (!snapshot.empty) {
+    const docData = snapshot.docs[0].data();
+    console.log(docData);
+    return normalizeFirestoreStore(docData as TStore);
+  }
+  return null;
+};
+
+export const fetchMarketplaceForUser = createAsyncThunk(
+  "auth/fetchMarketplaceForUser",
+  async (userId: string) => {
+    return await getStoreData<MarketplaceStore>("marketplaceStores", userId);
+  },
+);
+
+export const fetchNetworkingForUser = createAsyncThunk(
+  "auth/fetchNetworkingForUser",
+  async (userId: string) => {
+    return await getStoreData<NetworkingStore>("networkingStores", userId);
+  },
+);
+const normalizeUser = (user: User): User => ({
+  ...user,
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -50,7 +79,8 @@ const authSlice = createSlice({
       state.error = null;
     },
     setUser: (state, action: PayloadAction<User | null>) => {
-      state.user = action.payload;
+      console.log("user set user payload", action.payload);
+      state.user = action.payload ? normalizeUser(action.payload) : null;
       state.isAuthenticated = !!action.payload;
       state.isLoading = false;
     },
@@ -64,7 +94,7 @@ const authSlice = createSlice({
     ) => {
       if (state.user) {
         const { pageType, data, completed } = action.payload;
-        console.log("payload", action.payload);
+        console.log("user update onboarding payload", action.payload);
         state.user[pageType] = {
           ...data,
           completed,
@@ -72,10 +102,43 @@ const authSlice = createSlice({
       }
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchMarketplaceForUser.fulfilled, (state, action) => {
+      const userId = action.meta.arg;
+      if (state.user && state.user.userId === userId) {
+        state.user.marketplace = action.payload;
+      }
+    });
+    builder.addCase(fetchNetworkingForUser.fulfilled, (state, action) => {
+      const userId = action.meta.arg;
+      if (state.user && state.user.userId === userId) {
+        state.user.networking = action.payload;
+      }
+    });
+  },
 });
 
 // ================== Exports ==================
 export const { logout, clearError, setUser, updateUserOnboarding } =
   authSlice.actions;
+
+// Listener middleware: when `setUser` is dispatched with a user, fetch both stores.
+export const authListenerMiddleware = createListenerMiddleware();
+
+authListenerMiddleware.startListening({
+  actionCreator: setUser,
+  effect: async (action, listenerApi) => {
+    const user = action.payload as User | null;
+    if (!user) return;
+    try {
+      await Promise.all([
+        listenerApi.dispatch(fetchMarketplaceForUser(user.userId)),
+        listenerApi.dispatch(fetchNetworkingForUser(user.userId)),
+      ]);
+    } catch (e) {
+      // ignore errors; fetchMarketplaceForUser handles nulls
+    }
+  },
+});
 
 export default authSlice.reducer;

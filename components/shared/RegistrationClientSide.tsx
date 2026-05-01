@@ -1,41 +1,64 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import OnboardingCard from "@/components/shared/OnboardingCard";
 import { AlertDialogShared } from "@/components/shared/AlertDialogShared";
 import { useAppSelector } from "@/app/redux/hooks";
-import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
+import { useState, useEffect } from "react";
 
 export default function RegistrationClientSide() {
   const user = useAppSelector((state) => state.auth.user);
-  const [isMarketplaceCompletedOpen, setIsMarketplaceCompletedOpen] =
-    useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogType, setDialogType] = useState<
+    "marketplace" | "networking" | null
+  >(null);
 
-  const ismarkeptlaceCompleted = useMarketplaceStore({
-    isCompleted: true,
-  });
+  const isMarketplaceCompleted = user?.marketplace?.completed;
+  const isNetworkingCompleted = user?.networking?.completed;
 
-  const { data: marketplaceStores, fetchMarketplaceStores } =
-    ismarkeptlaceCompleted;
-
-  useEffect(() => {
-    if (!user) return;
-    fetchMarketplaceStores().catch(() => undefined);
-  }, [user, fetchMarketplaceStores]);
-
-  const hasMarketplaceCompleted = Boolean(
-    marketplaceStores?.some((store) => store?.completed) ||
-    user?.marketplace?.completed,
-  );
-
-  const handleMarketplaceClick = (
-    event: React.MouseEvent<HTMLAnchorElement>,
-  ) => {
-    if (!hasMarketplaceCompleted) return;
-    event.preventDefault();
-    setIsMarketplaceCompletedOpen(true);
+  const getAlertContent = (type: "marketplace" | "networking" | null) => {
+    if (type === "marketplace") {
+      return {
+        title: "Already registered as marketplace vendor",
+        description:
+          "You have already completed the marketplace vendor registration. Please proceed to the marketplace to manage your store or explore other features.",
+        routeLink: "/marketplace",
+        btnLabel: "Go to marketplace",
+      };
+    }
+    if (type === "networking") {
+      return {
+        title: "Already joined automotive networking",
+        description:
+          "You have already joined the automotive networking. Please proceed to the networking section to connect with enthusiasts, clubs, and events.",
+        routeLink: "/networking",
+        btnLabel: "Go to networking",
+      };
+    }
+    return {
+      title: "",
+      description: "",
+      routeLink: "",
+      btnLabel: "",
+    };
   };
 
+  const alertContent = getAlertContent(dialogType);
+
+  const handleMarketplaceClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isMarketplaceCompleted) {
+      e.preventDefault();
+      setDialogType("marketplace");
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleNetworkingClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (isNetworkingCompleted) {
+      e.preventDefault();
+      setDialogType("networking");
+      setIsDialogOpen(true);
+    }
+  };
   return (
     <>
       <section
@@ -72,25 +95,26 @@ export default function RegistrationClientSide() {
           ]}
           buttonText="Join Networking"
           link="/networking/registration"
+          onButtonClick={handleNetworkingClick}
         />
 
         <OnboardingCard
           icon="🚗"
           title="Join as member"
           description="Become a member to connect with car & bike enthusiasts, clubs, events, and mechanics."
-          buttonText="Join as Member"
           benefits={["member"]}
+          buttonText="Join as Member"
           link="/member-registration"
         />
       </section>
 
       <AlertDialogShared
-        isOpen={isMarketplaceCompletedOpen}
-        onOpenChange={setIsMarketplaceCompletedOpen}
-        dialogTitle="Already registured as marketplace vendor"
-        dialogDescription="You have already completed the marketplace vendor registration. Please proceed to the marketplace to manage your store or explore other features."
-        routeLink="/marketplace"
-        btnLabel="Go to marketplace"
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        dialogTitle={alertContent.title}
+        dialogDescription={alertContent.description}
+        routeLink={alertContent.routeLink}
+        btnLabel={alertContent.btnLabel}
       />
     </>
   );

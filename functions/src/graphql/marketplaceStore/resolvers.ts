@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase-admin/firestore";
 import admin from "firebase-admin";
+import { COLLECTIONS } from "../../constants";
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -21,7 +22,7 @@ const marketplaceStoreResolvers = {
       const { uid } = context;
 
       let ref = db
-        .collection("marketplaceStores")
+        .collection(COLLECTIONS.MARKETPLACE_STORES)
         .where("ownerUid", "==", uid)
         .where("completed", "==", true);
 
@@ -49,7 +50,7 @@ const marketplaceStoreResolvers = {
       const { uid } = context;
       const { id, input } = args;
 
-      const docRef = db.collection("marketplaceStores").doc(id);
+      const docRef = db.collection(COLLECTIONS.MARKETPLACE_STORES).doc(id);
       const doc = await docRef.get();
 
       if (!doc.exists) {

@@ -90,8 +90,8 @@ export const useOnboardStep = ({ pageType }: UseOnboardStepOptions) => {
               : { ...data };
 
           if (pageType === "marketplace") {
-            if (!("ownerUid" in marketplaceData) && user?.id) {
-              marketplaceData.ownerUid = user.id;
+            if (!("ownerUid" in marketplaceData) && user?.userId) {
+              marketplaceData.ownerUid = user.userId;
             }
             if (!("createdAt" in marketplaceData)) {
               marketplaceData.createdAt = formatDateWithOffset(new Date());
@@ -106,18 +106,6 @@ export const useOnboardStep = ({ pageType }: UseOnboardStepOptions) => {
               completed: options.completed,
             }),
           );
-
-          if (pageType === "marketplace" && user) {
-            console.log({
-              userId: user.id,
-              name: user.name,
-              email: user.email,
-              marketplace: {
-                ...marketplaceData,
-                completed: options.completed,
-              },
-            });
-          }
         }
 
         return result;

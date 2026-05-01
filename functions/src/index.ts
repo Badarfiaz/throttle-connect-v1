@@ -3,6 +3,10 @@ import { withCors } from "../utils/withcors";
 import marketplaceStoreResolvers from "./graphql/marketplaceStore/resolvers";
 import { admin, verifyToken } from "../lib/firebase";
 import marketplaceStoreTypeDefs from "./graphql/marketplaceStore/typeDefs";
+import { GraphQLSchema } from "graphql";
+import marketplaceProductsTypeDefs from "./graphql/marketplaceProducts/typeDef";
+import marketplaceProductsResolvers from "./graphql/marketplaceProducts/resolvers";
+import { COLLECTIONS } from "./constants";
 const db = admin.firestore();
 
 const currentDate = new Date();
@@ -25,9 +29,7 @@ async function startApolloServer() {
   const schema = makeExecutableSchema({ typeDefs, resolvers });
   return schema;
 }
-import { GraphQLSchema } from "graphql";
-import marketplaceProductsTypeDefs from "./graphql/marketplaceProducts/typeDef";
-import marketplaceProductsResolvers from "./graphql/marketplaceProducts/resolvers";
+
 let mainServerPromise: Promise<GraphQLSchema> | null = null;
 
 async function ensureMainServer(): Promise<GraphQLSchema> {
@@ -86,7 +88,9 @@ export const onboard = onRequest(
         createdAt: currentDate,
       };
       const COLLECTION_NAME =
-        onBoardType === "marketplace" ? "marketplaceStores" : "builderProfiles";
+        onBoardType === "marketplace"
+          ? COLLECTIONS.MARKETPLACE_STORES
+          : COLLECTIONS.NETWORKING_CLUBS;
 
       await db.collection(COLLECTION_NAME).doc(uid).set(dataToSave);
 

@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase-admin/firestore";
 import admin from "firebase-admin";
+import { COLLECTIONS } from "../../constants";
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -22,7 +23,7 @@ const marketplaceProductsResolvers = {
       const { uid } = context;
 
       const snapshot = await db
-        .collection("marketplaceProducts")
+        .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
         .where("ownerUid", "==", uid)
         .orderBy("createdAt", "desc")
         .get();
@@ -49,7 +50,7 @@ const marketplaceProductsResolvers = {
       const { uid } = context;
       const { id } = args;
 
-      const docRef = db.collection("marketplaceProducts").doc(id);
+      const docRef = db.collection(COLLECTIONS.MARKETPLACE_PRODUCTS).doc(id);
       const doc = await docRef.get();
 
       if (!doc.exists) {
@@ -105,7 +106,7 @@ const marketplaceProductsResolvers = {
       };
 
       const docRef = await db
-        .collection("marketplaceProducts")
+        .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
         .add(productData);
       const newDoc = await docRef.get();
       const data = newDoc.data() as any;
@@ -127,7 +128,7 @@ const marketplaceProductsResolvers = {
       const { uid } = context;
       const { id, input } = args;
 
-      const docRef = db.collection("marketplaceProducts").doc(id);
+      const docRef = db.collection(COLLECTIONS.MARKETPLACE_PRODUCTS).doc(id);
       const doc = await docRef.get();
 
       if (!doc.exists) {
@@ -191,7 +192,7 @@ const marketplaceProductsResolvers = {
       const { uid } = context;
       const { id } = args;
 
-      const docRef = db.collection("marketplaceProducts").doc(id);
+      const docRef = db.collection(COLLECTIONS.MARKETPLACE_PRODUCTS).doc(id);
       const doc = await docRef.get();
 
       if (!doc.exists) {

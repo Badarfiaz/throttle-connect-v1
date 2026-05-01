@@ -1,18 +1,16 @@
+import { ContactMethod, locationFields } from "./CommonType";
+
 export type MarketplaceStore = {
   id?: string;
   title?: string;
   address?: string;
   businessType?: string[] | null;
-  completed: boolean;
-  contactMethod?: string | null;
+  completed?: boolean;
+  contactMethod?: ContactMethod;
   createdAt?: string | null;
   email?: string | null;
   logoUrl?: string | null;
-  location?: {
-    area?: string | null;
-    city?: string | null;
-    province?: string | null;
-  } | null;
+  location?: locationFields | null;
   onBoardType?: string | null;
   overview?: string | null;
   ownerUid?: string | null;
