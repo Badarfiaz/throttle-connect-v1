@@ -15,6 +15,7 @@ type AlertDialogProps = {
   dialogTitle: string;
   dialogDescription: string;
   routeLink: string;
+  closeRouteLink?: string;
   btnLabel: string;
 };
 export function AlertDialogShared({
@@ -23,6 +24,7 @@ export function AlertDialogShared({
   dialogTitle,
   dialogDescription,
   routeLink,
+  closeRouteLink,
   btnLabel,
 }: AlertDialogProps) {
   const router = useRouter();
@@ -44,7 +46,7 @@ export function AlertDialogShared({
           <Button
             variant="ghost"
             className="w-full sm:w-auto"
-            onClick={() => onOpenChange(false)}
+            onClick={() => router.push(closeRouteLink || routeLink || "/")}
           >
             Close
           </Button>

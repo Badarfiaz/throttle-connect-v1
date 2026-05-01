@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 import AnimatedStep from "@/components/shared/registration/AnimatedStep";
 import SidebarRegistration from "@/components/shared/registration/SidebarRegistration";
@@ -10,15 +10,7 @@ import {
   RegistrationCardStyles,
   RegistrationContainerStyles,
 } from "@/components/shared/registration/registrationStyles";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { AlertDialogShared } from "@/components/shared/AlertDialogShared";
 import PersonalInfo from "./PersonalInfo";
 import VehicleDetails from "./VehicleDetails";
 import EmergencyDetails from "./EmergencyDetails";
@@ -178,25 +170,15 @@ export default function MemberRegistration() {
         </div>
       </div>
 
-      <Dialog open={isSuccessOpen} onOpenChange={setIsSuccessOpen}>
-        <DialogContent className="max-w-md rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>Welcome to the Throttle connect!</DialogTitle>
-            <DialogDescription>
-              Your member profile has been successfully saved!
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex-col gap-3 sm:flex-row">
-            <Button
-              variant="ghost"
-              className="w-full"
-              onClick={() => setIsSuccessOpen(false)}
-            >
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AlertDialogShared
+        isOpen={isSuccessOpen}
+        onOpenChange={setIsSuccessOpen}
+        dialogTitle="Welcome to the Throttle connect!"
+        dialogDescription="Your member profile has been successfully saved!"
+        routeLink="/"
+        closeRouteLink="/"
+        btnLabel="Go to home"
+      />
     </div>
   );
 }
