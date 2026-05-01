@@ -1,91 +1,18 @@
 import { useCallback, useState } from "react";
-import { FETCHER_URL } from "@/lib/config";
-import getFirebaseToken from "@/ulity/getFirebaseToken";
-import { uploadImage } from "@/ulity/imageUpload";
 import { toast } from "sonner";
-
-type ImageUrlInput = {
-  ref: string;
-  url: string;
-};
-
-type CreateProductInput = {
-  productName: string;
-  imageurl?: ImageUrlInput;
-  stock: number;
-  price: number;
-};
-
-type MarketplaceProduct = {
-  id: string;
-  ownerUid: string;
-  productName: string;
-  imageurl?: ImageUrlInput;
-  stock: number;
-  price: number;
-  createdAt?: string;
-  updatedAt?: string;
-};
-
-const CREATE_PRODUCT_MUTATION = `
-  mutation CreateProduct($input: CreateMarketplaceProductInput!) {
-    createMarketplaceProduct(input: $input) {
-      id
-      ownerUid
-      productName
-      imageurl {
-        ref
-        url
-      }
-      stock
-      price
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const GET_PRODUCTS_QUERY = `
-  query GetProducts {
-    marketplaceProducts {
-      id
-      ownerUid
-      productName
-      imageurl {
-        ref
-        url
-      }
-      stock
-      price
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const UPDATE_PRODUCT_MUTATION = `
-  mutation UpdateProduct($id: ID!, $input: UpdateMarketplaceProductInput!) {
-    updateMarketplaceProduct(id: $id, input: $input) {
-      id
-      ownerUid
-      productName
-      imageurl {
-        ref
-        url
-      }
-      stock
-      price
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const DELETE_PRODUCT_MUTATION = `
-  mutation DeleteProduct($id: ID!) {
-    deleteMarketplaceProduct(id: $id)
-  }
-`;
+import { MarketplaceProduct } from "@/types/marketplace";
+import {
+  CREATE_PRODUCT_MUTATION,
+  DELETE_PRODUCT_MUTATION,
+  GET_PRODUCTS_QUERY,
+  UPDATE_PRODUCT_MUTATION,
+} from "@/app/graphql/marketplace";
+import {
+  buildMarketplaceProductImageInput,
+  executeMarketplaceProductRequest,
+  getMarketplaceAuthContext,
+  type MarketplaceProductFormInput,
+} from "@/ulity/marketplaceProducts";
 
 export const useMarketplaceProducts = () => {
   const [products, setProducts] = useState<MarketplaceProduct[] | null>(null);
@@ -100,29 +27,10 @@ export const useMarketplaceProducts = () => {
     setError(null);
 
     try {
-      const { token } = await getFirebaseToken();
-
-      if (!token) {
-        throw new Error("Not authenticated. Please log in first.");
-      }
-
-      const res = await fetch(FETCHER_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ query: GET_PRODUCTS_QUERY }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok || result.errors) {
-        const message = result?.errors
-          ? JSON.stringify(result.errors, null, 2)
-          : "Request failed.";
-        throw new Error(message);
-      }
+      const { token } = await getMarketplaceAuthContext();
+      const result = await executeMarketplaceProductRequest<{
+        marketplaceProducts: MarketplaceProduct[];
+      }>(GET_PRODUCTS_QUERY, token);
 
       const fetchedProducts = result?.data?.marketplaceProducts ?? [];
       setProducts(fetchedProducts);
@@ -139,58 +47,24 @@ export const useMarketplaceProducts = () => {
   }, []);
 
   const createProduct = useCallback(
-    async (input: CreateProductInput, imageFile?: File | null) => {
+    async (input: MarketplaceProductFormInput, imageFile?: File | null) => {
       setCreating(true);
       setError(null);
 
       try {
-        const { token, uid } = await getFirebaseToken();
+        const { token, uid } = await getMarketplaceAuthContext();
+        const imageUrlData = await buildMarketplaceProductImageInput(
+          imageFile,
+          uid,
+        );
 
-        if (!token || !uid) {
-          throw new Error("Not authenticated. Please log in first.");
-        }
-
-        let imageUrlData: ImageUrlInput | undefined;
-
-        // Upload image if provided
-        if (imageFile) {
-          const { url, path } = await uploadImage(imageFile, {
-            ownerId: uid,
-            folder: "products",
-            maxSizeMb: 5,
-          });
-
-          imageUrlData = {
-            ref: path,
-            url,
-          };
-        }
-
-        const productInput: CreateProductInput = {
+        const productInput: MarketplaceProductFormInput = {
           ...input,
           ...(imageUrlData && { imageurl: imageUrlData }),
         };
-
-        const res = await fetch(FETCHER_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            query: CREATE_PRODUCT_MUTATION,
-            variables: { input: productInput },
-          }),
-        });
-
-        const result = await res.json();
-
-        if (!res.ok || result.errors) {
-          const message = result?.errors
-            ? JSON.stringify(result.errors, null, 2)
-            : "Request failed.";
-          throw new Error(message);
-        }
+        const result = await executeMarketplaceProductRequest<{
+          createMarketplaceProduct: MarketplaceProduct;
+        }>(CREATE_PRODUCT_MUTATION, token, { input: productInput });
 
         const newProduct = result?.data?.createMarketplaceProduct as
           | MarketplaceProduct
@@ -219,60 +93,27 @@ export const useMarketplaceProducts = () => {
   const updateProduct = useCallback(
     async (
       id: string,
-      input: Partial<CreateProductInput>,
+      input: Partial<MarketplaceProductFormInput>,
       imageFile?: File | null,
     ) => {
       setUpdating(true);
       setError(null);
 
       try {
-        const { token, uid } = await getFirebaseToken();
-
-        if (!token || !uid) {
-          throw new Error("Not authenticated. Please log in first.");
-        }
-
-        let imageUrlData: ImageUrlInput | undefined;
-
-        // Upload new image if provided
-        if (imageFile) {
-          const { url, path } = await uploadImage(imageFile, {
-            ownerId: uid,
-            folder: "products",
-            maxSizeMb: 5,
-          });
-
-          imageUrlData = {
-            ref: path,
-            url,
-          };
-        }
+        const { token, uid } = await getMarketplaceAuthContext();
+        const imageUrlData = await buildMarketplaceProductImageInput(
+          imageFile,
+          uid,
+        );
 
         const productInput = {
           ...input,
           ...(imageUrlData && { imageurl: imageUrlData }),
         };
 
-        const res = await fetch(FETCHER_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            query: UPDATE_PRODUCT_MUTATION,
-            variables: { id, input: productInput },
-          }),
-        });
-
-        const result = await res.json();
-
-        if (!res.ok || result.errors) {
-          const message = result?.errors
-            ? JSON.stringify(result.errors, null, 2)
-            : "Request failed.";
-          throw new Error(message);
-        }
+        const result = await executeMarketplaceProductRequest<{
+          updateMarketplaceProduct: MarketplaceProduct;
+        }>(UPDATE_PRODUCT_MUTATION, token, { id, input: productInput });
 
         const updatedProduct = result?.data?.updateMarketplaceProduct as
           | MarketplaceProduct
@@ -308,32 +149,10 @@ export const useMarketplaceProducts = () => {
     setError(null);
 
     try {
-      const { token } = await getFirebaseToken();
-
-      if (!token) {
-        throw new Error("Not authenticated. Please log in first.");
-      }
-
-      const res = await fetch(FETCHER_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          query: DELETE_PRODUCT_MUTATION,
-          variables: { id },
-        }),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok || result.errors) {
-        const message = result?.errors
-          ? JSON.stringify(result.errors, null, 2)
-          : "Request failed.";
-        throw new Error(message);
-      }
+      const { token } = await getMarketplaceAuthContext();
+      await executeMarketplaceProductRequest<{
+        deleteMarketplaceProduct: boolean;
+      }>(DELETE_PRODUCT_MUTATION, token, { id });
 
       setProducts((prev) => {
         if (!prev) return prev;

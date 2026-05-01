@@ -1,20 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-type MarketplaceProduct = {
-  id: string;
-  ownerUid: string;
-  productName: string;
-  imageurl?: {
-    ref: string;
-    url: string;
-  };
-  stock: number;
-  price: number;
-  createdAt?: string;
-  updatedAt?: string;
-};
+import { MarketplaceProduct } from "@/types/marketplace";
 
 type ProductsSectionProps = {
   products: MarketplaceProduct[];

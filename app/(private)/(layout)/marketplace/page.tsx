@@ -1,19 +1,26 @@
 "use client";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProductCard from "@/components/marketplace/ProductCard";
 import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 
-import { marketplaceProducts } from "@/dummydata/marketplace";
+import type { marketplaceProductType } from "@/dummydata/marketplace";
 import { cardDataMarketplace } from "@/dummydata/networking";
 import { MARKETPLACE_ALL_STORES_QUERY } from "@/app/graphql/marketplace";
 import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
 import { MarketplaceStoreCard } from "@/types/marketplace";
 import CategorySection from "@/components/shared/CategorySection";
+import { getMarketplaceFeaturedProducts } from "@/ulity/marketplaceProducts";
 
 function Page() {
+  const [featuredProducts, setFeaturedProducts] = useState<
+    marketplaceProductType[]
+  >([]);
+  const [featuredLoading, setFeaturedLoading] = useState(false);
+  const [featuredError, setFeaturedError] = useState<string | null>(null);
+
   const { data, loading, error, fetchMarketplaceStores } = useMarketplaceStore({
     query: MARKETPLACE_ALL_STORES_QUERY,
     isPublic: true,
@@ -21,6 +28,48 @@ function Page() {
   useEffect(() => {
     fetchMarketplaceStores().catch(() => undefined);
   }, [fetchMarketplaceStores]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadFeaturedProducts = async () => {
+      setFeaturedLoading(true);
+      setFeaturedError(null);
+
+      try {
+        const products = await getMarketplaceFeaturedProducts();
+        const mappedProducts = products.map((product, index) => ({
+          id: Number(product.id || index + 1),
+          productName: product.productName,
+          image: product.imageurl?.url || "/images/logos/segalmotors.jpg",
+          profileName: product.ownerUid,
+          price: product.price,
+        }));
+
+        if (isMounted) {
+          setFeaturedProducts(mappedProducts);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setFeaturedError(
+            error instanceof Error
+              ? error.message
+              : "Failed to load featured products.",
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setFeaturedLoading(false);
+        }
+      }
+    };
+
+    loadFeaturedProducts().catch(() => undefined);
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   console.log("STORE DATA ", data); // coorect
   const storeCards: MarketplaceStoreCard[] = useMemo(
@@ -97,20 +146,34 @@ function Page() {
       />
 
       <div className="px-4 mb-10 sm:px-6 md:px-12 lg:px-20">
-        <PrimaryCarousel
-          items={marketplaceProducts}
-          className="w-full"
-          responsive={{
-            mobile: 2,
-            tablet: 2,
-            desktop: 4,
-          }}
-          renderItem={(product) => (
-            <div key={product.id} className="w-full h-full">
-              <ProductCard product={product} />
-            </div>
-          )}
-        />
+        {featuredLoading ? (
+          <p className="py-10 text-center text-sm text-muted-foreground">
+            Loading featured products...
+          </p>
+        ) : featuredError ? (
+          <p className="py-10 text-center text-sm text-destructive">
+            Failed to load featured products.
+          </p>
+        ) : featuredProducts.length > 0 ? (
+          <PrimaryCarousel
+            items={featuredProducts}
+            className="w-full"
+            responsive={{
+              mobile: 2,
+              tablet: 2,
+              desktop: 4,
+            }}
+            renderItem={(product) => (
+              <div key={product.id} className="w-full h-full">
+                <ProductCard product={product} />
+              </div>
+            )}
+          />
+        ) : (
+          <p className="py-10 text-center text-sm text-muted-foreground">
+            No featured products available right now.
+          </p>
+        )}
       </div>
     </div>
   );

@@ -74,3 +74,79 @@ export const UPDATE_MARKETPLACE_STORE_MUTATION = `
     }
   }
 `;
+
+export const CREATE_PRODUCT_MUTATION = `
+  mutation CreateProduct($input: CreateMarketplaceProductInput!) {
+    createMarketplaceProduct(input: $input) {
+      id
+      ownerUid
+      productName
+      imageurl {
+        ref
+        url
+      }
+      stock
+      price
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_PRODUCTS_QUERY = `
+  query GetProducts {
+    marketplaceProducts {
+      id
+      ownerUid
+      productName
+      imageurl {
+        ref
+        url
+      }
+      stock
+      price
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const UPDATE_PRODUCT_MUTATION = `
+  mutation UpdateProduct($id: ID!, $input: UpdateMarketplaceProductInput!) {
+    updateMarketplaceProduct(id: $id, input: $input) {
+      id
+      ownerUid
+      productName
+      imageurl {
+        ref
+        url
+      }
+      stock
+      price
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_PRODUCT_MUTATION = `
+  mutation DeleteProduct($id: ID!) {
+    deleteMarketplaceProduct(id: $id)
+  }
+`;
+export const GET_FEATURED_PRODUCTS_QUERY = `
+  query GetFeaturedProducts {
+    getMarketplaceFeaturedProducts {
+      id
+      productName
+      imageurl {
+        ref
+        url
+      }
+      stock
+      price
+      createdAt
+      updatedAt
+    }
+  }
+`;

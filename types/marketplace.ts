@@ -25,3 +25,17 @@ export type MarketplaceStoreCard = {
   logoUrl?: string | null;
   slugUrl?: string | null;
 };
+
+export type MarketplaceProduct = {
+  id: string;
+  ownerUid: string;
+  productName: string;
+  imageurl?: {
+    ref: string;
+    url: string;
+  };
+  stock: number;
+  price: number;
+  createdAt?: string;
+  updatedAt?: string;
+};

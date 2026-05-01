@@ -79,6 +79,25 @@ const marketplaceProductsResolvers = {
         updatedAt: normalizeTimestamp(data?.updatedAt),
       };
     },
+    getMarketplaceFeaturedProducts: async () => {
+      const snapshot = await db
+        .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
+        .orderBy("createdAt", "desc")
+        .limit(10)
+        .get();
+
+      if (snapshot.empty) return [];
+
+      return snapshot.docs.map((doc) => {
+        const data = doc.data() as any;
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: normalizeTimestamp(data?.createdAt),
+          updatedAt: normalizeTimestamp(data?.updatedAt),
+        };
+      });
+    },
   },
 
   Mutation: {
