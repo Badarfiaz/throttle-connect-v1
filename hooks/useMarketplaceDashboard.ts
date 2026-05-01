@@ -24,7 +24,7 @@ export const useMarketplaceDashboard = () => {
     updateMarketplaceStore,
     updating,
     updateError,
-  } = useMarketplaceStore();
+  } = useMarketplaceStore({});
 
   const {
     products,

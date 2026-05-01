@@ -11,7 +11,6 @@ import HeaderProfile from "./HeaderProfile";
 import LoginModal from "./LoginModal";
 import { auth } from "@/firebase";
 import { useAuthHandlers } from "@/hooks/useAuthHandlers";
-import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
 
 type AuthMode = "login" | "signup";
 
@@ -23,24 +22,9 @@ const HeaderPrimary: FC = () => {
   const [mode, setMode] = useState<AuthMode>("login");
 
   const user = useSelector((s: RootState) => s.auth.user, shallowEqual);
-  const isAuthed = !!user?.email;
+  const isAuthed = !!user?.userId;
 
-  const ismarkeptlaceCompleted = useMarketplaceStore({
-    isCompleted: true,
-  });
-  console.log("ismarkeptlaceCompleted", ismarkeptlaceCompleted);
-  const { data: marketplaceStores, fetchMarketplaceStores } =
-    ismarkeptlaceCompleted;
-
-  useEffect(() => {
-    if (!isAuthed) return;
-    if (pathname !== "/marketplace") return;
-    fetchMarketplaceStores().catch(() => undefined);
-  }, [isAuthed, pathname, fetchMarketplaceStores]);
-
-  const hasMarketplaceCompleted = Boolean(
-    marketplaceStores?.some((store) => store?.completed),
-  );
+  const hasMarketplaceCompleted = user?.marketplace?.completed;
 
   const avatarLetter = useMemo(
     () => (isAuthed ? user!.email.trim().charAt(0).toUpperCase() : "?"),

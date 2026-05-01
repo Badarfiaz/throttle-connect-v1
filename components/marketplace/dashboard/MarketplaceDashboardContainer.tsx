@@ -96,7 +96,7 @@ const MarketplaceDashboardContainer = () => {
         <ProfileSection
           store={store}
           userEmail={user?.email}
-          userId={user?.id}
+          userId={user?.userId}
           locationLabel={locationLabel}
           storeInitials={storeInitials}
           staticProfile={staticProfile}
