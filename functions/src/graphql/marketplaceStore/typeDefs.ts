@@ -47,6 +47,7 @@ const marketplaceStoreTypeDefs = /* GraphQL */ `
   type Query {
     marketplaceStores: [MarketplaceStore!]!
     marketplaceAllStores: [MarketplaceStore!]!
+    marketplaceStoreProfile(slugUrl: String!): [MarketplaceStore!]!
   }
 
   type Mutation {

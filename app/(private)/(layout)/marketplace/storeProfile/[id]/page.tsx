@@ -1,11 +1,9 @@
+import StoreProfileContainer from "@/components/marketplace/StoreProfileContainer";
+import { Store } from "lucide-react";
 import React from "react";
 
 function page() {
-  return (
-    <div>
-      <h1>Store Profile Page</h1>
-    </div>
-  );
+  return <StoreProfileContainer />;
 }
 
 export default page;

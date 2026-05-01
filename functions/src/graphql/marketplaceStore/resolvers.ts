@@ -60,6 +60,24 @@ const marketplaceStoreResolvers = {
         };
       });
     },
+    marketplaceStoreProfile: async (_: any, args: { slugUrl: string }) => {
+      const snapshot = await db
+        .collection(COLLECTIONS.MARKETPLACE_STORES)
+        .where("completed", "==", true)
+        .where("slugUrl", "==", args.slugUrl)
+        .get();
+
+      if (snapshot.empty) return [];
+
+      return snapshot.docs.map((doc) => {
+        const data = doc.data() as any;
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: normalizeCreatedAt(data?.createdAt),
+        };
+      });
+    },
   },
 
   Mutation: {

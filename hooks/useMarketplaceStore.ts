@@ -11,10 +11,12 @@ import {
 type UseMarketplaceStoreProps = {
   query?: string;
   isPublic?: boolean;
+  variables?: Record<string, unknown>;
 };
 export const useMarketplaceStore = ({
   query = MARKETPLACE_STORES_QUERY,
   isPublic = false,
+  variables = {},
 }: UseMarketplaceStoreProps) => {
   const [data, setData] = useState<MarketplaceStore[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -53,7 +55,7 @@ export const useMarketplaceStore = ({
       let res = await fetch(FETCHER_URL, {
         method: "POST",
         headers,
-        body: JSON.stringify({ query: query }),
+        body: JSON.stringify({ query: query, variables }),
       });
 
       let result = await res.json();
@@ -61,9 +63,14 @@ export const useMarketplaceStore = ({
 
       // If this is a public query and the response indicates an auth error,
       // retry without the Authorization header
-      if ((!
-        res.ok || result?.errors) && isPublicResolved && headers.Authorization) {
-        const fallbackHeaders: HeadersInit = { "Content-Type": "application/json" };
+      if (
+        (!res.ok || result?.errors) &&
+        isPublicResolved &&
+        headers.Authorization
+      ) {
+        const fallbackHeaders: HeadersInit = {
+          "Content-Type": "application/json",
+        };
         const fallbackRes = await fetch(FETCHER_URL, {
           method: "POST",
           headers: fallbackHeaders,

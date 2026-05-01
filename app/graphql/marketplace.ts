@@ -17,7 +17,27 @@ export const MARKETPLACE_STORES_QUERY = `{
     phone
   }
 }`;
-
+export const MARKETPLACE_STORE_PROFILE_QUERY = `
+  query MarketplaceStoreProfile($slugUrl: String!) {
+    marketplaceStoreProfile(slugUrl: $slugUrl) {
+      id
+      title
+      address
+      businessType
+      completed
+      contactMethod
+      createdAt
+      email
+      logoUrl
+      location { area city province }
+      onBoardType
+      overview
+      ownerUid
+      pageType
+      phone
+    }
+  }
+`;
 export const MARKETPLACE_ALL_STORES_QUERY = `{
   marketplaceAllStores {
     id
