@@ -5,7 +5,6 @@ import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
-import { useAppSelector } from "@/app/redux/hooks";
 
 import { marketplaceProducts } from "@/dummydata/marketplace";
 import { cardDataMarketplace } from "@/dummydata/networking";
@@ -17,13 +16,11 @@ import CategorySection from "@/components/shared/CategorySection";
 function Page() {
   const { data, loading, error, fetchMarketplaceStores } = useMarketplaceStore({
     query: MARKETPLACE_ALL_STORES_QUERY,
+    isPublic: true,
   });
-  const user = useAppSelector((state) => state.auth.user);
   useEffect(() => {
-    if (user?.userId) {
-      fetchMarketplaceStores();
-    }
-  }, [user?.userId, fetchMarketplaceStores]);
+    fetchMarketplaceStores().catch(() => undefined);
+  }, [fetchMarketplaceStores]);
 
   console.log("STORcsdcE DATA ", data); // coorect
   const storeCards: MarketplaceStoreCard[] = useMemo(

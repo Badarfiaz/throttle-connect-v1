@@ -27,24 +27,54 @@ export const useMarketplaceStore = ({
     setError(null);
     setData(null);
 
-    try {
-      const { token } = await getFirebaseToken();
+    // If not explicitly public, treat as private unless query indicates otherwise
+    const isPublicResolved =
+      typeof isPublic === "boolean"
+        ? isPublic
+        : String(query).includes("marketplaceAllStores");
+
+    let token: string | null = null;
+    if (!isPublicResolved) {
+      const tokenResult = await getFirebaseToken();
+      token = tokenResult.token;
 
       if (!token) {
-        throw new Error("Not authenticated. Please log in first.");
+        const message = "Not authenticated. Please log in first.";
+        setError(message);
+        setLoading(false);
+        throw new Error(message);
       }
+    }
 
-      const res = await fetch(FETCHER_URL, {
+    try {
+      const headers: HeadersInit = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
+      let res = await fetch(FETCHER_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers,
         body: JSON.stringify({ query: query }),
       });
 
-      const result = await res.json();
+      let result = await res.json();
       console.log("Fetch Result marketplace store :", result);
+
+      // If this is a public query and the response indicates an auth error,
+      // retry without the Authorization header
+      if ((!
+        res.ok || result?.errors) && isPublicResolved && headers.Authorization) {
+        const fallbackHeaders: HeadersInit = { "Content-Type": "application/json" };
+        const fallbackRes = await fetch(FETCHER_URL, {
+          method: "POST",
+          headers: fallbackHeaders,
+          body: JSON.stringify({ query: query }),
+        });
+        const fallbackResult = await fallbackRes.json();
+        console.log("Fallback fetch result:", fallbackResult);
+        res = fallbackRes;
+        result = fallbackResult;
+      }
+
       if (!res.ok || result.errors) {
         const message = result?.errors
           ? JSON.stringify(result.errors, null, 2)
@@ -66,7 +96,7 @@ export const useMarketplaceStore = ({
     } finally {
       setLoading(false);
     }
-  }, [query]);
+  }, [query, isPublic]);
 
   const updateMarketplaceStore = useCallback(
     async (id: string, input: Record<string, unknown>) => {

@@ -21,6 +21,10 @@ const marketplaceStoreResolvers = {
     marketplaceStores: async (_: any, __: any, context: { uid: string }) => {
       const { uid } = context;
 
+      if (!uid) {
+        throw new Error("Unauthorized - Missing token");
+      }
+
       let ref = db
         .collection(COLLECTIONS.MARKETPLACE_STORES)
         .where("ownerUid", "==", uid)

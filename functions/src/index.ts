@@ -42,16 +42,15 @@ async function ensureMainServer(): Promise<GraphQLSchema> {
 export const fetcher = onRequest(
   withCors(async (req, res) => {
     try {
-      // Verify the user's token and get uid
-      const uid = await verifyToken(req, res, { optional: false });
-      if (!uid) return;
+      // Allow public marketplace queries to run without a token.
+      const uid = await verifyToken(req, res, { optional: true });
 
       const schema = await ensureMainServer();
       const { createHandler } = await import("graphql-http/lib/use/express");
 
       const handler = createHandler({
         schema,
-        context: async () => ({ uid }), // Pass uid in context
+        context: async () => ({ uid }),
       });
 
       await handler(req, res, () => {});

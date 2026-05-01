@@ -22,6 +22,10 @@ const marketplaceProductsResolvers = {
     marketplaceProducts: async (_: any, __: any, context: { uid: string }) => {
       const { uid } = context;
 
+      if (!uid) {
+        throw new Error("Unauthorized - Missing token");
+      }
+
       const snapshot = await db
         .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
         .where("ownerUid", "==", uid)
@@ -48,6 +52,10 @@ const marketplaceProductsResolvers = {
       context: { uid: string },
     ) => {
       const { uid } = context;
+
+      if (!uid) {
+        throw new Error("Unauthorized - Missing token");
+      }
       const { id } = args;
 
       const docRef = db.collection(COLLECTIONS.MARKETPLACE_PRODUCTS).doc(id);
@@ -81,6 +89,10 @@ const marketplaceProductsResolvers = {
       context: { uid: string },
     ) => {
       const { uid } = context;
+
+      if (!uid) {
+        throw new Error("Unauthorized - Missing token");
+      }
       const { input } = args;
 
       // Validate required fields
@@ -126,6 +138,10 @@ const marketplaceProductsResolvers = {
       context: { uid: string },
     ) => {
       const { uid } = context;
+
+      if (!uid) {
+        throw new Error("Unauthorized - Missing token");
+      }
       const { id, input } = args;
 
       const docRef = db.collection(COLLECTIONS.MARKETPLACE_PRODUCTS).doc(id);
@@ -190,6 +206,10 @@ const marketplaceProductsResolvers = {
       context: { uid: string },
     ) => {
       const { uid } = context;
+
+      if (!uid) {
+        throw new Error("Unauthorized - Missing token");
+      }
       const { id } = args;
 
       const docRef = db.collection(COLLECTIONS.MARKETPLACE_PRODUCTS).doc(id);
