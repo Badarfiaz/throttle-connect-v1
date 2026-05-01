@@ -3,11 +3,11 @@ import type { UseFormReturn } from "react-hook-form";
 import RegistrationInputField from "@/components/marketplace/registration/RegistrationInputField";
 import ImageUploadField from "@/components/shared/ImageUploadField";
 import { verificationFields } from "./formFields";
-import type { MemberProfile } from "./types";
+import type { MemberRegistrationFormValues } from "@/types/member";
 import { auth } from "@/firebase";
 
 type EmergencyDetailsProps = {
-  form: UseFormReturn<MemberProfile>;
+  form: UseFormReturn<MemberRegistrationFormValues>;
 };
 
 export default function EmergencyDetails({ form }: EmergencyDetailsProps) {
@@ -17,7 +17,7 @@ export default function EmergencyDetails({ form }: EmergencyDetailsProps) {
     <div className="grid gap-5">
       {verificationFields.map((field) => {
         // Use ImageUploadField for documents (driving license)
-        if (field.name === "drivingLicenseImage") {
+        if (field.name === "documents") {
           return (
             <ImageUploadField
               key={field.name}
@@ -31,7 +31,7 @@ export default function EmergencyDetails({ form }: EmergencyDetailsProps) {
             />
           );
         }
-        
+
         return (
           <RegistrationInputField key={field.name} field={field} form={form} />
         );

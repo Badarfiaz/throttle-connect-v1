@@ -195,7 +195,7 @@ export const useMarketplaceProducts = () => {
         const newProduct = result?.data?.createMarketplaceProduct as
           | MarketplaceProduct
           | undefined;
-
+        console.log("newProduct", newProduct);
         if (newProduct) {
           setProducts((prev) => (prev ? [newProduct, ...prev] : [newProduct]));
           toast.success("Product created", {

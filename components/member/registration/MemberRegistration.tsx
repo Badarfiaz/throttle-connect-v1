@@ -22,11 +22,11 @@ import {
 import PersonalInfo from "./PersonalInfo";
 import VehicleDetails from "./VehicleDetails";
 import EmergencyDetails from "./EmergencyDetails";
-import { MemberProfile } from "./types";
 import { db, auth } from "@/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { toast } from "sonner";
 import { useAppSelector } from "@/app/redux/hooks";
+import { MemberProfile, MemberRegistrationFormValues } from "@/types/member";
 
 const steps = [
   {
@@ -45,19 +45,20 @@ const steps = [
     description: "Add documents and emergency contact",
   },
 ];
- 
 
 export default function MemberRegistration() {
-  const [collectedData, setCollectedData] = useState<Record<string, any>>({});
+  const [collectedData, setCollectedData] = useState<
+    Partial<MemberRegistrationFormValues>
+  >({});
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const user = useAppSelector((state) => state.auth.user);
-  const forms: UseFormReturn<MemberProfile>[] = [
-    useForm<MemberProfile>(),
-    useForm<MemberProfile>(),
-    useForm<MemberProfile>(),
+  const forms: UseFormReturn<MemberRegistrationFormValues>[] = [
+    useForm<MemberRegistrationFormValues>(),
+    useForm<MemberRegistrationFormValues>(),
+    useForm<MemberRegistrationFormValues>(),
   ];
   const currentForm = forms[currentStep];
 
@@ -71,7 +72,8 @@ export default function MemberRegistration() {
     const isLastStep = currentStep === steps.length - 1;
 
     setCollectedData(mergedData);
-
+    console.log("mergedData", mergedData);
+    console.log("collectedData", collectedData);
     if (!isLastStep) {
       setDirection(1);
       setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
@@ -80,7 +82,7 @@ export default function MemberRegistration() {
 
     try {
       setSubmitting(true);
- 
+
       if (!user) {
         toast.error("Authentication required", {
           description: "Please sign in to complete registration.",
@@ -89,8 +91,9 @@ export default function MemberRegistration() {
       }
 
       // Transform the form data to match the required Firebase structure
-      const memberData = {
-        userId: user.id,
+      // Map form values to the Firestore member document structure
+      const memberData: MemberProfile = {
+        userId: user.userId,
         memberName: mergedData.memberName || "",
         phone: mergedData.phone || "",
         whatsapp: mergedData.whatsapp || "",
@@ -103,36 +106,38 @@ export default function MemberRegistration() {
           type: mergedData.vehicleType || "",
           brand: mergedData.vehicleBrand || "",
           model: mergedData.vehicleModel || "",
-          modelYear: mergedData.ModelYear || "",
+          year: mergedData.ModelYear || "",
           images: mergedData.vehicleImages || "",
         },
-        emergencyDetails: {
-          contactName: mergedData.emergencyContactName || "",
-          contactPhone: mergedData.emergencyContactPhone || "",
+        emergencyContact: {
+          name: mergedData.emergencyContactName || "",
+          phone: mergedData.emergencyContactPhone || "",
           bloodGroup: mergedData.bloodGroup || "",
         },
         profileImage: mergedData.profileImage || "",
         experienceYears: mergedData.experienceYears || "",
         interests: mergedData.interests || [],
-        drivingLicenseImage: mergedData.drivingLicenseImage || "",
+        drivingLicenseImage:
+          mergedData.drivingLicenseImage || mergedData.documents || "",
         createdAt: new Date().toISOString(),
       };
 
       // Save to Firestore using userId as document ID
-      const memberDocRef = doc(db, "members", user.id);
+      const memberDocRef = doc(db, "members", user.userId);
       await setDoc(memberDocRef, memberData);
 
       console.log("Member onboarding payload saved to Firebase:", memberData);
-      
+
       toast.success("Registration complete!", {
         description: "Your member profile has been saved successfully.",
       });
-      
+
       setIsSuccessOpen(true);
     } catch (error) {
       console.error("Error saving member data:", error);
       toast.error("Registration failed", {
-        description: error instanceof Error ? error.message : "Please try again.",
+        description:
+          error instanceof Error ? error.message : "Please try again.",
       });
     } finally {
       setSubmitting(false);

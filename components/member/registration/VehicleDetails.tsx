@@ -3,15 +3,15 @@ import type { UseFormReturn } from "react-hook-form";
 import RegistrationInputField from "@/components/marketplace/registration/RegistrationInputField";
 import ImageUploadField from "@/components/shared/ImageUploadField";
 import { vehicleFields } from "./formFields";
-import type { MemberProfile } from "./types";
+import type { MemberRegistrationFormValues } from "@/types/member";
 import { useAppSelector } from "@/app/redux/hooks";
- 
+
 type VehicleDetailsProps = {
-  form: UseFormReturn<MemberProfile>;
+  form: UseFormReturn<MemberRegistrationFormValues>;
 };
 
 export default function VehicleDetails({ form }: VehicleDetailsProps) {
-const userId = useAppSelector((state) => state.auth.user?.id) || "guest";
+  const userId = useAppSelector((state) => state.auth.user?.userId) || "guest";
   return (
     <div className="grid gap-5">
       {vehicleFields.map((field) => {
@@ -30,7 +30,7 @@ const userId = useAppSelector((state) => state.auth.user?.id) || "guest";
             />
           );
         }
-        
+
         return (
           <RegistrationInputField key={field.name} field={field} form={form} />
         );

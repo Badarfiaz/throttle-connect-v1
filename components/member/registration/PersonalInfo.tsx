@@ -3,11 +3,11 @@ import type { UseFormReturn } from "react-hook-form";
 import RegistrationInputField from "@/components/marketplace/registration/RegistrationInputField";
 import ImageUploadField from "@/components/shared/ImageUploadField";
 import { personalInfoFields } from "./formFields";
-import type { MemberProfile } from "./types";
+import type { MemberRegistrationFormValues } from "@/types/member";
 import { auth } from "@/firebase";
 
 type PersonalInfoProps = {
-  form: UseFormReturn<MemberProfile>;
+  form: UseFormReturn<MemberRegistrationFormValues>;
 };
 
 export default function PersonalInfo({ form }: PersonalInfoProps) {
@@ -31,7 +31,7 @@ export default function PersonalInfo({ form }: PersonalInfoProps) {
             />
           );
         }
-        
+
         return (
           <RegistrationInputField key={field.name} field={field} form={form} />
         );

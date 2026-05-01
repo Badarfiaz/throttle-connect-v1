@@ -59,12 +59,6 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
     reader.readAsDataURL(file);
   };
 
-  const handleSaveDraft = () => {
-    const data = form.getValues();
-    console.log("Draft data:", data, "Image:", imageFile);
-    // TODO: Implement save draft logic
-  };
-
   const handlePublish = async () => {
     const data = form.getValues();
 
@@ -149,7 +143,7 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        {!isEditMode && <Button onClick={handleSaveDraft}>Save Draft</Button>}
+        {!isEditMode && <Button onClick={handlePublish}>Save Product</Button>}
         <Button
           variant={isEditMode ? "default" : "outline"}
           onClick={handlePublish}
