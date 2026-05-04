@@ -131,6 +131,7 @@ function Page() {
           </p>
         )}
       </div>
+      {/*  */}
 
       <RegistureClubBanner
         title="Join the Throttle Connect Marketplace"
