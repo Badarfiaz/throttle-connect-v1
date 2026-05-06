@@ -1,15 +1,20 @@
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { MarketplaceProduct, MarketplaceProductFormInput } from "@/types/marketplace";
+import {
+  MarketplaceProduct,
+  MarketplaceProductFormInput,
+} from "@/types/marketplace";
 import {
   CREATE_PRODUCT_MUTATION,
   DELETE_PRODUCT_MUTATION,
+  GET_PRODUCT_BY_ID_QUERY,
   GET_PRODUCTS_QUERY,
   UPDATE_PRODUCT_MUTATION,
 } from "@/app/graphql/marketplace";
 import {
   buildMarketplaceProductImageInput,
   executeMarketplaceProductRequest,
+  executeMarketplaceProductRequestPublic,
   getMarketplaceAuthContext,
  
 } from "@/ulity/marketplaceProducts";
@@ -40,6 +45,26 @@ export const useMarketplaceProducts = () => {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
       toast.error("Failed to fetch products", { description: message });
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchProductById = useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await executeMarketplaceProductRequestPublic<{
+        marketplaceProduct: MarketplaceProduct | null;
+      }>(GET_PRODUCT_BY_ID_QUERY, { id });
+
+      return result?.data?.marketplaceProduct ?? null;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setError(message);
+      toast.error("Failed to fetch product", { description: message });
       throw err;
     } finally {
       setLoading(false);
@@ -182,6 +207,7 @@ export const useMarketplaceProducts = () => {
     updating,
     deleting,
     fetchProducts,
+    fetchProductById,
     createProduct,
     updateProduct,
     deleteProduct,

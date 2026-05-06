@@ -45,17 +45,8 @@ const marketplaceProductsResolvers = {
       });
     },
 
-    // Get a single product by ID
-    marketplaceProduct: async (
-      _: any,
-      args: { id: string },
-      context: { uid: string },
-    ) => {
-      const { uid } = context;
-
-      if (!uid) {
-        throw new Error("Unauthorized - Missing token");
-      }
+    // Get a single product by ID (public read)
+    marketplaceProduct: async (_: any, args: { id: string }) => {
       const { id } = args;
 
       const docRef = db.collection(COLLECTIONS.MARKETPLACE_PRODUCTS).doc(id);
@@ -66,11 +57,6 @@ const marketplaceProductsResolvers = {
       }
 
       const data = doc.data() as any;
-
-      // Verify ownership
-      if (data.ownerUid !== uid) {
-        throw new Error("Unauthorized: you do not own this product.");
-      }
 
       return {
         id: doc.id,

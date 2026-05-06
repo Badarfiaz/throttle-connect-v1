@@ -39,7 +39,7 @@ function Page() {
       try {
         const products = await getMarketplaceFeaturedProducts();
         const mappedProducts = products.map((product, index) => ({
-          id: Number(product.id || index + 1),
+          id: product.id ,
           productName: product.productName,
           image: product.imageurl?.url || "/images/logos/segalmotors.jpg",
           profileName: product.ownerUid,

@@ -7,6 +7,7 @@ import { Heart, ShoppingBag } from "lucide-react"; // Changed ShoppingCart to Sh
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import CardLinkWrapper from "../shared/CardLinkWapper";
 
 type ProductCardProps = {
   product: marketplaceProductType;
@@ -14,23 +15,21 @@ type ProductCardProps = {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isFavorite, setIsFavorite] = useState(false);
-
+console.log('product',product)
   return (
+    <CardLinkWrapper link={`/marketplace/product/${product.id}`}>
+
     <Card className="group relative w-full h-full border-none shadow-none bg-transparent hover:shadow-none transition-all duration-300">
-      {/* Image Container */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gray-100">
+       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gray-100">
         <Image
           fill
           src={product.image}
           alt={product.productName}
           className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
         />
-
-        {/* Overlay Gradient (Subtle) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-        {/* Favorite Button (Top Right) */}
-        <button
+{/* reuse headert button  */}
+         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+         <Button
           onClick={(e) => {
             e.preventDefault();
             setIsFavorite(!isFavorite);
@@ -41,7 +40,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             size={18}
             className={cn("transition-all", isFavorite ? "fill-red-500 text-red-500" : "")}
           />
-        </button>
+        </Button>
 
         {/* Quick Add Button (Bottom Right) - Visible on Hover for Desktop, Always for Mobile if desired, but here we keep it clean */}
         <div className="absolute bottom-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
@@ -80,6 +79,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Optional: Category or other meta info could go here, but keeping it minimal */}
       </CardContent>
     </Card>
+    </CardLinkWrapper>
   );
 };
 

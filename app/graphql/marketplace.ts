@@ -116,6 +116,26 @@ export const GET_PRODUCTS_QUERY = `
   }
 `;
 
+export const GET_PRODUCT_BY_ID_QUERY = `
+  query GetProductById($id: ID!) {
+    marketplaceProduct(id: $id) {
+      id
+      ownerUid
+      productName
+      category
+      description
+      imageurl {
+        ref
+        url
+      }
+      stock
+      price
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const UPDATE_PRODUCT_MUTATION = `
   mutation UpdateProduct($id: ID!, $input: UpdateMarketplaceProductInput!) {
     updateMarketplaceProduct(id: $id, input: $input) {

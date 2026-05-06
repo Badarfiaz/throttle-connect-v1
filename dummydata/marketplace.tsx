@@ -37,7 +37,7 @@ export const markeptlaceCatgegoryies: markeptlaceType[] = [
 ];
 
 export type marketplaceProductType = {
-  id: number;
+  id: string;
   productName: string;
   image: string;
   profileName?: string;
@@ -45,7 +45,7 @@ export type marketplaceProductType = {
 };
 export const marketplaceProducts: marketplaceProductType[] = [
   {
-    id: 1,
+    id: "1",
     productName: "Racing Helmet",
     image: "/images/logos/ls2Helment.jpeg",
     profileName: "LS2 Helmets PK",
@@ -53,7 +53,7 @@ export const marketplaceProducts: marketplaceProductType[] = [
     price: 21500,
   },
   {
-    id: 2,
+    id: "2",
     productName: "Brv Roof Cage",
     image: "/images/logos/brv.jpeg",
     profileName: "Segal Motors",
@@ -61,35 +61,35 @@ export const marketplaceProducts: marketplaceProductType[] = [
     price: 30500,
   },
   {
-    id: 3,
+    id: "3",
     productName: "Bike grips",
     image: "/images/logos/bikeGrips.jpeg",
     profileName: "Ga auto PK",
     price: 300,
   },
   {
-    id: 4,
+    id: "4",
     productName: "Index Helment",
     image: "/images/logos/indexHelemnt.jpeg",
     profileName: "Index Helmets PK",
     price: 12680,
   },
   {
-    id: 5,
+    id: "5",
     productName: "Civic Side Mirror",
     image: "/images/logos/sidemiror.webp",
     profileName: "Segal Motors",
     price: 5000,
   },
   {
-    id: 6,
+    id: "6",
     productName: "Toyota carpets",
     image: "/images/logos/carpet.jpeg",
     profileName: "Segal Motors",
     price: 5000,
   },
   {
-    id: 7,
+    id: "7",
     productName: "Index Helment",
     image: "/images/logos/indexHelemnt.jpeg",
     profileName: "Index Helmets PK",

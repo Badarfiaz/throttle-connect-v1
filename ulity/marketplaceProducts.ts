@@ -64,6 +64,27 @@ export const executeMarketplaceProductRequest = async <TData>(
   return result as { data: TData };
 };
 
+export const executeMarketplaceProductRequestPublic = async <TData>(
+  query: string,
+  variables?: Record<string, unknown>,
+) => {
+  const res = await fetch(FETCHER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  const result = (await res.json()) as GraphQLResult;
+
+  if (!res.ok || result.errors) {
+    throw new Error(getMarketplaceGraphQLErrorMessage(result));
+  }
+
+  return result as { data: TData };
+};
+
 export const getMarketplaceGraphQLErrorMessage = (result: GraphQLResult) =>
   result?.errors ? JSON.stringify(result.errors, null, 2) : "Request failed.";
 
