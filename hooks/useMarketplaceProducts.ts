@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { MarketplaceProduct } from "@/types/marketplace";
+import { MarketplaceProduct, MarketplaceProductFormInput } from "@/types/marketplace";
 import {
   CREATE_PRODUCT_MUTATION,
   DELETE_PRODUCT_MUTATION,
@@ -11,7 +11,7 @@ import {
   buildMarketplaceProductImageInput,
   executeMarketplaceProductRequest,
   getMarketplaceAuthContext,
-  type MarketplaceProductFormInput,
+ 
 } from "@/ulity/marketplaceProducts";
 
 export const useMarketplaceProducts = () => {

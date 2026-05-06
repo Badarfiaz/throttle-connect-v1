@@ -2,24 +2,14 @@ import { FETCHER_URL } from "@/lib/config";
 import { GET_FEATURED_PRODUCTS_QUERY } from "@/app/graphql/marketplace";
 import getFirebaseToken from "@/ulity/getFirebaseToken";
 import { uploadImage } from "@/ulity/imageUpload";
-import type { MarketplaceProduct } from "@/types/marketplace";
+import type { MarketplaceProduct, MarketplaceProductImageInput } from "@/types/marketplace";
 
 type GraphQLResult = {
   data?: Record<string, unknown>;
   errors?: unknown;
 };
 
-export type MarketplaceProductImageInput = {
-  ref: string;
-  url: string;
-};
-
-export type MarketplaceProductFormInput = {
-  productName: string;
-  imageurl?: MarketplaceProductImageInput;
-  stock: number;
-  price: number;
-};
+ 
 
 export const AUTH_REQUIRED_MESSAGE = "Not authenticated. Please log in first.";
 

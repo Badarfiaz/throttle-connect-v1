@@ -130,6 +130,8 @@ const marketplaceProductsResolvers = {
         ownerUid: uid,
         productName: input.productName,
         imageurl: input.imageurl || null,
+        category: input.category || null,
+        description: input.description || null,
         stock: input.stock,
         price: input.price,
         createdAt: date,
@@ -203,6 +205,14 @@ const marketplaceProductsResolvers = {
 
       if (input.imageurl !== undefined) {
         update.imageurl = input.imageurl;
+      }
+
+      if (input.category !== undefined) {
+        update.category = input.category;
+      }
+
+      if (input.description !== undefined) {
+        update.description = input.description;
       }
 
       update.updatedAt = Timestamp.now();

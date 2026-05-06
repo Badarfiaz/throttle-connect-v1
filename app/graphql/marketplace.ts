@@ -81,6 +81,8 @@ export const CREATE_PRODUCT_MUTATION = `
       id
       ownerUid
       productName
+      category
+      description
       imageurl {
         ref
         url
@@ -99,6 +101,9 @@ export const GET_PRODUCTS_QUERY = `
       id
       ownerUid
       productName
+      category
+      description
+
       imageurl {
         ref
         url
@@ -122,6 +127,9 @@ export const UPDATE_PRODUCT_MUTATION = `
         url
       }
       stock
+      category
+      description
+
       price
       createdAt
       updatedAt
@@ -145,6 +153,8 @@ export const GET_FEATURED_PRODUCTS_QUERY = `
       }
       stock
       price
+      category
+      description
       createdAt
       updatedAt
     }

@@ -6,20 +6,9 @@ import { productFields } from "../productFormFields";
 import ProductInputField from "../ProductInputField";
 import { useForm } from "react-hook-form";
 import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
+import { MarketplaceProduct } from "@/types/marketplace";
 
-type MarketplaceProduct = {
-  id: string;
-  ownerUid: string;
-  productName: string;
-  imageurl?: {
-    ref: string;
-    url: string;
-  };
-  stock: number;
-  price: number;
-  createdAt?: string;
-  updatedAt?: string;
-};
+ 
 
 type AddProductSectionProps = {
   onBack: () => void;
@@ -36,10 +25,10 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
   const form = useForm({
     defaultValues: {
       productName: editProduct?.productName ?? "",
-      category: "",
+      category: editProduct?.category ?? "",
       price: editProduct?.price ?? 0,
       stock: editProduct?.stock ?? 0,
-      description: "",
+      description: editProduct?.description ?? "",
     },
   });
 
@@ -79,6 +68,8 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
             productName: data.productName,
             price: data.price,
             stock: data.stock,
+            description: data.description,
+            category: data.category,
           },
           imageFile,
         );
@@ -89,6 +80,8 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
             productName: data.productName,
             price: data.price,
             stock: data.stock,
+            description: data.description,
+            category: data.category,
           },
           imageFile,
         );

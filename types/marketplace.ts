@@ -30,6 +30,8 @@ export type MarketplaceProduct = {
   id: string;
   ownerUid: string;
   productName: string;
+  description?: string;
+  category?: string;
   imageurl?: {
     ref: string;
     url: string;
@@ -38,4 +40,17 @@ export type MarketplaceProduct = {
   price: number;
   createdAt?: string;
   updatedAt?: string;
+};
+export type MarketplaceProductImageInput = {
+  ref: string;
+  url: string;
+};
+
+export type MarketplaceProductFormInput = {
+  productName: string;
+  imageurl?: MarketplaceProductImageInput;
+  stock: number;
+  price: number;
+  description?: string;
+  category?: string;
 };

@@ -15,6 +15,8 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
     productName: String!
     imageurl: ImageUrl
     stock: Int!
+    category: String
+    description: String
     price: Float!
     createdAt: String
     updatedAt: String
@@ -25,6 +27,8 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
     imageurl: ImageUrlInput
     stock: Int!
     price: Float!
+    category: String
+    description: String
   }
 
   input UpdateMarketplaceProductInput {
@@ -32,6 +36,8 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
     imageurl: ImageUrlInput
     stock: Int
     price: Float
+    category: String
+    description: String
   }
 
   type Query {
