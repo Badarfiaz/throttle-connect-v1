@@ -84,6 +84,33 @@ const marketplaceProductsResolvers = {
         };
       });
     },
+
+    // Get all products by category
+    getProductsByCategory: async (_: any, args: { category: string }) => {
+      const { category } = args;
+
+      if (!category || category.trim() === "") {
+        throw new Error("Category is required.");
+      }
+
+      const snapshot = await db
+        .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
+        .where("category", "==", category)
+        .orderBy("createdAt", "desc")
+        .get();
+
+      if (snapshot.empty) return [];
+
+      return snapshot.docs.map((doc) => {
+        const data = doc.data() as any;
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: normalizeTimestamp(data?.createdAt),
+          updatedAt: normalizeTimestamp(data?.updatedAt),
+        };
+      });
+    },
   },
 
   Mutation: {

@@ -17,13 +17,12 @@ const RegistureClubBanner = ({
   description,
   ctaButton1,
   ctaButton2,
-  cardData
+  cardData,
 }: RegistureClubProps) => {
   return (
     <section className="relative py-16 px-6  overflow-hidden border-t border-b border-gray-100">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-12 items-center justify-between">
-
           {/* Left: Text Content */}
           <div className="text-left space-y-6 max-w-2xl flex-1">
             <AnimateMotion
@@ -35,7 +34,8 @@ const RegistureClubBanner = ({
                 {title || "Unlock Your Automotive Potential"}
               </h2>
               <p className="text-base md:text-lg text-gray-500 leading-relaxed">
-                {description || "Join a community of enthusiasts and professionals. List your business or find the perfect club today."}
+                {description ||
+                  "Join a community of enthusiasts and professionals. List your business or find the perfect club today."}
               </p>
             </AnimateMotion>
 
@@ -51,11 +51,13 @@ const RegistureClubBanner = ({
                   className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20"
                 />
               </Link>
-              <SharedButton
-                variant="outline"
-                label={ctaButton2 || "Learn More"}
-                className="border-gray-200 text-gray-700 hover:bg-gray-50"
-              />
+              {ctaButton2 && (
+                <SharedButton
+                  variant="outline"
+                  label={ctaButton2 || "Learn More"}
+                  className="border-gray-200 text-gray-700 hover:bg-gray-50"
+                />
+              )}
             </AnimateMotion>
           </div>
 
@@ -77,15 +79,18 @@ const RegistureClubBanner = ({
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-900 mb-1">{card.title}</h3>
-                      <p className="text-xs text-gray-500 leading-snug line-clamp-2">{card.description}</p>
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                        {card.title}
+                      </h3>
+                      <p className="text-xs text-gray-500 leading-snug line-clamp-2">
+                        {card.description}
+                      </p>
                     </div>
                   </AnimateMotion>
                 );
               })}
             </div>
           </div>
-
         </div>
       </div>
     </section>

@@ -1,5 +1,11 @@
 import { CategoryType, Club, EventItem } from "@/types/main";
-import { ClipboardPlus, Globe2, LucideIcon, Users } from "lucide-react";
+import {
+  ClipboardPlus,
+  Globe2,
+  LucideIcon,
+  MonitorCheckIcon,
+  Users,
+} from "lucide-react";
 export interface vehicleCategoriesType {
   id: number;
   categoryType?: CategoryType;
@@ -234,7 +240,7 @@ export type cardDataType = {
   icon: LucideIcon;
   title: string;
   description: string;
-}
+};
 export const cardDataNetworking: cardDataType[] = [
   {
     icon: Users,
@@ -274,5 +280,11 @@ export const cardDataMarketplace: cardDataType[] = [
     title: "Easy Buying & Selling",
     description:
       "List your products or make purchases with a few simple clicks.",
+  },
+  {
+    icon: MonitorCheckIcon,
+    title: "Secure Transactions",
+    description:
+      "Buy and sell securely with our trusted payment and shipping options.",
   },
 ];

@@ -2,14 +2,16 @@ import { FETCHER_URL } from "@/lib/config";
 import { GET_FEATURED_PRODUCTS_QUERY } from "@/app/graphql/marketplace";
 import getFirebaseToken from "@/ulity/getFirebaseToken";
 import { uploadImage } from "@/ulity/imageUpload";
-import type { MarketplaceProduct, MarketplaceProductImageInput } from "@/types/marketplace";
+import type {
+  MarketplaceProduct,
+  MarketplaceProductImageInput,
+} from "@/types/marketplace";
+import { GET_PRODUCTS_BY_CATEGORY_QUERY } from "@/app/graphql/marketplace";
 
 type GraphQLResult = {
   data?: Record<string, unknown>;
   errors?: unknown;
 };
-
- 
 
 export const AUTH_REQUIRED_MESSAGE = "Not authenticated. Please log in first.";
 
@@ -106,4 +108,27 @@ export const getMarketplaceFeaturedProducts = async () => {
   }
 
   return result?.data?.getMarketplaceFeaturedProducts ?? [];
+};
+
+export const getProductsByCategory = async (category: string) => {
+  const res = await fetch(FETCHER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: GET_PRODUCTS_BY_CATEGORY_QUERY,
+      variables: { category },
+    }),
+  });
+
+  const result = (await res.json()) as GraphQLResult & {
+    data?: { getProductsByCategory?: MarketplaceProduct[] };
+  };
+
+  if (!res.ok || result.errors) {
+    throw new Error(getMarketplaceGraphQLErrorMessage(result));
+  }
+
+  return result?.data?.getProductsByCategory ?? [];
 };

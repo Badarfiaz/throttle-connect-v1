@@ -14,6 +14,7 @@ import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
 import { MarketplaceStoreCard } from "@/types/marketplace";
 import CategorySection from "@/components/shared/CategorySection";
 import { getMarketplaceFeaturedProducts } from "@/ulity/marketplaceProducts";
+import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
 
 function Page() {
   const [featuredProducts, setFeaturedProducts] = useState<
@@ -139,13 +140,13 @@ function Page() {
       {/*  */}
 
       <RegistureClubBanner
-        title="Join the Throttle Connect Marketplace"
-        description="Whether you’re a seller looking to reach passionate enthusiasts or a buyer seeking unique products, our marketplace is your destination."
-        ctaButton1="Register as shop"
-        ctaButton2="Find a Club"
+        title="Why Choose Us?
+"
+        description="Buy and sell securely, easily, and conveniently from your vehicle. Enjoy a professional experience designed for your comfort and peace of mind.."
+        ctaButton1="Register now for free"
+        // ctaButton2="Find a Club"
         cardData={cardDataMarketplace}
       />
-      {/*  */}
       <Title
         title="Featured Products"
         description="Discover our handpicked selection of automotive products, curated for quality and performance."
@@ -170,7 +171,7 @@ function Page() {
               desktop: 4,
             }}
             renderItem={(product) => (
-              <div key={product.id} className="w-full h-full">
+              <div key={product.id} className="s">
                 <ProductCard product={product} />
               </div>
             )}
@@ -180,6 +181,30 @@ function Page() {
             No featured products available right now.
           </p>
         )}
+      </div>
+
+      <div className="px-4 sm:px-6 md:px-12 lg:px-20">
+        <CategoryProductsSection
+          category="accessories"
+          categoryTitle="Accessories"
+          categoryDescription="Find quality automotive accessories for your vehicle."
+        />
+      </div>
+
+      <div className="px-4 sm:px-6 md:px-12 lg:px-20">
+        <CategoryProductsSection
+          category="oils-and-fluids"
+          categoryTitle="Oils & Fluids"
+          categoryDescription="Premium automotive oils and fluids for optimal performance."
+        />
+      </div>
+
+      <div className="px-4 sm:px-6 md:px-12 lg:px-20">
+        <CategoryProductsSection
+          category="riding-gear"
+          categoryTitle="Riding Gear"
+          categoryDescription="Professional riding gear and safety equipment."
+        />
       </div>
     </div>
   );

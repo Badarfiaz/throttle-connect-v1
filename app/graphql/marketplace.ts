@@ -38,6 +38,24 @@ export const MARKETPLACE_STORE_PROFILE_QUERY = `
     }
   }
 `;
+export const GET_PRODUCTS_BY_CATEGORY_QUERY = `
+  query GetProductsByCategory($category: String!) {
+    getProductsByCategory(category: $category) {
+      id
+      productName
+      imageurl {
+        ref
+        url
+      }
+      stock
+      price
+      category
+      description
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const MARKETPLACE_ALL_STORES_QUERY = `{
   marketplaceAllStores {
     id

@@ -44,6 +44,7 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
     marketplaceProducts: [MarketplaceProduct!]!
     marketplaceProduct(id: ID!): MarketplaceProduct
     getMarketplaceFeaturedProducts: [MarketplaceProduct!]!
+    getProductsByCategory(category: String!): [MarketplaceProduct!]!
   }
 
   type Mutation {
