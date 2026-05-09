@@ -18,7 +18,12 @@ export default function CategoryLabel({
   const categoryName = getMarketplaceCategoryName(label);
 
   return (
-    <p className={cn("min-h-[1rem] text-xs font-medium text-blue-600", className)}>
+    <p
+      className={cn(
+        "min-h-[1rem] text-xs font-medium text-blue-600",
+        className,
+      )}
+    >
       {categoryName}
     </p>
   );
