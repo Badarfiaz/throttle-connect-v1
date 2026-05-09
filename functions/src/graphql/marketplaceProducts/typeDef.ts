@@ -15,6 +15,7 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
     productName: String!
     imageurl: ImageUrl
     stock: Int!
+    owner: MarketplaceStore
     category: String
     description: String
     price: Float!

@@ -7,18 +7,17 @@ import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 import MarketplaceCategoryCarousel from "@/components/marketplace/MarketplaceCategoryCarousel";
 
-import type { marketplaceProductType } from "@/dummydata/marketplace";
-import { cardDataMarketplace } from "@/dummydata/networking";
+ import { cardDataMarketplace } from "@/dummydata/networking";
 import { MARKETPLACE_ALL_STORES_QUERY } from "@/app/graphql/marketplace";
 import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
-import { MarketplaceStoreCard } from "@/types/marketplace";
+import { MarketplaceProduct, MarketplaceStoreCard } from "@/types/marketplace";
 import CategorySection from "@/components/shared/CategorySection";
 import { getMarketplaceFeaturedProducts } from "@/ulity/marketplaceProducts";
 import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
 
 function Page() {
   const [featuredProducts, setFeaturedProducts] = useState<
-    marketplaceProductType[]
+    MarketplaceProduct[]
   >([]);
   const [featuredLoading, setFeaturedLoading] = useState(false);
   const [featuredError, setFeaturedError] = useState<string | null>(null);
@@ -40,16 +39,10 @@ function Page() {
 
       try {
         const products = await getMarketplaceFeaturedProducts();
-        const mappedProducts = products.map((product, index) => ({
-          id: product.id,
-          productName: product.productName,
-          image: product.imageurl?.url || "/images/logos/segalmotors.jpg",
-          profileName: product.ownerUid,
-          price: product.price,
-        }));
-
+        console.log('Featured products',products)
+        
         if (isMounted) {
-          setFeaturedProducts(mappedProducts);
+          setFeaturedProducts(products);
         }
       } catch (error) {
         if (isMounted) {

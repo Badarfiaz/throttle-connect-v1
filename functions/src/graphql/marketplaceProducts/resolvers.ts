@@ -113,6 +113,34 @@ const marketplaceProductsResolvers = {
     },
   },
 
+  MarketplaceProduct: {
+    owner: async (parent: any) => {
+      try {
+        const ownerUid = parent?.ownerUid;
+        if (!ownerUid) return null;
+
+        const snapshot = await db
+          .collection(COLLECTIONS.MARKETPLACE_STORES)
+          .where("ownerUid", "==", ownerUid)
+          .where("completed", "==", true)
+          .limit(1)
+          .get();
+
+        if (snapshot.empty) return null;
+
+        const doc = snapshot.docs[0];
+        const data = doc.data() as any;
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: normalizeTimestamp(data?.createdAt),
+        };
+      } catch (err) {
+        return null;
+      }
+    },
+  },
+
   Mutation: {
     // Create a new product
     createMarketplaceProduct: async (

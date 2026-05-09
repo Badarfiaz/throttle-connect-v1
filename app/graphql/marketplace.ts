@@ -51,6 +51,16 @@ export const GET_PRODUCTS_BY_CATEGORY_QUERY = `
       price
       category
       description
+      owner {
+        id
+        title
+        contactMethod
+        logoUrl
+        slugUrl
+        phone
+        email
+        location { area city province }
+      }
       createdAt
       updatedAt
     }
@@ -118,6 +128,16 @@ export const GET_PRODUCTS_QUERY = `
     marketplaceProducts {
       id
       ownerUid
+      owner {
+        id
+        title
+        contactMethod
+        logoUrl
+        slugUrl
+        phone
+        email
+        location { area city province }
+      }
       productName
       category
       description
@@ -139,6 +159,16 @@ export const GET_PRODUCT_BY_ID_QUERY = `
     marketplaceProduct(id: $id) {
       id
       ownerUid
+      owner {
+        id
+        title
+        contactMethod
+        logoUrl
+        slugUrl
+        phone
+        email
+        location { area city province }
+      }
       productName
       category
       description
@@ -193,6 +223,16 @@ export const GET_FEATURED_PRODUCTS_QUERY = `
       price
       category
       description
+      owner {
+        id
+        title
+        contactMethod
+        logoUrl
+        slugUrl
+        phone
+        email
+        location { area city province }
+      }
       createdAt
       updatedAt
     }

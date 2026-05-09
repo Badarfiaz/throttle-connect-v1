@@ -102,6 +102,7 @@ export const getMarketplaceFeaturedProducts = async () => {
   const result = (await res.json()) as GraphQLResult & {
     data?: { getMarketplaceFeaturedProducts?: MarketplaceProduct[] };
   };
+  console.log('result =>  ',result)
 
   if (!res.ok || result.errors) {
     throw new Error(getMarketplaceGraphQLErrorMessage(result));

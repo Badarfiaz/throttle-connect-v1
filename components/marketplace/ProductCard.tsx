@@ -8,9 +8,10 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import CardLinkWrapper from "../shared/CardLinkWapper";
+import { MarketplaceProduct } from "@/types/marketplace";
 
 type ProductCardProps = {
-  product: marketplaceProductType;
+  product: MarketplaceProduct;
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
@@ -23,7 +24,7 @@ console.log('product',product)
        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gray-100">
         <Image
           fill
-          src={product.image}
+          src={product.imageurl?.url  || ''}
           alt={product.productName}
           className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
         />
@@ -73,7 +74,7 @@ console.log('product',product)
           )}
         </div>
         <span className="text-xs text-gray-400 ">
-          Profile: {product.profileName}
+          Profile: {product.owner?.title}
         </span>
 
         {/* Optional: Category or other meta info could go here, but keeping it minimal */}

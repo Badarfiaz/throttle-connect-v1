@@ -29,6 +29,7 @@ export type MarketplaceStoreCard = {
 export type MarketplaceProduct = {
   id: string;
   ownerUid: string;
+  owner?: MarketplaceStore | null;
   productName: string;
   description?: string;
   category?: string;

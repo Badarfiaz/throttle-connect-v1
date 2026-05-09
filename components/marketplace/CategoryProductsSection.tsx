@@ -6,6 +6,7 @@ import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import Title from "@/components/shared/Title";
 import { getProductsByCategory } from "@/ulity/marketplaceProducts";
 import type { marketplaceProductType } from "@/dummydata/marketplace";
+import { MarketplaceProduct } from "@/types/marketplace";
 
 interface CategoryProductsSectionProps {
   category: string;
@@ -18,7 +19,7 @@ export default function CategoryProductsSection({
   categoryTitle,
   categoryDescription,
 }: CategoryProductsSectionProps) {
-  const [products, setProducts] = useState<marketplaceProductType[]>([]);
+  const [products, setProducts] = useState<MarketplaceProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,17 +32,10 @@ export default function CategoryProductsSection({
 
       try {
         const fetchedProducts = await getProductsByCategory(category);
-        const mappedProducts = fetchedProducts.map((product) => ({
-          id: product.id,
-          productName: product.productName,
-          image: product.imageurl?.url || "/images/logos/segalmotors.jpg",
-          profileName: product.ownerUid,
-          price: product.price,
-          category: product.category,
-        }));
+  
 
         if (isMounted) {
-          setProducts(mappedProducts);
+          setProducts(fetchedProducts);
         }
       } catch (err) {
         if (isMounted) {
