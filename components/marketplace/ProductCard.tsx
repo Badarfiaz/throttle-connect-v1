@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { marketplaceProductType } from "@/dummydata/marketplace";
-import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ShoppingBag } from "lucide-react"; // Changed ShoppingCart to ShoppingBag for a more modern feel
+import { Heart, ShoppingBag, Clock, MessageCircle } from "lucide-react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import CardLinkWrapper from "../shared/CardLinkWapper";
 import { MarketplaceProduct } from "@/types/marketplace";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 type ProductCardProps = {
   product: MarketplaceProduct;
@@ -16,70 +16,105 @@ type ProductCardProps = {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isFavorite, setIsFavorite] = useState(false);
-console.log('product',product)
+
   return (
     <CardLinkWrapper link={`/marketplace/product/${product.id}`}>
+      <TooltipProvider>
+           {/* Image area (fixed height 170) */}
+          <div className="relative w-full h-[170px] overflow-hidden bg-gray-100 group">
+            <Image
+              src={product.imageurl?.url || "/images/logos/segalmotors.jpg"}
+              alt={product.productName}
+              fill
+              className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+            />
 
-    <Card className="group relative w-full h-full border-none shadow-none bg-transparent hover:shadow-none transition-all duration-300">
-       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gray-100">
-        <Image
-          fill
-          src={product.imageurl?.url  || ''}
-          alt={product.productName}
-          className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-        />
-{/* reuse headert button  */}
-         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-         <Button
-          onClick={(e) => {
-            e.preventDefault();
-            setIsFavorite(!isFavorite);
-          }}
-          className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:text-red-500 transition-colors shadow-sm"
-        >
-          <Heart
-            size={18}
-            className={cn("transition-all", isFavorite ? "fill-red-500 text-red-500" : "")}
-          />
-        </Button>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Quick Add Button (Bottom Right) - Visible on Hover for Desktop, Always for Mobile if desired, but here we keep it clean */}
-        <div className="absolute bottom-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <Button
-            size="icon"
-            className="h-10 w-10 rounded-full bg-white text-black hover:bg-black hover:text-white shadow-md transition-colors"
-            onClick={(e) => e.preventDefault()}
-          >
-            <ShoppingBag size={18} />
-          </Button>
-        </div>
-      </div>
+            {/* Favorite Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsFavorite((s) => !s);
+                  }}
+                  size="icon"
+                  variant="ghost"
+                  className={cn(
+                    "absolute top-3 right-3 rounded-full h-8 w-8 bg-white/90 backdrop-blur-sm hover:bg-white",
+                    isFavorite && "text-red-500"
+                  )}
+                >
+                  <Heart
+                    size={18}
+                    className={cn(isFavorite && "fill-red-500")}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{isFavorite ? "Remove from favorites" : "Add to favorites"}</TooltipContent>
+            </Tooltip>
 
-      {/* Content */}
-      <CardContent className="px-1 py-3">
-        <div className="flex justify-between items-start gap-2">
-          <h3 className="text-sm md:text-base font-medium text-gray-900 line-clamp-2 leading-tight group-hover:underline decoration-1 underline-offset-2">
-            {product.productName}
-          </h3>
-        </div>
+            {/* Quick Add Button */}
+            <div className="absolute bottom-3 right-3">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={(e) => e.preventDefault()}
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 rounded-lg bg-white/90 hover:bg-white"
+                  >
+                    <ShoppingBag size={18} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Quick add</TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
 
-        <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-base md:text-lg font-bold text-gray-900">
-            ${product.price}
-          </span>
-          {product.price && (
-            <span className="text-xs text-gray-400 line-through">
-              ${Math.round(product.price * 1.2)}
-            </span>
-          )}
-        </div>
-        <span className="text-xs text-gray-400 ">
-          Profile: {product.owner?.title}
-        </span>
+          {/* Content area */}
+          <CardContent className="p-3">
+            <h3 className="text-base font-semibold text-[#083047] line-clamp-2 mb-2">
+              {product.productName}
+            </h3>
 
-        {/* Optional: Category or other meta info could go here, but keeping it minimal */}
-      </CardContent>
-    </Card>
+            <div className="space-y-1 mb-3">
+              <p className="text-sm font-medium text-red-600">
+                Rs {product.price} / Unit
+              </p>
+              <p className="text-xs font-medium text-blue-600">Whole seller</p>
+              <p className="text-xs text-gray-500">{product.owner?.title}</p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={(e) => e.preventDefault()}
+                className={cn(
+                  "flex-1 h-9 text-xs font-medium gap-1.5",
+                  "bg-[#0F6AA6] hover:bg-[#0E5A8E] text-white"
+                )}
+              >
+                <MessageCircle size={16} />
+                Whatsapp
+              </Button>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="h-9 w-9 text-slate-600 hover:text-slate-800"
+                  >
+                    <Clock size={16} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>View details</TooltipContent>
+              </Tooltip>
+            </div>
+          </CardContent>
+       </TooltipProvider>
     </CardLinkWrapper>
   );
 };
