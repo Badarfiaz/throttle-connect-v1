@@ -68,3 +68,40 @@ export function getContactMethod({
 
   return null;
 }
+
+export function getAllContactMethods({
+  phone,
+  email,
+  preferredMethod = "whatsapp",
+}: GetContactMethodParams): (ContactMethod & { method: ContactMethodType })[] {
+  const methods: (ContactMethod & { method: ContactMethodType })[] = [];
+
+  if (phone) {
+    methods.push({
+      method: "phone",
+      label: "Call",
+      icon: Phone,
+      href: `tel:${phone}`,
+      target: "_self",
+    });
+    methods.push({
+      method: "social",
+      label: "WhatsApp",
+      icon: MessageCircle,
+      href: `https://wa.me/${phone.replace(/\D/g, "")}`,
+      target: "_blank",
+    });
+  }
+
+  if (email) {
+    methods.push({
+      method: "email",
+      label: "Email",
+      icon: Mail,
+      href: `mailto:${email}`,
+      target: "_self",
+    });
+  }
+
+  return methods;
+}

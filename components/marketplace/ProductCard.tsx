@@ -61,6 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               phone={product.owner?.phone}
               email={product.owner?.email}
               preferredMethod={product.owner?.contactMethod}
+              menuIcon
             />
           </div>
         </CardContent>
