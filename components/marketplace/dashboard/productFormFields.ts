@@ -1,11 +1,14 @@
+import { marketplaceCategories } from "@/data/category";
+
 export type ProductFieldConfig = {
   name: string;
   label: string;
   placeholder?: string;
   required?: boolean;
-  type?: "input" | "textarea" | "number" | "file";
+  type?: "input" | "textarea" | "number" | "file" | "select";
   keyboardType?: "default" | "numeric";
   gridSpan?: "full" | "half";
+  options?: { label: string; value: string }[];
 };
 
 export const productFields: ProductFieldConfig[] = [
@@ -21,8 +24,12 @@ export const productFields: ProductFieldConfig[] = [
     name: "category",
     label: "Category",
     placeholder: "Braking, Lighting, Engine",
-    type: "input",
+    type: "select",
     gridSpan: "half",
+    options: marketplaceCategories.map((cat) => ({
+      label: cat.name,
+      value: cat.slug,
+    })),
   },
   {
     name: "price",

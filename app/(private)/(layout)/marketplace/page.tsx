@@ -5,6 +5,7 @@ import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
+import MarketplaceCategoryCarousel from "@/components/marketplace/MarketplaceCategoryCarousel";
 
 import type { marketplaceProductType } from "@/dummydata/marketplace";
 import { cardDataMarketplace } from "@/dummydata/networking";
@@ -39,7 +40,7 @@ function Page() {
       try {
         const products = await getMarketplaceFeaturedProducts();
         const mappedProducts = products.map((product, index) => ({
-          id: product.id ,
+          id: product.id,
           productName: product.productName,
           image: product.imageurl?.url || "/images/logos/segalmotors.jpg",
           profileName: product.ownerUid,
@@ -91,6 +92,10 @@ function Page() {
         ctaText="Explore products"
         layout={2}
       />
+
+      <div className="mt-14">
+        <MarketplaceCategoryCarousel />
+      </div>
 
       <div className="max-w-5xl mt-20 mx-auto px-6">
         <Title

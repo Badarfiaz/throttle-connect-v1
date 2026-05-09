@@ -8,6 +8,13 @@ import type { ProductFieldConfig } from "./productFormFields";
 import type { UseFormReturn } from "react-hook-form";
 import { useRef, type ChangeEvent } from "react";
 import { Upload } from "lucide-react";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 type ProductInputFieldProps = {
   field: ProductFieldConfig;
@@ -81,6 +88,30 @@ function ProductInputField({
           placeholder={field.placeholder}
           {...(form && form.register(field.name))}
         />
+      );
+    }
+    if (field.type === "select" && field.options && form) {
+      const { watch, setValue } = form;
+      const value = watch(field.name) as string | undefined;
+
+      return (
+        <Select
+          value={value ?? ""}
+          onValueChange={(v) =>
+            setValue(field.name, v, { shouldValidate: true })
+          }
+        >
+          <SelectTrigger className="mt-2 w-full">
+            <SelectValue placeholder={field.placeholder} />
+          </SelectTrigger>
+          <SelectContent>
+            {field.options.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       );
     }
 
