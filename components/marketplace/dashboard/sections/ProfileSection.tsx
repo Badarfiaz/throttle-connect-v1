@@ -145,12 +145,7 @@ export default function ProfileSection({
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <StoreIdentityCard form={form} onSave={handleSave} saving={updating} />
-        <StoreLogoCard
-          store={store}
-          storeInitials={storeInitials}
-          staticProfile={staticProfile}
-          onUpdateStore={onUpdateStore}
-        />
+        <StoreLogoCard store={store} onUpdateStore={onUpdateStore} />
       </div>
 
       <ContactLocationCard form={form} />

@@ -266,26 +266,6 @@ export default function RegistrationInputField({
             : {})}
         />
       )}
-      {field.name === "logoUrl" && (
-        <StoreLogoCard
-          store={
-            watchedValue
-              ? ({
-                  id: "logo-preview",
-                  title: field.label,
-                  logoUrl: watchedValue,
-                } as any)
-              : null
-          }
-          storeInitials="LG"
-          staticProfile={{
-            website: "",
-            linkedin: "",
-            instagram: "",
-            other: "",
-          }}
-        />
-      )}
     </div>
   );
 }
