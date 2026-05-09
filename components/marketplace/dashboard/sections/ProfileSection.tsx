@@ -8,13 +8,15 @@ import StoreIdentityCard from "./profile/StoreIdentityCard";
 import StoreLogoCard from "./profile/StoreLogoCard";
 import ContactLocationCard from "./profile/ContactLocationCard";
 import StoreMetadataCard from "./profile/StoreMetadataCard";
+import { socialFields } from "../../registration/formFields";
+import RegistrationInputField from "../../registration/RegistrationInputField";
+import DashboardWrapper from "@/components/shared/DashboardWrapper";
 
 type StaticProfile = {
   website: string;
-  facebook: string;
+  linkedin: string;
   instagram: string;
-  tiktok: string;
-  whatsapp: string;
+  other: string;
 };
 
 type ProfileSectionProps = {
@@ -144,7 +146,6 @@ export default function ProfileSection({
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <StoreIdentityCard form={form} onSave={handleSave} saving={updating} />
         <StoreLogoCard
-          form={form}
           store={store}
           storeInitials={storeInitials}
           staticProfile={staticProfile}
@@ -153,7 +154,20 @@ export default function ProfileSection({
       </div>
 
       <ContactLocationCard form={form} />
-
+      <DashboardWrapper
+        title="Social Platforms"
+        description="Connect your store's social media accounts to engage with customers and expand your online presence."
+      >
+        <div className="mt-6 grid gap-4">
+          {socialFields.map((field) => (
+            <RegistrationInputField
+              key={field.name}
+              field={field}
+              form={form}
+            />
+          ))}
+        </div>
+      </DashboardWrapper>
       <StoreMetadataCard store={store} userId={userId} />
 
       {updateError ? (

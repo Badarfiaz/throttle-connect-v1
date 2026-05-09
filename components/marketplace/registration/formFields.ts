@@ -69,6 +69,11 @@ export const shopSetupFields: FieldConfig[] = [
     label: "Shop Address",
     placeholder: "Enter shop address",
   },
+  {
+    name: "logoUrl",
+    label: "Shop Logo URL",
+    placeholder: "Enter URL of your shop logo",
+  },
 ];
 
 // ---------------- Shop Details ----------------

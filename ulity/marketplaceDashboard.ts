@@ -33,10 +33,9 @@ export const marketplaceNavItems: DashboardNavItem[] = [
 
 export const staticProfile = {
   website: "https://yourstore.example",
-  facebook: "facebook.com/yourstore",
+  linkedin: "linkedin.com/company/yourstore",
   instagram: "@yourstore",
-  tiktok: "@yourstore",
-  whatsapp: "+92 300 0000000",
+  other: "",
 };
 
 export const sampleProducts: ProductItem[] = [

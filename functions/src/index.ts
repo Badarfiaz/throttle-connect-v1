@@ -8,6 +8,7 @@ import marketplaceProductsTypeDefs from "./graphql/marketplaceProducts/typeDef";
 import marketplaceProductsResolvers from "./graphql/marketplaceProducts/resolvers";
 import { COLLECTIONS } from "./constants";
 const db = admin.firestore();
+import { makeSlugUrl } from "../utils/makeSlugUrl";
 
 const currentDate = new Date();
 type OnboardPageType = "marketplace" | "networking";
@@ -85,7 +86,9 @@ export const onboard = onRequest(
         ...req.body,
         ownerUid: uid, // currect user's UID as owner
         createdAt: currentDate,
+        slugUrl: makeSlugUrl(req.body.title || `${onBoardType}-${uid}`),
       };
+      console.log("Data to save:", dataToSave);
       const COLLECTION_NAME =
         onBoardType === "marketplace"
           ? COLLECTIONS.MARKETPLACE_STORES

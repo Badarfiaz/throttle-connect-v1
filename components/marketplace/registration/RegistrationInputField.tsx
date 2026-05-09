@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import type { FieldConfig, Option } from "./formFields";
 import type { UseFormReturn } from "react-hook-form";
+import StoreLogoCard from "@/components/marketplace/dashboard/sections/profile/StoreLogoCard";
 
 type SocialSelectorProps = {
   options: Option[];
@@ -230,7 +231,9 @@ export default function RegistrationInputField({
       {field.type === "textarea" && (
         <Textarea
           placeholder={field.placeholder}
-          {...(register ? register(field.name, { required: field.required }) : {})}
+          {...(register
+            ? register(field.name, { required: field.required })
+            : {})}
         />
       )}
 
@@ -258,7 +261,29 @@ export default function RegistrationInputField({
                   : "text"
           }
           placeholder={field.placeholder}
-          {...(register ? register(field.name, { required: field.required }) : {})}
+          {...(register
+            ? register(field.name, { required: field.required })
+            : {})}
+        />
+      )}
+      {field.name === "logoUrl" && (
+        <StoreLogoCard
+          store={
+            watchedValue
+              ? ({
+                  id: "logo-preview",
+                  title: field.label,
+                  logoUrl: watchedValue,
+                } as any)
+              : null
+          }
+          storeInitials="LG"
+          staticProfile={{
+            website: "",
+            linkedin: "",
+            instagram: "",
+            other: "",
+          }}
         />
       )}
     </div>

@@ -1,23 +1,18 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import type { MarketplaceStore } from "@/types/marketplace";
-import RegistrationInputField from "@/components/marketplace/registration/RegistrationInputField";
 import { uploadImage } from "@/ulity/imageUpload";
-import type { UseFormReturn } from "react-hook-form";
-import { socialFields } from "@/components/marketplace/registration/formFields";
+import DashboardWrapper from "@/components/shared/DashboardWrapper";
 
 type StaticProfile = {
   website: string;
-  facebook: string;
+  linkedin: string;
   instagram: string;
-  tiktok: string;
-  whatsapp: string;
+  other: string;
 };
 
 type Props = {
-  form?: UseFormReturn<any>;
   store: MarketplaceStore | null;
   storeInitials: string;
   staticProfile: StaticProfile;
@@ -28,14 +23,15 @@ type Props = {
 };
 
 export default function StoreLogoCard({
-  form,
   store,
   storeInitials,
-  staticProfile,
   onUpdateStore,
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const canUpdateStore = Boolean(
+    onUpdateStore && (store?.id || store?.ownerUid),
+  );
 
   const handleLogoClick = () => {
     fileInputRef.current?.click();
@@ -85,12 +81,10 @@ export default function StoreLogoCard({
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900">Store Logo</h2>
-      <p className="text-sm text-slate-500">
-        Add a brand mark to help buyers recognize your store.
-      </p>
-
+    <DashboardWrapper
+      title="Store Logo"
+      description="Upload a logo to represent your store and make it easily recognizable to customers."
+    >
       <div className="mt-6 flex items-center gap-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
         {store?.logoUrl ? (
           <img
@@ -109,54 +103,32 @@ export default function StoreLogoCard({
           </p>
           <p className="text-xs text-slate-500">Recommended 512x512px</p>
         </div>
-        <Button
-          className="ml-auto"
-          size="sm"
-          variant="outline"
-          type="button"
-          onClick={handleLogoClick}
-          disabled={uploading}
-        >
-          {uploading ? "Uploading..." : "Upload Logo"}
-        </Button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleLogoChange}
-        />
-      </div>
-
-      <div className="mt-6 grid gap-4">
-        {socialFields.map((field) => (
-          <RegistrationInputField key={field.name} field={field} form={form} />
-        ))}
-
-        <div>
-          <label className="text-xs font-semibold uppercase text-slate-500">
-            Social Links
-          </label>
-          <div className="mt-2 grid gap-3 sm:grid-cols-2">
-            <Input
-              defaultValue={staticProfile.facebook}
-              placeholder="Facebook URL"
+        {canUpdateStore ? (
+          <>
+            <Button
+              className="ml-auto"
+              size="sm"
+              variant="outline"
+              type="button"
+              onClick={handleLogoClick}
+              disabled={uploading}
+            >
+              {uploading ? "Uploading..." : "Upload Logo"}
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleLogoChange}
             />
-            <Input
-              defaultValue={staticProfile.instagram}
-              placeholder="Instagram URL"
-            />
-            <Input
-              defaultValue={staticProfile.tiktok}
-              placeholder="TikTok URL"
-            />
-            <Input
-              defaultValue={staticProfile.whatsapp}
-              placeholder="WhatsApp URL"
-            />
+          </>
+        ) : (
+          <div className="ml-auto rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-500">
+            Logo preview
           </div>
-        </div>
+        )}
       </div>
-    </div>
+    </DashboardWrapper>
   );
 }

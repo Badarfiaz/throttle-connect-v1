@@ -82,10 +82,10 @@ export default function MarketplaceRegistration({}) {
     const mergedData = {
       ...collectedData,
       ...data,
-      slugUrl: makeSlugUrl(marketplace?.title as string) || "",
+      // slugUrl: makeSlugUrl(marketplace?.title as string) || "NO TITLE PROVIDED",
     };
     const isLastStep = currentStep === steps.length - 1;
-
+    console.log(mergedData, "MERGED DATA");
     setCollectedData(mergedData);
 
     try {

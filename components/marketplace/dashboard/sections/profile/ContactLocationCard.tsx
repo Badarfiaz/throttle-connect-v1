@@ -1,5 +1,9 @@
-import { shopDetailsFields } from "@/components/marketplace/registration/formFields";
+import {
+  shopDetailsFields,
+  socialFields,
+} from "@/components/marketplace/registration/formFields";
 import RegistrationInputField from "@/components/marketplace/registration/RegistrationInputField";
+import DashboardWrapper from "@/components/shared/DashboardWrapper";
 import type { UseFormReturn } from "react-hook-form";
 
 type Props = {
@@ -8,19 +12,15 @@ type Props = {
 
 export default function ContactLocationCard({ form }: Props) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900">
-        Contact & Location
-      </h2>
-      <p className="text-sm text-slate-500">
-        Manage how buyers reach you and where you operate.
-      </p>
-
+    <DashboardWrapper
+      title="Contact & Location"
+      description="Provide your store's contact details and location information to help customers reach you easily."
+    >
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {shopDetailsFields.map((field) => (
           <RegistrationInputField key={field.name} field={field} form={form} />
         ))}
       </div>
-    </div>
+    </DashboardWrapper>
   );
 }
