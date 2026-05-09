@@ -63,6 +63,17 @@ export default function StoreProfilePage({
     <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
       {/* Hero Section with Logo */}
       <div className="relative h-64 md:h-80 bg-linear-to-r from-slate-900 to-slate-700 overflow-hidden">
+        {store.bannerUrl ? (
+          <Image
+            src={store.bannerUrl}
+            alt={store.title || "Store banner"}
+            fill
+            className="object-cover"
+            priority
+          />
+        ) : null}
+        <div className="absolute inset-0 bg-linear-to-r from-slate-950/75 via-slate-900/55 to-slate-800/35" />
+
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-grid-pattern"></div>

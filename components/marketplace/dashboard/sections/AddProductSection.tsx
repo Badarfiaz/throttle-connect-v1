@@ -7,8 +7,7 @@ import ProductInputField from "../ProductInputField";
 import { useForm } from "react-hook-form";
 import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
 import { MarketplaceProduct } from "@/types/marketplace";
-
- 
+import { readImagePreview } from "@/ulity/imageUpload";
 
 type AddProductSectionProps = {
   onBack: () => void;
@@ -41,11 +40,7 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
 
   const handleImageSelect = (file: File) => {
     setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    void readImagePreview(file).then(setImagePreview).catch(console.error);
   };
 
   const handlePublish = async () => {

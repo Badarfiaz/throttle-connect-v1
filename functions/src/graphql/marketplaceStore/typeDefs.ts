@@ -20,6 +20,7 @@ const marketplaceStoreTypeDefs = /* GraphQL */ `
     contactMethod: String
     phone: String
     email: String
+    bannerUrl: String
     logoUrl: String
     slugUrl: String
     location: MarketplaceLocation
@@ -38,6 +39,7 @@ const marketplaceStoreTypeDefs = /* GraphQL */ `
     contactMethod: String
     phone: String
     email: String
+    bannerUrl: String
     logoUrl: String
     location: MarketplaceLocationInput
     onBoardType: String

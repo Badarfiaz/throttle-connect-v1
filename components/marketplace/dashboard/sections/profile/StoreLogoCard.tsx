@@ -2,7 +2,7 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { MarketplaceStore } from "@/types/marketplace";
-import { uploadImage } from "@/ulity/imageUpload";
+import { readImagePreview, uploadImage } from "@/ulity/imageUpload";
 import DashboardWrapper from "@/components/shared/DashboardWrapper";
 import { useAppSelector } from "@/app/redux/hooks";
 
@@ -75,11 +75,8 @@ export default function StoreLogoCard({
       console.log("Logo uploaded successfully, URL:", logoUrl);
 
       // Create preview from file
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLocalLogoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      const preview = await readImagePreview(file);
+      setLocalLogoPreview(preview);
 
       // Store the uploaded URL
       setUploadedLogoUrl(logoUrl);

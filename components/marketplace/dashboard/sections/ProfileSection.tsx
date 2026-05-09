@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import type { MarketplaceStore } from "@/types/marketplace";
 import StoreIdentityCard from "./profile/StoreIdentityCard";
 import StoreLogoCard from "./profile/StoreLogoCard";
+import StoreBannerCard from "./profile/StoreBannerCard";
 import ContactLocationCard from "./profile/ContactLocationCard";
 import StoreMetadataCard from "./profile/StoreMetadataCard";
 import { socialFields } from "../../registration/formFields";
@@ -72,8 +73,7 @@ export default function ProfileSection({
   store,
   userEmail,
   userId,
-  storeInitials,
-  staticProfile,
+
   onUpdateStore,
   updating,
   updateError,
@@ -146,6 +146,7 @@ export default function ProfileSection({
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <StoreIdentityCard form={form} onSave={handleSave} saving={updating} />
         <StoreLogoCard store={store} onUpdateStore={onUpdateStore} />
+        <StoreBannerCard store={store} onUpdateStore={onUpdateStore} />
       </div>
 
       <ContactLocationCard form={form} />

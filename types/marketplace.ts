@@ -9,6 +9,7 @@ export type MarketplaceStore = {
   contactMethod?: ContactMethod;
   createdAt?: string | null;
   email?: string | null;
+  bannerUrl?: string | null;
   logoUrl?: string | null;
   location?: locationFields | null;
   onBoardType?: string | null;
@@ -22,6 +23,7 @@ export type MarketplaceStore = {
 export type MarketplaceStoreCard = {
   id: string;
   title?: string | null;
+  bannerUrl?: string | null;
   logoUrl?: string | null;
   slugUrl?: string | null;
 };

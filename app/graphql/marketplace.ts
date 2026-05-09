@@ -8,6 +8,7 @@ export const MARKETPLACE_STORES_QUERY = `{
     contactMethod
     createdAt
     email
+    bannerUrl
     logoUrl
     location { area city province }
     onBoardType
@@ -28,6 +29,7 @@ export const MARKETPLACE_STORE_PROFILE_QUERY = `
       contactMethod
       createdAt
       email
+      bannerUrl
       logoUrl
       location { area city province }
       onBoardType
@@ -70,6 +72,7 @@ export const MARKETPLACE_ALL_STORES_QUERY = `{
   marketplaceAllStores {
     id
     title
+    bannerUrl
     logoUrl
     slugUrl
   }
@@ -92,6 +95,7 @@ export const UPDATE_MARKETPLACE_STORE_MUTATION = `
       contactMethod
       createdAt
       email
+      bannerUrl
       logoUrl
       location { area city province }
       onBoardType

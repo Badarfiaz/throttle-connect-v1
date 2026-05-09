@@ -111,6 +111,7 @@ const marketplaceStoreResolvers = {
         "contactMethod",
         "phone",
         "email",
+        "bannerUrl",
         "logoUrl",
         "onBoardType",
         "pageType",

@@ -25,6 +25,56 @@ export type ImageUploadResult = {
   path: string;
 };
 
+export type ImageUploadPathInput = {
+  ownerId: string;
+  folder: string;
+  basePath?: string;
+};
+
+export const buildImageUploadPath = ({
+  ownerId,
+  folder,
+  basePath = "marketplaceStores",
+}: ImageUploadPathInput) => {
+  const safeOwnerId = ownerId.trim();
+  const safeFolder = folder.trim();
+
+  if (!safeOwnerId) {
+    throw new Error("Owner ID is required for image uploads.");
+  }
+
+  if (!safeFolder) {
+    throw new Error("Upload folder is required for image uploads.");
+  }
+
+  return `${basePath}/${safeOwnerId}/${safeFolder}`;
+};
+
+export const validateImageFile = (file: File, maxSizeMb: number) => {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Please upload an image file.");
+  }
+
+  if (file.size > maxSizeMb * 1024 * 1024) {
+    throw new Error(`Please upload an image under ${maxSizeMb}MB.`);
+  }
+};
+
+export const readImagePreview = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      resolve(reader.result as string);
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Unable to read image preview."));
+    };
+
+    reader.readAsDataURL(file);
+  });
+
 /**
  * Validates and uploads an image file to Firebase Storage
  * @param file - The image file to upload
@@ -43,20 +93,17 @@ export async function uploadImage(
     basePath = "marketplaceStores",
   } = options;
 
-  // Validate file type
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Please upload an image file.");
-  }
-
-  // Validate file size
-  if (file.size > maxSizeMb * 1024 * 1024) {
-    throw new Error(`Please upload an image under ${maxSizeMb}MB.`);
-  }
+  validateImageFile(file, maxSizeMb);
 
   // Create safe filename
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
   const timestamp = Date.now();
-  const filePath = `${basePath}/${ownerId}/${folder}/${timestamp}-${safeName}`;
+  const uploadBasePath = buildImageUploadPath({
+    ownerId,
+    folder,
+    basePath,
+  });
+  const filePath = `${uploadBasePath}/${timestamp}-${safeName}`;
 
   // Upload to Firebase Storage
   const fileRef = ref(storage, filePath);

@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import RegistrationInputField from "./RegistrationInputField";
 import { shopSetupFields } from "./formFields";
 import StoreLogoCard from "../dashboard/sections/profile/StoreLogoCard";
+import StoreBannerCard from "../dashboard/sections/profile/StoreBannerCard";
 import { useAppSelector } from "@/app/redux/hooks";
 import { getStoreInitials } from "@/ulity/marketplaceDashboard";
 import type { MarketplaceStore } from "@/types/marketplace";
@@ -24,6 +25,10 @@ function ShopSetup({ form }: ShopSetupProps) {
     form.setValue("logoUrl", logoUrl);
   };
 
+  const handleBannerUrlChange = (bannerUrl: string | null) => {
+    form.setValue("bannerUrl", bannerUrl);
+  };
+
   return (
     <form className="grid gap-5">
       {/* Shop Setup Form Fields */}
@@ -35,6 +40,16 @@ function ShopSetup({ form }: ShopSetupProps) {
               store={marketplaceStoreData}
               storeInitials={storeInitials}
               onLogoUrlChange={handleLogoUrlChange}
+            />
+          );
+        }
+
+        if (field.name === "bannerUrl") {
+          return (
+            <StoreBannerCard
+              key={field.name}
+              store={marketplaceStoreData}
+              onBannerUrlChange={handleBannerUrlChange}
             />
           );
         }

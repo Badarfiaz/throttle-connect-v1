@@ -123,8 +123,12 @@ export default function ImageUploadField({
               <Upload className="size-8 text-slate-400" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-slate-900">{placeholder}</p>
-              <p className="text-xs text-slate-500">Recommended max {maxSizeMb}MB</p>
+              <p className="text-sm font-medium text-slate-900">
+                {placeholder}
+              </p>
+              <p className="text-xs text-slate-500">
+                Recommended max {maxSizeMb}MB
+              </p>
             </div>
             <Button
               size="sm"
