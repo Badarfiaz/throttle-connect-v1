@@ -33,7 +33,7 @@ function ContactButton({
       asChild
       className={cn(
         "flex-1 h-9 text-xs font-medium gap-1.5",
-        "bg-[#0F6AA6] hover:bg-[#0E5A8E] text-white",
+        "bg-[#19376D] hover:bg-[#0E5A8E] text-white",
       )}
     >
       <a

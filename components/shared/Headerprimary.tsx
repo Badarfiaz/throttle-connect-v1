@@ -11,6 +11,7 @@ import HeaderProfile from "./HeaderProfile";
 import LoginModal from "./LoginModal";
 import { auth } from "@/firebase";
 import { useAuthHandlers } from "@/hooks/useAuthHandlers";
+import { Button } from "../ui/button";
 
 type AuthMode = "login" | "signup";
 
@@ -84,13 +85,13 @@ const HeaderPrimary: FC = () => {
           ))}
           <Togglenav pathname={pathname} />
           {pathname === "/marketplace" && hasMarketplaceCompleted && (
-            <button
+            <Button
               type="button"
               onClick={() => router.push("/marketplace/dashboard")}
               className="rounded-md bg-[#19376D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B2447] transition-colors"
             >
               Dashboard
-            </button>
+            </Button>
           )}
         </nav>
 
