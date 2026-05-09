@@ -1,84 +1,96 @@
 "use client";
 
 import React, { useState } from "react";
-import { marketplaceProductType } from "@/dummydata/marketplace";
-import { Card, CardContent } from "@/components/ui/card";
-import { Heart, ShoppingBag } from "lucide-react"; // Changed ShoppingCart to ShoppingBag for a more modern feel
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { marketplaceProductType } from "@/dummydata/marketplace";
 import CardLinkWrapper from "../shared/CardLinkWapper";
+import CategoryLabel from "./product-card/CategoryLabel";
+import ContactButton from "./product-card/ContactButton";
+import FeaturedLabel from "./product-card/FeaturedLabel";
+import HeartIconButton from "./product-card/HeartIconButton";
+import PriceLabel from "./product-card/PriceLabel";
 
 type ProductCardProps = {
-  product: marketplaceProductType;
+  product: marketplaceProductType & {
+    category?: string;
+  };
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [isFavorite, setIsFavorite] = useState(false);
-console.log('product',product)
+
   return (
     <CardLinkWrapper link={`/marketplace/product/${product.id}`}>
+      <Card className="group relative h-full overflow-hidden rounded-[20px] border border-[#BDD7EA] bg-[#F8FBFE] shadow-[0_5px_16px_rgba(14,28,46,0.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_24px_rgba(14,28,46,0.14)] sm:rounded-[22px]">
+        <div className="p-1.5 sm:p-2">
+          <div className="relative aspect-[1.08/1] w-full overflow-hidden rounded-[16px] border border-[#B7D4E7] bg-slate-100 sm:aspect-[1.02/1] sm:rounded-[18px]">
+            <Image
+              fill
+              src={product.image}
+              alt={product.productName}
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
 
-    <Card className="group relative w-full h-full border-none shadow-none bg-transparent hover:shadow-none transition-all duration-300">
-       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-gray-100">
-        <Image
-          fill
-          src={product.image}
-          alt={product.productName}
-          className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-        />
-{/* reuse headert button  */}
-         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-         <Button
-          onClick={(e) => {
-            e.preventDefault();
-            setIsFavorite(!isFavorite);
-          }}
-          className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:text-red-500 transition-colors shadow-sm"
-        >
-          <Heart
-            size={18}
-            className={cn("transition-all", isFavorite ? "fill-red-500 text-red-500" : "")}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent" />
+
+            <div className="absolute left-2.5 top-2.5 hidden sm:block sm:left-3 sm:top-3">
+              <FeaturedLabel className="scale-90 sm:scale-100" />
+            </div>
+
+            <div className="absolute right-2.5 top-2.5 sm:right-3 sm:top-3">
+              <HeartIconButton
+                active={isFavorite}
+                onToggle={() => setIsFavorite((current) => !current)}
+                className="h-9 w-9 sm:h-10 sm:w-10"
+              />
+            </div>
+
+            <div className="absolute bottom-2 left-1/2 h-1 w-7 -translate-x-1/2 rounded-full bg-white/85 shadow-sm sm:bottom-3 sm:h-1.5 sm:w-8" />
+          </div>
+        </div>
+
+        <CardContent className="space-y-2 px-3 pb-3 pt-0 sm:space-y-3 sm:px-4 sm:pb-4">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="line-clamp-2 flex-1 text-[12.5px] font-semibold leading-snug text-slate-900 sm:text-base">
+              {product.productName}
+            </h3>
+          </div>
+
+          <PriceLabel
+            price={product.price}
+            compareAtPrice={Math.round(product.price * 1.18)}
+            className="-mt-0.5"
           />
-        </Button>
 
-        {/* Quick Add Button (Bottom Right) - Visible on Hover for Desktop, Always for Mobile if desired, but here we keep it clean */}
-        <div className="absolute bottom-3 right-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <Button
-            size="icon"
-            className="h-10 w-10 rounded-full bg-white text-black hover:bg-black hover:text-white shadow-md transition-colors"
-            onClick={(e) => e.preventDefault()}
-          >
-            <ShoppingBag size={18} />
-          </Button>
-        </div>
-      </div>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <CategoryLabel label={product.category || "Marketplace Category"} />
+          </div>
 
-      {/* Content */}
-      <CardContent className="px-1 py-3">
-        <div className="flex justify-between items-start gap-2">
-          <h3 className="text-sm md:text-base font-medium text-gray-900 line-clamp-2 leading-tight group-hover:underline decoration-1 underline-offset-2">
-            {product.productName}
-          </h3>
-        </div>
-
-        <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-base md:text-lg font-bold text-gray-900">
-            ${product.price}
-          </span>
-          {product.price && (
-            <span className="text-xs text-gray-400 line-through">
-              ${Math.round(product.price * 1.2)}
-            </span>
-          )}
-        </div>
-        <span className="text-xs text-gray-400 ">
-          Profile: {product.profileName}
-        </span>
-
-        {/* Optional: Category or other meta info could go here, but keeping it minimal */}
-      </CardContent>
-    </Card>
+          <div className="flex items-center gap-2 pt-0.5 sm:pt-1">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-[10px] font-bold text-slate-700 shadow-sm sm:h-10 sm:w-10 sm:text-xs">
+              {(product.profileName || "M").slice(0, 2).toUpperCase()}
+            </div>
+            <div className="flex flex-1 items-center gap-2">
+              <ContactButton
+                label="Whatsapp"
+                className="h-10 flex-1 rounded-xl px-3 text-xs sm:h-11 sm:px-4 sm:text-sm"
+              />
+              <button
+                type="button"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#DDEBF6] text-[#0B2447] shadow-sm transition-all duration-300 hover:bg-[#cfe2f3] sm:h-11 sm:w-11"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }}
+                aria-label="More options"
+              >
+                <span className="text-xl leading-none sm:text-2xl">⋮</span>
+              </button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </CardLinkWrapper>
   );
 };

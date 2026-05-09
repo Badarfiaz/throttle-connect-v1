@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import ProductCard from "@/components/marketplace/ProductCard";
 import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
@@ -14,11 +13,14 @@ import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
 import { MarketplaceStoreCard } from "@/types/marketplace";
 import CategorySection from "@/components/shared/CategorySection";
 import { getMarketplaceFeaturedProducts } from "@/ulity/marketplaceProducts";
+import ProductCard from "@/components/marketplace/ProductCard";
+import { ca } from "zod/v4/locales";
 
 function Page() {
   const [featuredProducts, setFeaturedProducts] = useState<
     marketplaceProductType[]
   >([]);
+  console.log("featuredProducts", featuredProducts);
   const [featuredLoading, setFeaturedLoading] = useState(false);
   const [featuredError, setFeaturedError] = useState<string | null>(null);
 
@@ -43,7 +45,8 @@ function Page() {
           id: product.id,
           productName: product.productName,
           image: product.imageurl?.url || "/images/logos/segalmotors.jpg",
-          profileName: product.ownerUid,
+          // profileName: product.ownerUid,
+          category: product.category,
           price: product.price,
         }));
 
