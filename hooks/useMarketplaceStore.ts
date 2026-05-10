@@ -13,18 +13,45 @@ type UseMarketplaceStoreProps = {
   isPublic?: boolean;
   variables?: Record<string, unknown>;
 };
+
+const marketplaceStoreCache = new Map<string, MarketplaceStore[] | null>();
+const marketplaceStorePromises = new Map<
+  string,
+  Promise<MarketplaceStore[] | null>
+>();
+
 export const useMarketplaceStore = ({
   query = MARKETPLACE_STORES_QUERY,
   isPublic = false,
   variables = {},
 }: UseMarketplaceStoreProps) => {
-  const [data, setData] = useState<MarketplaceStore[] | null>(null);
+  const cacheKey = JSON.stringify({ query, isPublic, variables });
+  const [data, setData] = useState<MarketplaceStore[] | null>(
+    () => marketplaceStoreCache.get(cacheKey) ?? null,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
 
   const fetchMarketplaceStores = useCallback(async () => {
+    const cachedStores = marketplaceStoreCache.get(cacheKey);
+    if (cachedStores !== undefined) {
+      setData(cachedStores);
+      setError(null);
+      setLoading(false);
+      return cachedStores;
+    }
+
+    const inFlightRequest = marketplaceStorePromises.get(cacheKey);
+    if (inFlightRequest) {
+      setLoading(true);
+      setError(null);
+      const stores = await inFlightRequest;
+      setData(stores);
+      return stores;
+    }
+
     setLoading(true);
     setError(null);
     setData(null);
@@ -35,20 +62,17 @@ export const useMarketplaceStore = ({
         ? isPublic
         : String(query).includes("marketplaceAllStores");
 
-    let token: string | null = null;
-    if (!isPublicResolved) {
-      const tokenResult = await getFirebaseToken();
-      token = tokenResult.token;
+    const requestPromise = (async () => {
+      let token: string | null = null;
+      if (!isPublicResolved) {
+        const tokenResult = await getFirebaseToken();
+        token = tokenResult.token;
 
-      if (!token) {
-        const message = "Not authenticated. Please log in first.";
-        setError(message);
-        setLoading(false);
-        throw new Error(message);
+        if (!token) {
+          throw new Error("Not authenticated. Please log in first.");
+        }
       }
-    }
 
-    try {
       const headers: HeadersInit = { "Content-Type": "application/json" };
       if (token) headers.Authorization = `Bearer ${token}`;
 
@@ -59,7 +83,6 @@ export const useMarketplaceStore = ({
       });
 
       let result = await res.json();
-      console.log("Fetch Result marketplace store :", result);
 
       // If this is a public query and the response indicates an auth error,
       // retry without the Authorization header
@@ -77,7 +100,6 @@ export const useMarketplaceStore = ({
           body: JSON.stringify({ query: query }),
         });
         const fallbackResult = await fallbackRes.json();
-        console.log("Fallback fetch result:", fallbackResult);
         res = fallbackRes;
         result = fallbackResult;
       }
@@ -94,17 +116,26 @@ export const useMarketplaceStore = ({
         result?.data?.marketplaceAllStores ??
         result?.data?.marketplaceStoreProfile ??
         null;
-      setData(stores);
 
+      marketplaceStoreCache.set(cacheKey, stores);
       return stores as MarketplaceStore[] | null;
+    })();
+
+    marketplaceStorePromises.set(cacheKey, requestPromise);
+
+    try {
+      const stores = await requestPromise;
+      setData(stores);
+      return stores;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
       throw err;
     } finally {
+      marketplaceStorePromises.delete(cacheKey);
       setLoading(false);
     }
-  }, [query, isPublic]);
+  }, [cacheKey, isPublic, query, variables]);
 
   const updateMarketplaceStore = useCallback(
     async (id: string, input: Record<string, unknown>) => {
