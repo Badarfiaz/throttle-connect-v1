@@ -7,6 +7,7 @@ import Title from "@/components/shared/Title";
 import { getProductsByCategory } from "@/ulity/marketplaceProducts";
 import type { marketplaceProductType } from "@/dummydata/marketplace";
 import { MarketplaceProduct } from "@/types/marketplace";
+import { mobileResponsiveCount } from "@/types/CommonType";
 
 interface CategoryProductsSectionProps {
   category: string;
@@ -32,7 +33,6 @@ export default function CategoryProductsSection({
 
       try {
         const fetchedProducts = await getProductsByCategory(category);
-  
 
         if (isMounted) {
           setProducts(fetchedProducts);
@@ -87,7 +87,7 @@ export default function CategoryProductsSection({
       <PrimaryCarousel
         items={products}
         responsive={{
-          mobile: 2,
+          mobile: mobileResponsiveCount,
           tablet: 2,
           desktop: 4,
         }}

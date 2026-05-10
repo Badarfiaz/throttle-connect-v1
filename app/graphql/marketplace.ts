@@ -158,6 +158,37 @@ export const GET_PRODUCTS_QUERY = `
   }
 `;
 
+export const GET_PRODUCTS_BY_OWNER_UID_QUERY = `
+  query GetProductsByOwnerUid($ownerUid: ID!) {
+    marketplaceProductsByOwnerUid(ownerUid: $ownerUid) {
+      id
+      ownerUid
+      owner {
+        id
+        title
+        contactMethod
+        logoUrl
+        slugUrl
+        phone
+        email
+        location { area city province }
+      }
+      productName
+      category
+      description
+
+      imageurl {
+        ref
+        url
+      }
+      stock
+      price
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const GET_PRODUCT_BY_ID_QUERY = `
   query GetProductById($id: ID!) {
     marketplaceProduct(id: $id) {

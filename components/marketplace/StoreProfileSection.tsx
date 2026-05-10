@@ -4,6 +4,7 @@ import StoreBanner from "./StoreProfile/StoreBanner";
 import StoreHeader from "./StoreProfile/StoreHeader";
 import OverviewCard from "./StoreProfile/OverviewCard";
 import ContactCard from "./StoreProfile/ContactCard";
+import StoreProductsSection from "../shared/StoreProductsSection";
 
 type Props = {
   store?: MarketplaceStore | null;
@@ -47,6 +48,7 @@ export default function StoreProfilePage({
             <OverviewCard store={store} />
           </div>
         </div>
+        <StoreProductsSection store={store} />
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ import {
   executeMarketplaceProductRequest,
   executeMarketplaceProductRequestPublic,
   getMarketplaceAuthContext,
- 
+  getMarketplaceProducts,
 } from "@/ulity/marketplaceProducts";
 
 export const useMarketplaceProducts = () => {
@@ -32,12 +32,7 @@ export const useMarketplaceProducts = () => {
     setError(null);
 
     try {
-      const { token } = await getMarketplaceAuthContext();
-      const result = await executeMarketplaceProductRequest<{
-        marketplaceProducts: MarketplaceProduct[];
-      }>(GET_PRODUCTS_QUERY, token);
-
-      const fetchedProducts = result?.data?.marketplaceProducts ?? [];
+      const fetchedProducts = await getMarketplaceProducts();
       setProducts(fetchedProducts);
 
       return fetchedProducts as MarketplaceProduct[];

@@ -1,5 +1,9 @@
 import { FETCHER_URL } from "@/lib/config";
-import { GET_FEATURED_PRODUCTS_QUERY } from "@/app/graphql/marketplace";
+import {
+  GET_FEATURED_PRODUCTS_QUERY,
+  GET_PRODUCTS_QUERY,
+  GET_PRODUCTS_BY_OWNER_UID_QUERY,
+} from "@/app/graphql/marketplace";
 import getFirebaseToken from "@/ulity/getFirebaseToken";
 import { uploadImage } from "@/ulity/imageUpload";
 import type {
@@ -102,13 +106,48 @@ export const getMarketplaceFeaturedProducts = async () => {
   const result = (await res.json()) as GraphQLResult & {
     data?: { getMarketplaceFeaturedProducts?: MarketplaceProduct[] };
   };
-  console.log('result =>  ',result)
+  console.log("result =>  ", result);
 
   if (!res.ok || result.errors) {
     throw new Error(getMarketplaceGraphQLErrorMessage(result));
   }
 
   return result?.data?.getMarketplaceFeaturedProducts ?? [];
+};
+
+export const getMarketplaceProducts = async () => {
+  const { token } = await getMarketplaceAuthContext();
+
+  const result = await executeMarketplaceProductRequest<{
+    marketplaceProducts: MarketplaceProduct[];
+  }>(GET_PRODUCTS_QUERY, token);
+
+  return result?.data?.marketplaceProducts ?? [];
+};
+
+export const getMarketplaceProductsByOwnerUid = async (ownerUid: string) => {
+  if (!ownerUid) return [];
+
+  const res = await fetch(FETCHER_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: GET_PRODUCTS_BY_OWNER_UID_QUERY,
+      variables: { ownerUid },
+    }),
+  });
+
+  const result = (await res.json()) as GraphQLResult & {
+    data?: { marketplaceProductsByOwnerUid?: MarketplaceProduct[] };
+  };
+
+  if (!res.ok || result.errors) {
+    throw new Error(getMarketplaceGraphQLErrorMessage(result));
+  }
+
+  return result?.data?.marketplaceProductsByOwnerUid ?? [];
 };
 
 export const getProductsByCategory = async (category: string) => {

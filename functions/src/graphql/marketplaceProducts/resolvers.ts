@@ -18,17 +18,47 @@ const normalizeTimestamp = (value: unknown) => {
 
 const marketplaceProductsResolvers = {
   Query: {
-    // Get all products for the authenticated user
+    // Get all products for the store owner
     marketplaceProducts: async (_: any, __: any, context: { uid: string }) => {
       const { uid } = context;
 
-      if (!uid) {
-        throw new Error("Unauthorized - Missing token");
-      }
+      // if (!uid) {
+      //   throw new Error("Unauthorized - Missing token");
+      // }
 
       const snapshot = await db
         .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
         .where("ownerUid", "==", uid)
+        .orderBy("createdAt", "desc")
+        .get();
+
+      if (snapshot.empty) return [];
+
+      return snapshot.docs.map((doc) => {
+        const data = doc.data() as any;
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: normalizeTimestamp(data?.createdAt),
+          updatedAt: normalizeTimestamp(data?.updatedAt),
+        };
+      });
+    },
+
+    // Get all products for a specific store owner
+    marketplaceProductsByOwnerUid: async (
+      _: any,
+      args: { ownerUid: string },
+    ) => {
+      const { ownerUid } = args;
+
+      if (!ownerUid) {
+        throw new Error("ownerUid is required.");
+      }
+
+      const snapshot = await db
+        .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
+        .where("ownerUid", "==", ownerUid)
         .orderBy("createdAt", "desc")
         .get();
 

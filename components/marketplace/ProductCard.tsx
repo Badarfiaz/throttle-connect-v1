@@ -26,46 +26,48 @@ type ProductCardProps = {
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <CardLinkWrapper link={`/marketplace/product/${product.id}`}>
-      <TooltipProvider>
-        {/* Image area (fixed height 170) */}
-        <div className="relative w-full h-[170px] overflow-hidden bg-gray-100 group">
-          <Image
-            src={product.imageurl?.url || "/images/logos/segalmotors.jpg"}
-            alt={product.productName}
-            fill
-            className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-          {/* Favorite Button */}
-          <div className="absolute top-3 right-3">
-            <HeartButton />
-          </div>
-        </div>
-
-        {/* Content area */}
-        <CardContent className="p-3">
-          <h3 className="text-base font-semibold text-[#083047] line-clamp-1 mb-2">
-            {product.productName}
-          </h3>
-
-          <div className="space-y-1 mb-3">
-            <PriceLabel price={product.price} />
-            <CategoryLabel type="category" label={product.category ?? ""} />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2">
-            <ContactButton
-              phone={product.owner?.phone}
-              email={product.owner?.email}
-              preferredMethod={product.owner?.contactMethod}
-              menuIcon
+      <Card>
+        <TooltipProvider>
+          {/* Image area (fixed height 170) */}
+          <div className="relative w-full h-[170px] overflow-hidden  group">
+            <Image
+              src={product.imageurl?.url || "/images/logos/segalmotors.jpg"}
+              alt={product.productName}
+              fill
+              className="object-cover transition-transform rounded-b-2xl duration-700 ease-in-out group-hover:scale-105"
             />
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+            {/* Favorite Button */}
+            <div className="absolute top-3 right-3">
+              <HeartButton />
+            </div>
           </div>
-        </CardContent>
-      </TooltipProvider>
+
+          {/* Content area */}
+          <CardContent className="p-3">
+            <h3 className="text-base font-semibold text-[#083047] line-clamp-1 mb-2">
+              {product.productName}
+            </h3>
+
+            <div className="space-y-1 mb-3">
+              <PriceLabel price={product.price} />
+              <CategoryLabel type="category" label={product.category ?? ""} />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <ContactButton
+                phone={product.owner?.phone}
+                email={product.owner?.email}
+                preferredMethod={product.owner?.contactMethod}
+                menuIcon
+              />
+            </div>
+          </CardContent>
+        </TooltipProvider>
+      </Card>
     </CardLinkWrapper>
   );
 };

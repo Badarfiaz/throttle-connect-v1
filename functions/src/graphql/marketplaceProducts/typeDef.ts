@@ -43,6 +43,7 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
 
   type Query {
     marketplaceProducts: [MarketplaceProduct!]!
+    marketplaceProductsByOwnerUid(ownerUid: ID!): [MarketplaceProduct!]!
     marketplaceProduct(id: ID!): MarketplaceProduct
     getMarketplaceFeaturedProducts: [MarketplaceProduct!]!
     getProductsByCategory(category: String!): [MarketplaceProduct!]!

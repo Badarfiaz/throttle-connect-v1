@@ -7,14 +7,14 @@ import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 import MarketplaceCategoryCarousel from "@/components/marketplace/MarketplaceCategoryCarousel";
 
- import { cardDataMarketplace } from "@/dummydata/networking";
+import { cardDataMarketplace } from "@/dummydata/networking";
 import { MARKETPLACE_ALL_STORES_QUERY } from "@/app/graphql/marketplace";
 import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
 import { MarketplaceProduct, MarketplaceStoreCard } from "@/types/marketplace";
 import CategorySection from "@/components/shared/CategorySection";
 import { getMarketplaceFeaturedProducts } from "@/ulity/marketplaceProducts";
 import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
-
+import { mobileResponsiveCount } from "@/types/CommonType";
 function Page() {
   const [featuredProducts, setFeaturedProducts] = useState<
     MarketplaceProduct[]
@@ -39,8 +39,8 @@ function Page() {
 
       try {
         const products = await getMarketplaceFeaturedProducts();
-        console.log('Featured products',products)
-        
+        console.log("Featured products", products);
+
         if (isMounted) {
           setFeaturedProducts(products);
         }
@@ -111,7 +111,7 @@ function Page() {
           <PrimaryCarousel
             items={storeCards}
             responsive={{
-              mobile: 2,
+              mobile: mobileResponsiveCount,
               tablet: 3,
               desktop: 4,
             }}
@@ -159,7 +159,7 @@ function Page() {
             items={featuredProducts}
             className="w-full"
             responsive={{
-              mobile: 2,
+              mobile: mobileResponsiveCount,
               tablet: 2,
               desktop: 4,
             }}
