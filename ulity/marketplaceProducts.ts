@@ -161,28 +161,31 @@ export const getMarketplaceProducts = async () => {
 export const getMarketplaceProductsByOwnerUid = async (ownerUid: string) => {
   if (!ownerUid) return [];
 
-  return fetchWithMemoryCache(`marketplace-products-by-owner:${ownerUid}`, async () => {
-    const res = await fetch(FETCHER_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: GET_PRODUCTS_BY_OWNER_UID_QUERY,
-        variables: { ownerUid },
-      }),
-    });
+  return fetchWithMemoryCache(
+    `marketplace-products-by-owner:${ownerUid}`,
+    async () => {
+      const res = await fetch(FETCHER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: GET_PRODUCTS_BY_OWNER_UID_QUERY,
+          variables: { ownerUid },
+        }),
+      });
 
-    const result = (await res.json()) as GraphQLResult & {
-      data?: { marketplaceProductsByOwnerUid?: MarketplaceProduct[] };
-    };
+      const result = (await res.json()) as GraphQLResult & {
+        data?: { marketplaceProductsByOwnerUid?: MarketplaceProduct[] };
+      };
 
-    if (!res.ok || result.errors) {
-      throw new Error(getMarketplaceGraphQLErrorMessage(result));
-    }
+      if (!res.ok || result.errors) {
+        throw new Error(getMarketplaceGraphQLErrorMessage(result));
+      }
 
-    return result?.data?.marketplaceProductsByOwnerUid ?? [];
-  });
+      return result?.data?.marketplaceProductsByOwnerUid ?? [];
+    },
+  );
 };
 
 export const getProductsByCategory = async (category: string) => {
