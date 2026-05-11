@@ -1,10 +1,5 @@
- import ProductDetailContainer from "./ProductDetailContainer";
+import ProductDetailContainer from "../../../../../../components/marketplace/dashboard/ProductDetailContainer";
 
- 
 export default function ProductDetailPage() {
- 
-
-
-
   return <ProductDetailContainer />;
 }
