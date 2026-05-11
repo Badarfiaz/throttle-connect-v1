@@ -87,7 +87,7 @@ export default function CategoryProductsSection({
       <PrimaryCarousel
         items={products}
         responsive={{
-          mobile: mobileResponsiveCount,
+          mobile: 1,
           tablet: 2,
           desktop: 4,
         }}
