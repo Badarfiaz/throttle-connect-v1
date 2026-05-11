@@ -19,13 +19,15 @@ const marketplaceStorePromises = new Map<
   string,
   Promise<MarketplaceStore[] | null>
 >();
+const EMPTY_VARIABLES: Record<string, unknown> = {};
 
 export const useMarketplaceStore = ({
   query = MARKETPLACE_STORES_QUERY,
   isPublic = false,
-  variables = {},
+  variables,
 }: UseMarketplaceStoreProps) => {
-  const cacheKey = JSON.stringify({ query, isPublic, variables });
+  const resolvedVariables = variables ?? EMPTY_VARIABLES;
+  const cacheKey = JSON.stringify({ query, isPublic, variables: resolvedVariables });
   const [data, setData] = useState<MarketplaceStore[] | null>(
     () => marketplaceStoreCache.get(cacheKey) ?? null,
   );
@@ -135,7 +137,7 @@ export const useMarketplaceStore = ({
       marketplaceStorePromises.delete(cacheKey);
       setLoading(false);
     }
-  }, [cacheKey, isPublic, query, variables]);
+  }, [cacheKey, isPublic, query, resolvedVariables]);
 
   const updateMarketplaceStore = useCallback(
     async (id: string, input: Record<string, unknown>) => {

@@ -47,7 +47,9 @@ export const DashboardContainer = ({
                 </p>
               ) : null}
             </div>
-            {actions ? <div className="flex items-center gap-3">{actions}</div> : null}
+            {actions ? (
+              <div className="flex items-center gap-3">{actions}</div>
+            ) : null}
           </div>
 
           <div className="flex flex-col lg:flex-row">
