@@ -16,6 +16,21 @@ const normalizeTimestamp = (value: unknown) => {
   return null;
 };
 
+const normalizeProductDocument = (id: string, data: Record<string, any>) => {
+  const images = Array.isArray(data?.images) ? data.images.filter(Boolean) : [];
+  // Set imageurl to the first image for backward compatibility
+  const imageurl = images.length > 0 ? images[0] : null;
+
+  return {
+    id,
+    ...data,
+    images: images.length > 0 ? images : null,
+    imageurl,
+    createdAt: normalizeTimestamp(data?.createdAt),
+    updatedAt: normalizeTimestamp(data?.updatedAt),
+  };
+};
+
 const marketplaceProductsResolvers = {
   Query: {
     // Get all products for the store owner
@@ -34,15 +49,9 @@ const marketplaceProductsResolvers = {
 
       if (snapshot.empty) return [];
 
-      return snapshot.docs.map((doc) => {
-        const data = doc.data() as any;
-        return {
-          id: doc.id,
-          ...data,
-          createdAt: normalizeTimestamp(data?.createdAt),
-          updatedAt: normalizeTimestamp(data?.updatedAt),
-        };
-      });
+      return snapshot.docs.map((doc) =>
+        normalizeProductDocument(doc.id, doc.data() as any),
+      );
     },
 
     // Get all products for a specific store owner
@@ -64,15 +73,9 @@ const marketplaceProductsResolvers = {
 
       if (snapshot.empty) return [];
 
-      return snapshot.docs.map((doc) => {
-        const data = doc.data() as any;
-        return {
-          id: doc.id,
-          ...data,
-          createdAt: normalizeTimestamp(data?.createdAt),
-          updatedAt: normalizeTimestamp(data?.updatedAt),
-        };
-      });
+      return snapshot.docs.map((doc) =>
+        normalizeProductDocument(doc.id, doc.data() as any),
+      );
     },
 
     // Get a single product by ID (public read)
@@ -88,12 +91,7 @@ const marketplaceProductsResolvers = {
 
       const data = doc.data() as any;
 
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: normalizeTimestamp(data?.createdAt),
-        updatedAt: normalizeTimestamp(data?.updatedAt),
-      };
+      return normalizeProductDocument(doc.id, data as any);
     },
     getMarketplaceFeaturedProducts: async () => {
       const snapshot = await db
@@ -104,15 +102,9 @@ const marketplaceProductsResolvers = {
 
       if (snapshot.empty) return [];
 
-      return snapshot.docs.map((doc) => {
-        const data = doc.data() as any;
-        return {
-          id: doc.id,
-          ...data,
-          createdAt: normalizeTimestamp(data?.createdAt),
-          updatedAt: normalizeTimestamp(data?.updatedAt),
-        };
-      });
+      return snapshot.docs.map((doc) =>
+        normalizeProductDocument(doc.id, doc.data() as any),
+      );
     },
 
     // Get all products by category
@@ -131,15 +123,9 @@ const marketplaceProductsResolvers = {
 
       if (snapshot.empty) return [];
 
-      return snapshot.docs.map((doc) => {
-        const data = doc.data() as any;
-        return {
-          id: doc.id,
-          ...data,
-          createdAt: normalizeTimestamp(data?.createdAt),
-          updatedAt: normalizeTimestamp(data?.updatedAt),
-        };
-      });
+      return snapshot.docs.map((doc) =>
+        normalizeProductDocument(doc.id, doc.data() as any),
+      );
     },
   },
 
@@ -200,7 +186,7 @@ const marketplaceProductsResolvers = {
       const productData = {
         ownerUid: uid,
         productName: input.productName,
-        imageurl: input.imageurl || null,
+        images: input.images && input.images.length > 0 ? input.images : null,
         category: input.category || null,
         description: input.description || null,
         stock: input.stock,
@@ -215,12 +201,7 @@ const marketplaceProductsResolvers = {
       const newDoc = await docRef.get();
       const data = newDoc.data() as any;
 
-      return {
-        id: docRef.id,
-        ...data,
-        createdAt: normalizeTimestamp(data?.createdAt),
-        updatedAt: normalizeTimestamp(data?.updatedAt),
-      };
+      return normalizeProductDocument(docRef.id, data as any);
     },
 
     // Update an existing product
@@ -274,8 +255,9 @@ const marketplaceProductsResolvers = {
         update.price = input.price;
       }
 
-      if (input.imageurl !== undefined) {
-        update.imageurl = input.imageurl;
+      if (input.images !== undefined) {
+        update.images =
+          input.images && input.images.length > 0 ? input.images : null;
       }
 
       if (input.category !== undefined) {
@@ -291,12 +273,7 @@ const marketplaceProductsResolvers = {
       await docRef.update(update);
 
       const updated = (await docRef.get()).data() as any;
-      return {
-        id,
-        ...updated,
-        createdAt: normalizeTimestamp(updated?.createdAt),
-        updatedAt: normalizeTimestamp(updated?.updatedAt),
-      };
+      return normalizeProductDocument(id, updated as any);
     },
 
     // Delete a product

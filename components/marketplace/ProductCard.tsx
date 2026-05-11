@@ -24,6 +24,9 @@ type ProductCardProps = {
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  // Use imageurl first for backward compatibility, fallback to images[0]
+  const productImage = product.imageurl?.url || product.images?.[0]?.url;
+  console.log("product", product);
   return (
     <CardLinkWrapper link={`/marketplace/product/${product.id}`}>
       <Card>
@@ -31,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Image area (fixed height 170) */}
           <div className="relative w-full h-[170px] overflow-hidden  group">
             <Image
-              src={product.imageurl?.url || "/images/logos/segalmotors.jpg"}
+              src={productImage || "/placeholder.png"}
               alt={product.productName}
               fill
               className="object-cover transition-transform rounded-b-2xl duration-700 ease-in-out group-hover:scale-105"

@@ -45,6 +45,10 @@ export const GET_PRODUCTS_BY_CATEGORY_QUERY = `
     getProductsByCategory(category: $category) {
       id
       productName
+      images {
+        ref
+        url
+      }
       imageurl {
         ref
         url
@@ -115,6 +119,10 @@ export const CREATE_PRODUCT_MUTATION = `
       productName
       category
       description
+      images {
+        ref
+        url
+      }
       imageurl {
         ref
         url
@@ -145,7 +153,10 @@ export const GET_PRODUCTS_QUERY = `
       productName
       category
       description
-
+      images {
+        ref
+        url
+      }
       imageurl {
         ref
         url
@@ -176,7 +187,10 @@ export const GET_PRODUCTS_BY_OWNER_UID_QUERY = `
       productName
       category
       description
-
+      images {
+        ref
+        url
+      }
       imageurl {
         ref
         url
@@ -207,6 +221,10 @@ export const GET_PRODUCT_BY_ID_QUERY = `
       productName
       category
       description
+      images {
+        ref
+        url
+      }
       imageurl {
         ref
         url
@@ -225,6 +243,10 @@ export const UPDATE_PRODUCT_MUTATION = `
       id
       ownerUid
       productName
+      images {
+        ref
+        url
+      }
       imageurl {
         ref
         url
@@ -232,7 +254,6 @@ export const UPDATE_PRODUCT_MUTATION = `
       stock
       category
       description
-
       price
       createdAt
       updatedAt
@@ -250,6 +271,10 @@ export const GET_FEATURED_PRODUCTS_QUERY = `
     getMarketplaceFeaturedProducts {
       id
       productName
+      images {
+        ref
+        url
+      }
       imageurl {
         ref
         url

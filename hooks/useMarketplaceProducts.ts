@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import {
   MarketplaceProduct,
   MarketplaceProductFormInput,
+  MarketplaceProductImageInput,
 } from "@/types/marketplace";
 import {
   CREATE_PRODUCT_MUTATION,
@@ -12,7 +13,7 @@ import {
   UPDATE_PRODUCT_MUTATION,
 } from "@/app/graphql/marketplace";
 import {
-  buildMarketplaceProductImageInput,
+  buildMarketplaceProductImagesInput,
   executeMarketplaceProductRequest,
   executeMarketplaceProductRequestPublic,
   getMarketplaceAuthContext,
@@ -67,20 +68,32 @@ export const useMarketplaceProducts = () => {
   }, []);
 
   const createProduct = useCallback(
-    async (input: MarketplaceProductFormInput, imageFile?: File | null) => {
+    async (
+      input: MarketplaceProductFormInput,
+      imageEntries?:
+        | Array<File | MarketplaceProductImageInput>
+        | File
+        | MarketplaceProductImageInput
+        | null,
+    ) => {
       setCreating(true);
       setError(null);
 
       try {
         const { token, uid } = await getMarketplaceAuthContext();
-        const imageUrlData = await buildMarketplaceProductImageInput(
-          imageFile,
+        const selectedEntries = Array.isArray(imageEntries)
+          ? imageEntries
+          : imageEntries
+            ? [imageEntries]
+            : [];
+        const imageUrlsData = await buildMarketplaceProductImagesInput(
+          selectedEntries,
           uid,
         );
 
         const productInput: MarketplaceProductFormInput = {
           ...input,
-          ...(imageUrlData && { imageurl: imageUrlData }),
+          ...(imageUrlsData && { images: imageUrlsData }),
         };
         const result = await executeMarketplaceProductRequest<{
           createMarketplaceProduct: MarketplaceProduct;
@@ -114,21 +127,30 @@ export const useMarketplaceProducts = () => {
     async (
       id: string,
       input: Partial<MarketplaceProductFormInput>,
-      imageFile?: File | null,
+      imageEntries?:
+        | Array<File | MarketplaceProductImageInput>
+        | File
+        | MarketplaceProductImageInput
+        | null,
     ) => {
       setUpdating(true);
       setError(null);
 
       try {
         const { token, uid } = await getMarketplaceAuthContext();
-        const imageUrlData = await buildMarketplaceProductImageInput(
-          imageFile,
+        const selectedEntries = Array.isArray(imageEntries)
+          ? imageEntries
+          : imageEntries
+            ? [imageEntries]
+            : [];
+        const imageUrlsData = await buildMarketplaceProductImagesInput(
+          selectedEntries,
           uid,
         );
 
         const productInput = {
           ...input,
-          ...(imageUrlData && { imageurl: imageUrlData }),
+          ...(imageUrlsData && { images: imageUrlsData }),
         };
 
         const result = await executeMarketplaceProductRequest<{

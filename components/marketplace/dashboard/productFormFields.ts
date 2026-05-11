@@ -9,6 +9,7 @@ export type ProductFieldConfig = {
   keyboardType?: "default" | "numeric";
   gridSpan?: "full" | "half";
   options?: { label: string; value: string }[];
+  isMultiImage?: boolean;
 };
 
 export const productFields: ProductFieldConfig[] = [
@@ -59,8 +60,10 @@ export const productFields: ProductFieldConfig[] = [
   {
     name: "imageurl",
     label: "Product Image",
-    placeholder: "Upload product image",
+    placeholder: "Upload at least one product image",
+    required: true,
     type: "file",
+    isMultiImage: true,
     gridSpan: "full",
   },
 ];

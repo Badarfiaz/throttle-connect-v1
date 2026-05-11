@@ -15,10 +15,10 @@ type MarketplaceProduct = {
   id: string;
   ownerUid: string;
   productName: string;
-  imageurl?: {
+  images?: {
     ref: string;
     url: string;
-  };
+  }[];
   stock: number;
   price: number;
   createdAt?: string;

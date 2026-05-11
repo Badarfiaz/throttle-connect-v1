@@ -27,7 +27,11 @@ export const useMarketplaceStore = ({
   variables,
 }: UseMarketplaceStoreProps) => {
   const resolvedVariables = variables ?? EMPTY_VARIABLES;
-  const cacheKey = JSON.stringify({ query, isPublic, variables: resolvedVariables });
+  const cacheKey = JSON.stringify({
+    query,
+    isPublic,
+    variables: resolvedVariables,
+  });
   const [data, setData] = useState<MarketplaceStore[] | null>(
     () => marketplaceStoreCache.get(cacheKey) ?? null,
   );

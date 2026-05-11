@@ -78,6 +78,34 @@ export const buildMarketplaceProductImageInput = async (
   } satisfies MarketplaceProductImageInput;
 };
 
+export const buildMarketplaceProductImagesInput = async (
+  imageEntries: Array<File | MarketplaceProductImageInput> | null | undefined,
+  ownerId: string,
+) => {
+  if (!imageEntries || imageEntries.length === 0) return undefined;
+
+  const uploadedImages = await Promise.all(
+    imageEntries.map(async (entry) => {
+      if (entry instanceof File) {
+        const { url, path } = await uploadImage(entry, {
+          ownerId,
+          folder: "products",
+          maxSizeMb: 5,
+        });
+
+        return {
+          ref: path,
+          url,
+        } satisfies MarketplaceProductImageInput;
+      }
+
+      return entry;
+    }),
+  );
+
+  return uploadedImages;
+};
+
 export const executeMarketplaceProductRequest = async <TData>(
   query: string,
   token: string,

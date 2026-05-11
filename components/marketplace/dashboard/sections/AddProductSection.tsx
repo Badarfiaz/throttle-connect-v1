@@ -2,11 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { productFields } from "../productFormFields";
 import ProductInputField from "../ProductInputField";
 import { useForm } from "react-hook-form";
 import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
-import { MarketplaceProduct } from "@/types/marketplace";
+import {
+  MarketplaceProduct,
+  MarketplaceProductImageInput,
+} from "@/types/marketplace";
 import { readImagePreview } from "@/ulity/imageUpload";
 
 type AddProductSectionProps = {
@@ -15,8 +19,10 @@ type AddProductSectionProps = {
 };
 
 const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageEntries, setImageEntries] = useState<
+    Array<File | MarketplaceProductImageInput>
+  >([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const { createProduct, updateProduct, creating, updating } =
     useMarketplaceProducts();
   const isEditMode = !!editProduct;
@@ -31,16 +37,27 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
     },
   });
 
-  // Set image preview if editing and product has image
   useEffect(() => {
-    if (editProduct?.imageurl?.url) {
-      setImagePreview(editProduct.imageurl.url);
-    }
+    const productImages = editProduct?.images ?? [];
+    setImageEntries(productImages);
+    setImagePreviews(productImages.map((image) => image.url).filter(Boolean));
   }, [editProduct]);
 
-  const handleImageSelect = (file: File) => {
-    setImageFile(file);
-    void readImagePreview(file).then(setImagePreview).catch(console.error);
+  const handleImageSelect = (files: File | File[]) => {
+    const selectedFiles = Array.isArray(files) ? files : [files];
+    setImageEntries(selectedFiles);
+    void Promise.all(selectedFiles.map((file) => readImagePreview(file)))
+      .then(setImagePreviews)
+      .catch(console.error);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImageEntries((prev) =>
+      prev.filter((_, itemIndex) => itemIndex !== index),
+    );
+    setImagePreviews((prev) =>
+      prev.filter((_, itemIndex) => itemIndex !== index),
+    );
   };
 
   const handlePublish = async () => {
@@ -48,9 +65,16 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
 
     // Validate required fields
     if (!data.productName || data.productName.trim() === "") {
+      toast.error("Product name is required");
       return;
     }
     if (data.price < 0 || data.stock < 0) {
+      toast.error("Price and stock must be non-negative");
+      return;
+    }
+    // Only require images for new products, not for edits
+    if (!isEditMode && imageEntries.length === 0) {
+      toast.error("Please upload at least one product image");
       return;
     }
 
@@ -66,7 +90,7 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
             description: data.description,
             category: data.category,
           },
-          imageFile,
+          imageEntries,
         );
       } else {
         // Create new product
@@ -78,14 +102,14 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
             description: data.description,
             category: data.category,
           },
-          imageFile,
+          imageEntries,
         );
       }
 
       // Reset form after successful creation/update
       form.reset();
-      setImageFile(null);
-      setImagePreview(null);
+      setImageEntries([]);
+      setImagePreviews([]);
 
       // Navigate back to products list
       onBack();
@@ -125,7 +149,10 @@ const AddProductSection = ({ onBack, editProduct }: AddProductSectionProps) => {
             onImageSelect={
               field.type === "file" ? handleImageSelect : undefined
             }
-            imagePreview={field.type === "file" ? imagePreview : undefined}
+            onRemoveImage={
+              field.type === "file" ? handleRemoveImage : undefined
+            }
+            imagePreviews={field.type === "file" ? imagePreviews : undefined}
           />
         ))}
       </div>

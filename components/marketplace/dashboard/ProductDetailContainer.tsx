@@ -115,13 +115,13 @@ const ProductDetailContainer = () => {
             <motion.div variants={fadeIn} className="relative group">
               <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-3xl blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative rounded-2xl border bg-card p-4 md:p-8 flex items-center justify-center aspect-square md:aspect-[4/3] overflow-hidden shadow-sm">
-                {product.imageurl?.url ? (
+                {(product.imageurl?.url || product.images?.[0]?.url) ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <motion.img
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5 }}
-                    src={product.imageurl.url}
+                    src={product.imageurl?.url || product.images?.[0]?.url}
                     alt={product.productName}
                     className="max-h-full w-full object-contain mix-blend-multiply hover:scale-105 transition-transform duration-500"
                   />
