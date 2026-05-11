@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import CategoryProductsSection from "../CategoryProductsSection";
 import Title from "@/components/shared/Title";
+import Link from "next/link";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -168,6 +169,20 @@ const ProductDetailContainer = () => {
                   {Number(product.price).toLocaleString()}
                 </span>
               </div>
+              <Link
+                href={
+                  product.owner?.slugUrl
+                    ? `/marketplace/storeProfile/${product.owner.slugUrl}`
+                    : "#"
+                }
+                className="group inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 transition-all duration-200 hover:border-blue-500 hover:bg-blue-50"
+              >
+                <div className="  ">
+                  <span className="text-sm font-semibold text-blue-600">
+                    Preview Store {product.owner?.title || "Unknown Store"}
+                  </span>
+                </div>
+              </Link>
 
               <Separator className="my-6" />
 
