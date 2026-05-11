@@ -83,7 +83,7 @@ function ContactButton({
               <Button
                 variant="outline"
                 size="icon"
-                className="rounded-l-none rounded-r-lg border-l-0 border-blue-200 text-blue-700 hover:bg-blue-50"
+                className="rounded rounded-lg border border-blue-200 text-blue-700 hover:bg-blue-50"
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
