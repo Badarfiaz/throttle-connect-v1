@@ -15,6 +15,7 @@ import CategorySection from "@/components/shared/CategorySection";
 import { getMarketplaceFeaturedProducts } from "@/ulity/marketplaceProducts";
 import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
 import { mobileResponsiveCount } from "@/types/CommonType";
+import AlgoliaSearch from "@/components/shared/SearchComponent";
 function Page() {
   const [featuredProducts, setFeaturedProducts] = useState<
     MarketplaceProduct[]
@@ -80,13 +81,16 @@ function Page() {
 
   return (
     <div>
-      <HeroSection
+      {/* <HeroSection
         title="Discover Your Automotive Passion"
         subtitle="Explore our marketplace of automotive clubs and find your perfect match."
         ctaText="Explore products"
         layout={2}
-      />
+      /> */}
 
+      <div>
+        <AlgoliaSearch />
+      </div>
       <div className="mt-14">
         <MarketplaceCategoryCarousel />
       </div>
