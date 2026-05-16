@@ -6,6 +6,7 @@ import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 import MarketplaceCategoryCarousel from "@/components/marketplace/MarketplaceCategoryCarousel";
+import MarketplaceBanner from "@/components/marketplace/MarketplaceBanner";
 
 import { cardDataMarketplace } from "@/dummydata/networking";
 import { MARKETPLACE_ALL_STORES_QUERY } from "@/app/graphql/marketplace";
@@ -90,6 +91,8 @@ function Page() {
       <div className="mt-14">
         <MarketplaceCategoryCarousel />
       </div>
+
+      <MarketplaceBanner />
 
       <div className="max-w-5xl mt-20 mx-auto px-6">
         <Title
