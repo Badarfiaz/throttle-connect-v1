@@ -5,6 +5,7 @@ import Footer from "@/components/shared/Footer";
 import ReduxProvider from "./redux/reduxProvider";
 import { Toaster } from "sonner";
 import MobileBottomNav from "@/components/shared/MobileBottomNav";
+import MarketplaceSearch from "@/components/marketplace/MarketplaceSearch";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

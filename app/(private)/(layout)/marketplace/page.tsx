@@ -5,6 +5,7 @@ import ProductCard from "@/components/marketplace/ProductCard";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import MarketplaceCategoryGrid from "@/components/marketplace/MarketplaceCategoryGrid";
+import MarketplaceSearch from "@/components/marketplace/MarketplaceSearch";
 import CategorySection from "@/components/shared/CategorySection";
 import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
 
@@ -80,7 +81,8 @@ function Page() {
 
   return (
     <div>
-      <div className="mt-14">
+      <MarketplaceSearch />
+      <div className="mt-8">
         <MarketplaceCategoryGrid />
       </div>
 
