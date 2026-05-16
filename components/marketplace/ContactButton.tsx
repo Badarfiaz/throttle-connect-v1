@@ -13,11 +13,14 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
+
 type ContactButtonProps = {
   phone?: string | null;
   email?: string | null;
   preferredMethod?: ContactMethodType;
   menuIcon?: boolean;
+  /** When true, renders the larger "detail page" style used on product detail pages */
+  detailPage?: boolean;
 };
 
 function ContactButton({
@@ -25,6 +28,7 @@ function ContactButton({
   email,
   preferredMethod = "whatsapp",
   menuIcon = false,
+  detailPage = false,
 }: ContactButtonProps) {
   const contactMethod = getContactMethod({
     phone,
@@ -58,8 +62,12 @@ function ContactButton({
       <Button
         asChild
         className={cn(
-          "flex-1 h-9 text-xs font-medium gap-1.5",
-          "bg-[#19376D] hover:bg-[#0E5A8E] text-white",
+          "flex-1 font-medium gap-1.5",
+          detailPage
+            ? // Detail page: full-width, taller, slightly larger text
+            "h-11 text-sm rounded-md bg-[#19376D] hover:bg-[#0E5A8E] text-white w-full"
+            : // Default (card/list view): compact
+            "h-9 text-xs bg-[#19376D] hover:bg-[#0E5A8E] text-white",
         )}
       >
         <a
@@ -72,10 +80,11 @@ function ContactButton({
           }
           onClick={(e) => e.stopPropagation()}
         >
-          <ContactIcon size={16} />
+          <ContactIcon size={detailPage ? 18 : 16} />
           {contactMethod.label}
         </a>
       </Button>
+
       {menuIcon && alternativeMethods.length > 0 && (
         <div className="shrink-0">
           <DropdownMenu>
@@ -83,7 +92,10 @@ function ContactButton({
               <Button
                 variant="outline"
                 size="icon"
-                className="rounded rounded-lg border border-blue-200 text-blue-700 hover:bg-blue-50"
+                className={cn(
+                  "rounded-lg border border-blue-200 text-blue-700 hover:bg-blue-50",
+                  detailPage ? "h-11 w-11" : "",
+                )}
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
