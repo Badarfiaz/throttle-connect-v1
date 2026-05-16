@@ -9,7 +9,7 @@ export type locationFields = {
 };
 export type ContactMethod = "email" | "phone" | "whatsapp" | "social";
 export type allowedPageType = "marketplace" | "networking";
-export const mobileResponsiveCount = 1;
+export const mobileResponsiveCount = 1.5;
 
 export type SocialMediaPlatform =
   | "facebook"

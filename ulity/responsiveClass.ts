@@ -12,6 +12,8 @@ export const getResponsiveClasses = (
   const mobileClass =
     mobile === 1
       ? "basis-full"
+      : mobile === 1.5
+        ? "basis-full min-[420px]:basis-[65%]"
       : mobile === 2
         ? "basis-1/2"
         : mobile === 3
