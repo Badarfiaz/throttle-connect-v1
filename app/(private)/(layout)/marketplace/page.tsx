@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import ProductCard from "@/components/marketplace/ProductCard";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
-import MarketplaceCategoryCarousel from "@/components/marketplace/MarketplaceCategoryCarousel";
+import MarketplaceCategoryGrid from "@/components/marketplace/MarketplaceCategoryGrid";
 import CategorySection from "@/components/shared/CategorySection";
 import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
 
@@ -81,7 +81,7 @@ function Page() {
   return (
     <div>
       <div className="mt-14">
-        <MarketplaceCategoryCarousel />
+        <MarketplaceCategoryGrid />
       </div>
 
       {/* Stores */}
@@ -128,7 +128,8 @@ function Page() {
 
       {/* Featured */}
       <SectionWrapper
-        className={SECTION_CONTAINER}
+        bg={bg}
+        // className={SECTION_CONTAINER}
         title="Featured Products"
         description="Discover our handpicked selection..."
       >

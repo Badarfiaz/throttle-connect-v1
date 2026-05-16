@@ -17,9 +17,12 @@ export const SectionWrapper = ({
   description,
 }: SectionProps) => {
   return (
-    <div className={className} style={bg ? { backgroundColor: bg } : undefined}>
+    <div
+      className={`${className ?? ""} py-6`}
+      style={bg ? { backgroundColor: bg } : undefined}
+    >
       {(title || description) && (
-        <div className={SECTION_TITLE_CONTAINER + " pt-6"}>
+        <div className={SECTION_TITLE_CONTAINER + " pt-2"}>
           <Title title={title} description={description} spacing="tight" />
         </div>
       )}
