@@ -1,23 +1,25 @@
 "use client";
+
 import { useEffect, useMemo, useState } from "react";
 import ProductCard from "@/components/marketplace/ProductCard";
-import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
-import Title from "@/components/shared/Title";
 import MarketplaceCategoryCarousel from "@/components/marketplace/MarketplaceCategoryCarousel";
+import CategorySection from "@/components/shared/CategorySection";
+import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
 
 import { cardDataMarketplace } from "@/dummydata/networking";
 import { MARKETPLACE_ALL_STORES_QUERY } from "@/app/graphql/marketplace";
 import { useMarketplaceStore } from "@/hooks/useMarketplaceStore";
-import { MarketplaceProduct, MarketplaceStoreCard } from "@/types/marketplace";
-import CategorySection from "@/components/shared/CategorySection";
 import { getMarketplaceFeaturedProducts } from "@/ulity/marketplaceProducts";
-import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
 import { mobileResponsiveCount } from "@/types/CommonType";
+
+import { CENTER_TEXT, SECTION_CONTAINER } from "@/types/main";
+import { SectionWrapper } from "@/components/shared/SectionWrapper";
+
 function Page() {
   const [featuredProducts, setFeaturedProducts] = useState<
-    MarketplaceProduct[]
+    Awaited<ReturnType<typeof getMarketplaceFeaturedProducts>>
   >([]);
   const [featuredLoading, setFeaturedLoading] = useState(false);
   const [featuredError, setFeaturedError] = useState<string | null>(null);
@@ -26,20 +28,18 @@ function Page() {
     query: MARKETPLACE_ALL_STORES_QUERY,
     isPublic: true,
   });
+
   useEffect(() => {
     fetchMarketplaceStores().catch(() => undefined);
   }, [fetchMarketplaceStores]);
 
   useEffect(() => {
     let isMounted = true;
-
     const loadFeaturedProducts = async () => {
       setFeaturedLoading(true);
       setFeaturedError(null);
-
       try {
         const products = await getMarketplaceFeaturedProducts();
-
         if (isMounted) {
           setFeaturedProducts(products);
         }
@@ -57,18 +57,16 @@ function Page() {
         }
       }
     };
-
     loadFeaturedProducts().catch(() => undefined);
-
     return () => {
       isMounted = false;
     };
   }, []);
 
-  const storeCards: MarketplaceStoreCard[] = useMemo(
+  const storeCards = useMemo(
     () =>
-      (data ?? []).map((store, index) => ({
-        id: store.id ?? `store-${index}`,
+      (data ?? []).map((store, i) => ({
+        id: store.id ?? `store-${i}`,
         title: store.title,
         logoUrl: store.logoUrl,
         slugUrl: store.slugUrl,
@@ -78,82 +76,66 @@ function Page() {
     [data],
   );
 
+  const bg = "#D8E7ED";
+
   return (
     <div>
-      <HeroSection
-        title="Discover Your Automotive Passion"
-        subtitle="Explore our marketplace of automotive clubs and find your perfect match."
-        ctaText="Explore products"
-        layout={2}
-      />
-
       <div className="mt-14">
         <MarketplaceCategoryCarousel />
       </div>
 
-      <div className="max-w-5xl mt-20 mx-auto px-6">
-        <Title
-          title=" Explore Stores"
-          description="Explore our marketplace of automotive stores and find your perfect match."
-        />
-      </div>
+      {/* Stores */}
+      <SectionWrapper
+        bg={bg}
+        title="Explore Stores"
+        description="Explore our marketplace of automotive stores and find your perfect match."
+      >
+        <div className="pt-4">
+          {loading ? (
+            <p className={CENTER_TEXT}>Loading stores...</p>
+          ) : error ? (
+            <p className={CENTER_TEXT}>Failed to load stores.</p>
+          ) : storeCards.length > 0 ? (
+            <PrimaryCarousel
+              items={storeCards}
+              responsive={{
+                mobile: mobileResponsiveCount,
+                tablet: 3,
+                desktop: 5,
+              }}
+              className="w-full"
+              renderItem={(store) => (
+                <CategorySection
+                  pageType="marketplace"
+                  key={store.id}
+                  items={store}
+                />
+              )}
+            />
+          ) : (
+            <p className={CENTER_TEXT}>No stores available right now.</p>
+          )}
+        </div>
+      </SectionWrapper>
 
-      <div className="px-4 sm:px-6 md:px-12 lg:px-20">
-        {loading ? (
-          <p className="py-10 text-center text-sm text-muted-foreground">
-            Loading stores...
-          </p>
-        ) : error ? (
-          <p className="py-10 text-center text-sm text-destructive">
-            Failed to load stores.
-          </p>
-        ) : storeCards.length > 0 ? (
-          <PrimaryCarousel
-            items={storeCards}
-            responsive={{
-              mobile: mobileResponsiveCount,
-              tablet: 3,
-              desktop: 5,
-            }}
-            className="w-full"
-            renderItem={(store) => (
-              <CategorySection
-                pageType="marketplace"
-                key={store.id}
-                items={store}
-              />
-            )}
-          />
-        ) : (
-          <p className="py-10 text-center text-sm text-muted-foreground">
-            No stores available right now.
-          </p>
-        )}
-      </div>
-      {/*  */}
-
+      {/* Banner */}
       <RegistureClubBanner
-        title="Why Choose Us?
-"
-        description="Buy and sell securely, easily, and conveniently from your vehicle. Enjoy a professional experience designed for your comfort and peace of mind.."
+        title="Why Choose Us?"
+        description="Buy and sell securely, easily, and conveniently..."
         ctaButton1="Register now for free"
-        // ctaButton2="Find a Club"
         cardData={cardDataMarketplace}
       />
-      <Title
-        title="Featured Products"
-        description="Discover our handpicked selection of automotive products, curated for quality and performance."
-      />
 
-      <div className="px-4 mb-10 sm:px-6 md:px-12 lg:px-20">
+      {/* Featured */}
+      <SectionWrapper
+        className={SECTION_CONTAINER}
+        title="Featured Products"
+        description="Discover our handpicked selection..."
+      >
         {featuredLoading ? (
-          <p className="py-10 text-center text-sm text-muted-foreground">
-            Loading featured products...
-          </p>
+          <p className={CENTER_TEXT}>Loading featured products...</p>
         ) : featuredError ? (
-          <p className="py-10 text-center text-sm text-destructive">
-            Failed to load featured products.
-          </p>
+          <p className={CENTER_TEXT}>Failed to load featured products.</p>
         ) : featuredProducts.length > 0 ? (
           <PrimaryCarousel
             items={featuredProducts}
@@ -164,19 +146,18 @@ function Page() {
               desktop: 4,
             }}
             renderItem={(product) => (
-              <div key={product.id} className="s">
-                <ProductCard product={product} />
-              </div>
+              <ProductCard key={product.id} product={product} />
             )}
           />
         ) : (
-          <p className="py-10 text-center text-sm text-muted-foreground">
+          <p className={CENTER_TEXT}>
             No featured products available right now.
           </p>
         )}
-      </div>
+      </SectionWrapper>
 
-      <div className="px-4 sm:px-6 md:px-12 lg:px-20">
+      {/* Categories */}
+      <div className={SECTION_CONTAINER}>
         <CategoryProductsSection
           category="accessories"
           categoryTitle="Accessories"
@@ -184,15 +165,15 @@ function Page() {
         />
       </div>
 
-      <div className="px-4 sm:px-6 md:px-12 lg:px-20">
+      <div className={SECTION_CONTAINER}>
         <CategoryProductsSection
           category="oils-and-fluids"
           categoryTitle="Oils & Fluids"
-          categoryDescription="Premium automotive oils and fluids for optimal performance."
+          categoryDescription="Premium automotive oils and fluids."
         />
       </div>
 
-      <div className="px-4 sm:px-6 md:px-12 lg:px-20">
+      <div className={SECTION_CONTAINER}>
         <CategoryProductsSection
           category="riding-gear"
           categoryTitle="Riding Gear"

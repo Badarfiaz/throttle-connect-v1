@@ -1,0 +1,29 @@
+import { SECTION_TITLE_CONTAINER } from "@/types/main";
+import Title from "@/components/shared/Title";
+
+type SectionProps = {
+  children: React.ReactNode;
+  bg?: string;
+  className?: string;
+  title?: string;
+  description?: string;
+};
+
+export const SectionWrapper = ({
+  children,
+  bg,
+  className,
+  title,
+  description,
+}: SectionProps) => {
+  return (
+    <div className={className} style={bg ? { backgroundColor: bg } : undefined}>
+      {(title || description) && (
+        <div className={SECTION_TITLE_CONTAINER + " pt-6"}>
+          <Title title={title} description={description} spacing="tight" />
+        </div>
+      )}
+      {children}
+    </div>
+  );
+};

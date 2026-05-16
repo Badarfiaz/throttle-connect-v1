@@ -54,3 +54,9 @@ export type OnBoardType = {
   instagram: string;
   tiktok: string;
 };
+export const SECTION_CONTAINER = "max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:px-8";
+
+export const SECTION_TITLE_CONTAINER = "max-w-5xl mx-auto px-4 sm:px-6 lg:px-8";
+
+export const CENTER_TEXT = "text-center text-sm";
+export const SECTION_PADDING_Y = "py-5";
