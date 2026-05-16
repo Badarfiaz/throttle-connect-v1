@@ -39,7 +39,6 @@ function Page() {
 
       try {
         const products = await getMarketplaceFeaturedProducts();
-        console.log("Featured products", products);
 
         if (isMounted) {
           setFeaturedProducts(products);
@@ -66,7 +65,6 @@ function Page() {
     };
   }, []);
 
-  console.log("STORE DATA ", data); // coorect
   const storeCards: MarketplaceStoreCard[] = useMemo(
     () =>
       (data ?? []).map((store, index) => ({
@@ -74,6 +72,8 @@ function Page() {
         title: store.title,
         logoUrl: store.logoUrl,
         slugUrl: store.slugUrl,
+        businessType: store.businessType,
+        location: store.location,
       })),
     [data],
   );
@@ -93,7 +93,7 @@ function Page() {
 
       <div className="max-w-5xl mt-20 mx-auto px-6">
         <Title
-          title="Explore Stores"
+          title=" Explore Stores"
           description="Explore our marketplace of automotive stores and find your perfect match."
         />
       </div>
@@ -113,7 +113,7 @@ function Page() {
             responsive={{
               mobile: mobileResponsiveCount,
               tablet: 3,
-              desktop: 4,
+              desktop: 5,
             }}
             className="w-full"
             renderItem={(store) => (

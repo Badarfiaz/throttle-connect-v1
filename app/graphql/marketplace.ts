@@ -75,6 +75,9 @@ export const MARKETPLACE_ALL_STORES_QUERY = `{
     bannerUrl
     logoUrl
     slugUrl
+    businessType
+          location { area city province }
+
   }
 }`;
 

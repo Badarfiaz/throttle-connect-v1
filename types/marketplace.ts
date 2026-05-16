@@ -26,6 +26,8 @@ export type MarketplaceStoreCard = {
   bannerUrl?: string | null;
   logoUrl?: string | null;
   slugUrl?: string | null;
+  businessType?: string[] | null;
+  location?: locationFields | null;
 };
 
 export type MarketplaceProduct = {
