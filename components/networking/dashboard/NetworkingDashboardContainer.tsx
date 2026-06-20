@@ -6,9 +6,12 @@ import { DashboardContainer } from "@/components/shared/DashboardContainer";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { db } from "@/firebase";
+import { collection, query, where, onSnapshot, doc, getDoc, runTransaction } from "firebase/firestore";
+import { Loader2 } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -27,7 +30,9 @@ import {
   Compass,
   Edit2,
   Check,
-  X
+  X,
+  Users,
+  ShieldCheck
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -83,6 +88,196 @@ export default function NetworkingDashboardContainer() {
   const user = useAppSelector((state) => state.auth.user);
   const club = user?.networking;
   const dispatch = useAppDispatch();
+
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [activeMembers, setActiveMembers] = useState<any[]>([]);
+  const [loadingRequests, setLoadingRequests] = useState(false);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+
+  useEffect(() => {
+    if (!club?.id) return;
+
+    setLoadingRequests(true);
+    const requestsQuery = query(
+      collection(db, "membershipRequests"),
+      where("clubId", "==", club.id),
+      where("status", "==", "pending")
+    );
+
+    const unsubscribe = onSnapshot(requestsQuery, async (snapshot) => {
+      const requestsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // Fetch user details for each request
+      const enrichedRequests = await Promise.all(
+        requestsList.map(async (req: any) => {
+          try {
+            const userDocRef = doc(db, "users", req.userId);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+              const uData = userDocSnap.data();
+              return {
+                ...req,
+                user: {
+                  name: uData.name || "Unknown User",
+                  phone: uData.phone || "Not specified",
+                  profileImage: uData.profileImage || "",
+                }
+              };
+            }
+          } catch (e) {
+            console.error("Error fetching request user details", e);
+          }
+          return {
+            ...req,
+            user: {
+              name: "Unknown User",
+              phone: "Not specified",
+              profileImage: "",
+            }
+          };
+        })
+      );
+
+      setPendingRequests(enrichedRequests);
+      setLoadingRequests(false);
+    }, (error) => {
+      console.error("Error in pending requests subscription:", error);
+      setLoadingRequests(false);
+    });
+
+    return () => unsubscribe();
+  }, [club?.id]);
+
+  useEffect(() => {
+    if (!club?.id) return;
+
+    setLoadingMembers(true);
+    const membersQuery = query(
+      collection(db, "users"),
+      where("clubId", "==", club.id)
+    );
+
+    const unsubscribe = onSnapshot(membersQuery, (snapshot) => {
+      const membersList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setActiveMembers(membersList);
+      setLoadingMembers(false);
+    }, (error) => {
+      console.error("Error in active members subscription:", error);
+      setLoadingMembers(false);
+    });
+
+    return () => unsubscribe();
+  }, [club?.id]);
+
+  const handleApprove = async (requestId: string, requesterId: string) => {
+    if (!club?.id || !user?.userId) return;
+
+    try {
+      const requestRef = doc(db, "membershipRequests", requestId);
+      const userRef = doc(db, "users", requesterId);
+      const clubRef = doc(db, "networkingStores", club.id);
+
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        const clubDoc = await transaction.get(clubRef);
+
+        if (!userDoc.exists()) {
+          throw new Error("Requester user document does not exist.");
+        }
+        if (!clubDoc.exists()) {
+          throw new Error("Club document does not exist.");
+        }
+
+        const userData = userDoc.data();
+        const clubData = clubDoc.data();
+
+        // Rule 2: Only owner can approve
+        if (clubData.ownerUid !== user.userId) {
+          throw new Error("Unauthorized: Only the club owner can approve requests.");
+        }
+
+        // Rule 1: One Club Only
+        if (userData.clubId != null) {
+          // Reject request automatically
+          transaction.update(requestRef, { status: "rejected" });
+          transaction.update(userRef, { membershipStatus: "rejected" });
+          
+          // Decrement pending requests count
+          const pendingCount = clubData.pendingRequestsCount || 0;
+          transaction.update(clubRef, {
+            pendingRequestsCount: Math.max(0, pendingCount - 1)
+          });
+          
+          throw new Error("User already belongs to another club. Request rejected automatically.");
+        }
+
+        // Rule 3: Approve request
+        transaction.update(userRef, {
+          clubId: club.id,
+          membershipStatus: "active"
+        });
+
+        const currentMemberCount = clubData.memberCount || 0;
+        const pendingCount = clubData.pendingRequestsCount || 0;
+        transaction.update(clubRef, {
+          memberCount: currentMemberCount + 1,
+          pendingRequestsCount: Math.max(0, pendingCount - 1)
+        });
+
+        transaction.update(requestRef, {
+          status: "approved"
+        });
+      });
+
+      toast.success("Request Approved", {
+        description: "User is now a member of your club."
+      });
+    } catch (e: any) {
+      console.error("Error approving request", e);
+      toast.error(e.message || "Failed to approve request");
+    }
+  };
+
+  const handleReject = async (requestId: string, requesterId: string) => {
+    if (!club?.id || !user?.userId) return;
+
+    try {
+      const requestRef = doc(db, "membershipRequests", requestId);
+      const userRef = doc(db, "users", requesterId);
+      const clubRef = doc(db, "networkingStores", club.id);
+
+      await runTransaction(db, async (transaction) => {
+        const clubDoc = await transaction.get(clubRef);
+        if (!clubDoc.exists()) {
+          throw new Error("Club document does not exist.");
+        }
+
+        const clubData = clubDoc.data();
+
+        // Rule 2: Only owner can approve/reject
+        if (clubData.ownerUid !== user.userId) {
+          throw new Error("Unauthorized: Only the club owner can reject requests.");
+        }
+
+        // Reject request
+        transaction.update(requestRef, { status: "rejected" });
+        transaction.update(userRef, { membershipStatus: "rejected" });
+
+        // Decrement pending requests count
+        const pendingCount = clubData.pendingRequestsCount || 0;
+        transaction.update(clubRef, {
+          pendingRequestsCount: Math.max(0, pendingCount - 1)
+        });
+      });
+
+      toast.success("Request Rejected", {
+        description: "Join request has been rejected."
+      });
+    } catch (e: any) {
+      console.error("Error rejecting request", e);
+      toast.error(e.message || "Failed to reject request");
+    }
+  };
   
   const { updateNetworkingStore, updating, updateError } = useNetworkingStore();
 
@@ -297,11 +492,33 @@ console.log('input', input)
 
   const clubTypeWatch = form.watch("clubType");
 
+  const navItems = useMemo(() => {
+    return [
+      {
+        id: "profile",
+        label: "Club Profile",
+        description: "Club details & settings",
+      },
+      {
+        id: "members",
+        label: "Members",
+        description: "Manage club members",
+        badge: pendingRequests.length > 0 ? String(pendingRequests.length) : undefined,
+      },
+      {
+        id: "events",
+        label: "Club Events",
+        description: "Organize runs & meets",
+        badge: "3",
+      },
+    ];
+  }, [pendingRequests.length]);
+
   return (
     <DashboardContainer
       title={clubName}
       subtitle={`Manage your club profile, coordinate meets, and build your auto community.`}
-      navItems={networkingNavItems}
+      navItems={navItems}
       activeId={activeTab}
       onNavigate={(id) => {
         setActiveTab(id as DashboardTab);
@@ -765,43 +982,170 @@ console.log('input', input)
       )}
 
       {activeTab === "members" && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
+        <div className="space-y-8 animate-in fade-in duration-300">
+          {/* Section 1: Join Requests */}
+          <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">Club Roster</h3>
-              <p className="text-sm text-slate-500">Manage and view all registered club members</p>
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Users className="h-5 w-5 text-amber-500" />
+                Pending Join Requests
+                {pendingRequests.length > 0 && (
+                  <Badge className="bg-amber-500 text-white ml-2">
+                    {pendingRequests.length} pending
+                  </Badge>
+                )}
+              </h3>
+              <p className="text-xs text-slate-500">Review requests from riders wanting to join your club</p>
             </div>
-            <Button size="sm" className="bg-[#19376D] hover:bg-[#0B2447] text-white">
-              <Plus className="h-4 w-4 mr-1.5" />
-              Invite Member
-            </Button>
+
+            {loadingRequests ? (
+              <Card className="p-8 flex justify-center items-center">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </Card>
+            ) : pendingRequests.length === 0 ? (
+              <Card className="border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center rounded-xl">
+                <p className="text-sm text-slate-500">No pending join requests at the moment.</p>
+              </Card>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {pendingRequests.map((req) => {
+                  const userInitials = req.user?.name
+                    ?.split(" ")
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((w: string) => w[0]?.toUpperCase())
+                    .join("") || "R";
+                  
+                  return (
+                    <Card key={req.id} className="border border-slate-100 shadow-sm hover:shadow-md transition duration-300 overflow-hidden bg-white rounded-xl">
+                      <CardContent className="p-5 space-y-4">
+                        <div className="flex items-start gap-4">
+                          <Avatar className="h-12 w-12 rounded-xl border border-slate-100 shrink-0">
+                            {req.user?.profileImage ? (
+                              <AvatarImage src={req.user.profileImage} className="object-cover" />
+                            ) : (
+                              <AvatarFallback className="bg-[#19376D]/10 text-[#19376D] font-bold rounded-xl">
+                                {userInitials}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div className="space-y-1">
+                            <h4 className="font-semibold text-slate-900 text-sm">{req.user?.name}</h4>
+                            <p className="text-xs text-slate-500 flex items-center gap-1">
+                              <Phone className="h-3 w-3 text-emerald-500" />
+                              {req.user?.phone}
+                            </p>
+                            <p className="text-[10px] text-slate-400">
+                              Requested {new Date(req.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 pt-2 border-t border-slate-50">
+                          <Button
+                            size="sm"
+                            onClick={() => handleApprove(req.id, req.userId)}
+                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-xs"
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleReject(req.id, req.userId)}
+                            className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-medium rounded-lg text-xs"
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          <Card className="border border-slate-100 shadow-sm overflow-hidden">
-            <div className="divide-y divide-slate-100">
-              {dummyMembers.map((member, i) => (
-                <div key={i} className="flex items-center justify-between p-4 hover:bg-slate-50/50 transition">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-slate-100 text-[#19376D] font-bold">
-                        {member.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">{member.name}</p>
-                      <p className="text-xs text-slate-500">{member.role}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-400">Joined {member.joined}</span>
-                    <Badge variant={member.active ? "default" : "secondary"} className={member.active ? "bg-emerald-500 text-white font-medium" : "font-normal"}>
-                      {member.active ? "Officer" : "Member"}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
+          {/* Section 2: Club Members */}
+          <div className="space-y-4 pt-4">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-emerald-500" />
+                Active Members
+                {activeMembers.length > 0 && (
+                  <Badge className="bg-[#19376D] text-white ml-2">
+                    {activeMembers.length}
+                  </Badge>
+                )}
+              </h3>
+              <p className="text-xs text-slate-500">View and manage registered members of this club</p>
             </div>
-          </Card>
+
+            {loadingMembers ? (
+              <Card className="p-8 flex justify-center items-center">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </Card>
+            ) : activeMembers.length === 0 ? (
+              <Card className="border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center rounded-xl">
+                <p className="text-sm text-slate-500">No active members yet.</p>
+              </Card>
+            ) : (
+              <Card className="border border-slate-100 shadow-sm overflow-hidden rounded-xl bg-white">
+                <div className="divide-y divide-slate-100">
+                  {activeMembers.map((member) => {
+                    const initials = member.name
+                      ?.split(" ")
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map((w: string) => w[0]?.toUpperCase())
+                      .join("") || "M";
+
+                    return (
+                      <div key={member.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-slate-50/50 transition gap-4">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10 rounded-lg">
+                            {member.profileImage ? (
+                              <AvatarImage src={member.profileImage} className="object-cover" />
+                            ) : (
+                              <AvatarFallback className="bg-slate-100 text-[#19376D] font-bold">
+                                {initials}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">{member.name}</p>
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 mt-0.5">
+                              {member.location?.city && (
+                                <span className="flex items-center gap-0.5 text-slate-400">
+                                  <MapPin className="h-3 w-3" />
+                                  {member.location.city}
+                                </span>
+                              )}
+                              {member.vehicle?.brand && (
+                                <span className="text-primary/80 font-medium">
+                                  {member.vehicle.brand} {member.vehicle.model} ({member.vehicle.year})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 self-end sm:self-auto">
+                          {member.phone && (
+                            <span className="text-xs font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
+                              {member.phone}
+                            </span>
+                          )}
+                          <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium rounded-full text-[10px]">
+                            Active Member
+                          </Badge>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
+          </div>
         </div>
       )}
 

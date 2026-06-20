@@ -5,7 +5,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { clubs } from "@/dummydata/networking";
 import { db } from "@/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, onSnapshot, runTransaction } from "firebase/firestore";
 import {
   Card,
   CardHeader,
@@ -27,13 +27,23 @@ import {
   Trophy,
   Car,
   Bike,
+  Loader2,
 } from "lucide-react";
 import SharedButton from "@/components/shared/SharedButton";
+import { useAppSelector, useAppDispatch } from "@/app/redux/hooks";
+import { fetchUserProfileData } from "@/app/redux/features/authSlice";
+import { toast } from "sonner";
 
 export default function ClubProfile() {
   const { id } = useParams();
   const [dbClub, setDbClub] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const user = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
+  const [submitting, setSubmitting] = useState(false);
+  const [myRequest, setMyRequest] = useState<any>(null);
+  const [loadingRequest, setLoadingRequest] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -53,6 +63,111 @@ export default function ClubProfile() {
     fetchClub();
   }, [id]);
 
+  useEffect(() => {
+    if (!id || !user?.userId) return;
+
+    setLoadingRequest(true);
+    const q = query(
+      collection(db, "membershipRequests"),
+      where("userId", "==", user.userId),
+      where("clubId", "==", id)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        setMyRequest(snapshot.docs[0].data());
+      } else {
+        setMyRequest(null);
+      }
+      setLoadingRequest(false);
+    }, (error) => {
+      console.error("Error listening to request snapshot:", error);
+      setLoadingRequest(false);
+    });
+
+    return () => unsubscribe();
+  }, [id, user?.userId]);
+
+  const handleJoinRequest = async () => {
+    if (!user) {
+      toast.error("Authentication Required", {
+        description: "Please sign in to request to join a club.",
+      });
+      return;
+    }
+
+    if (!user.profileData?.completed) {
+      toast.error("Incomplete Profile", {
+        description: "Please complete your profile details in settings first.",
+      });
+      return;
+    }
+
+    if (user.profileData?.clubId != null) {
+      toast.error("Already in a Club", {
+        description: "A user can belong to only one club at a time.",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const requestRef = doc(collection(db, "membershipRequests"));
+      const requestId = requestRef.id;
+
+      const requestData = {
+        id: requestId,
+        userId: user.userId,
+        clubId: id as string,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
+
+      const userRef = doc(db, "users", user.userId);
+      const clubRef = doc(db, "networkingStores", id as string);
+
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        const clubDoc = await transaction.get(clubRef);
+
+        if (!userDoc.exists()) {
+          throw new Error("User document does not exist.");
+        }
+        if (!clubDoc.exists()) {
+          throw new Error("Club document does not exist.");
+        }
+
+        const userData = userDoc.data();
+        const clubData = clubDoc.data();
+
+        // Rule 1: One Club Only
+        if (userData.clubId != null) {
+          throw new Error("You already belong to another club.");
+        }
+
+        const currentPendingCount = clubData.pendingRequestsCount || 0;
+
+        transaction.set(requestRef, requestData);
+        transaction.update(userRef, {
+          membershipStatus: "pending",
+        });
+        transaction.update(clubRef, {
+          pendingRequestsCount: currentPendingCount + 1,
+        });
+      });
+
+      toast.success("Request Sent", {
+        description: "Your membership request has been submitted successfully.",
+      });
+      dispatch(fetchUserProfileData(user.userId));
+    } catch (e: any) {
+      console.error("Error submitting join request", e);
+      toast.error(e.message || "Failed to submit request");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const club = useMemo(() => {
     if (dbClub) {
       return {
@@ -61,7 +176,7 @@ export default function ClubProfile() {
         categoryType: (dbClub.clubType === "car" ? "sedans" : dbClub.clubType === "bike" ? "bikes" : "offroad") as any,
         image: dbClub.bannerUrl ,
         location: dbClub.city || "Unknown Location",
-        memberCount: 1,
+        memberCount: dbClub.memberCount || 0,
         description: dbClub.description || "No description provided.",
         createdBy: dbClub.email || "Owner",
       };
@@ -258,11 +373,65 @@ export default function ClubProfile() {
       </Tabs>
 
       {/* 🔹 CTA Section */}
-      <div className="text-center space-y-3">
+      <div className="text-center space-y-4 max-w-md mx-auto pt-6 border-t border-border/20">
         <h3 className="text-lg font-semibold text-primary">
           Ready to ride with {club.name}?
         </h3>
-        <SharedButton label="Join Club" />
+        
+        {loadingRequest ? (
+          <Button disabled className="w-full bg-slate-100 text-slate-400">
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            Loading request status...
+          </Button>
+        ) : myRequest ? (
+          <div className="space-y-2">
+            {myRequest.status === "pending" && (
+              <>
+                <Button disabled className="w-full bg-amber-500 text-white font-semibold cursor-not-allowed">
+                  Pending Approval
+                </Button>
+                <p className="text-xs text-amber-600 font-medium">Request Sent</p>
+              </>
+            )}
+            {myRequest.status === "approved" && (
+              <Button disabled className="w-full bg-emerald-600 text-white font-semibold cursor-not-allowed">
+                Approved (Member)
+              </Button>
+            )}
+            {myRequest.status === "rejected" && (
+              <Button disabled className="w-full bg-red-600 text-white font-semibold cursor-not-allowed">
+                Rejected
+              </Button>
+            )}
+          </div>
+        ) : user?.profileData?.clubId === id ? (
+          <Button disabled className="w-full bg-emerald-600 text-white font-semibold cursor-not-allowed">
+            Approved (Member)
+          </Button>
+        ) : user?.profileData?.clubId != null ? (
+          <Button disabled className="w-full bg-slate-200 text-slate-500 font-medium cursor-not-allowed">
+            Already in a Club
+          </Button>
+        ) : dbClub?.ownerUid === user?.userId ? (
+          <Button disabled className="w-full bg-slate-200 text-slate-500 font-medium cursor-not-allowed">
+            You own this club
+          </Button>
+        ) : (
+          <Button 
+            onClick={handleJoinRequest} 
+            disabled={submitting} 
+            className="w-full bg-[#19376D] hover:bg-[#0B2447] text-white font-semibold shadow-md transition py-6 rounded-xl"
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Sending Request...
+              </>
+            ) : (
+              "Join Club"
+            )}
+          </Button>
+        )}
       </div>
     </section>
   );

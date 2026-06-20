@@ -13,5 +13,7 @@ export const saveUserToFirestore = async (user: User) => {
     name: user.displayName || user.name || "",
     email: user.email,
     userId: user.uid,
+    clubId: null,
+    membershipStatus: "none",
   });
 };

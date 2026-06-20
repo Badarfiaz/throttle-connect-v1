@@ -52,4 +52,6 @@ export type MemberProfile = {
   experienceYears?: number | string;
   interests?: string[];
   createdAt?: string;
+  clubId?: string | null;
+  membershipStatus?: "none" | "pending" | "active" | "rejected";
 };

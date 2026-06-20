@@ -47,6 +47,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 location: userData.location || null,
                 vehicle: userData.vehicle || null,
                 userId: userData.userId || user.uid,
+                clubId: userData.clubId || null,
+                membershipStatus: userData.membershipStatus || "none",
               }
             : null;
 

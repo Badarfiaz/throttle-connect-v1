@@ -87,6 +87,8 @@ export const fetchUserProfileData = createAsyncThunk(
           location: userData.location || null,
           vehicle: userData.vehicle || null,
           userId: userData.userId || userId,
+          clubId: userData.clubId || null,
+          membershipStatus: userData.membershipStatus || "none",
         };
         return normalizeFirestoreStore(mergedProfile) as MemberProfile;
       }

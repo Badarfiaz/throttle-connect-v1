@@ -217,6 +217,8 @@ export default function ProfileHero() {
       },
 
       userId: user.userId,
+      clubId: profileData?.clubId ?? null,
+      membershipStatus: profileData?.membershipStatus ?? "none",
     };
 
     try {
