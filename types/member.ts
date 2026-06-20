@@ -49,7 +49,7 @@ export type MemberProfile = {
   vehicle?: MemberVehicle;
   drivingLicenseImage?: string;
   emergencyContact?: MemberEmergencyContact;
-  experienceYears?: string;
+  experienceYears?: number | string;
   interests?: string[];
   createdAt?: string;
 };

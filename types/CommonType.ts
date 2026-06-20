@@ -3,9 +3,10 @@ import { MemberProfile } from "./member";
 import { NetworkingStore } from "./networking";
 
 export type locationFields = {
-  area: string;
+  area?: string;
   city: string;
-  province: string;
+  province?: string;
+  country?: string;
 };
 export type ContactMethod = "email" | "phone" | "whatsapp" | "social";
 export type allowedPageType = "marketplace" | "networking";

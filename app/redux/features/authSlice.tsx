@@ -70,8 +70,25 @@ export const fetchUserProfileData = createAsyncThunk(
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const userData = docSnap.data();
-      if (userData && userData.profileData) {
-        return normalizeFirestoreStore(userData.profileData) as MemberProfile;
+      if (userData) {
+        const mergedProfile = {
+          completed: userData.profileData?.completed,
+          createdAt: userData.profileData?.createdAt,
+          experienceYears: userData.profileData?.experienceYears,
+          interests: userData.profileData?.interests,
+          drivingLicenseImage: userData.profileData?.drivingLicenseImage || "",
+          memberName: userData.name || "",
+          name: userData.name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          whatsapp: userData.whatsapp || "",
+          profileImage: userData.profileImage || "",
+          emergencyContact: userData.emergencyContact || null,
+          location: userData.location || null,
+          vehicle: userData.vehicle || null,
+          userId: userData.userId || userId,
+        };
+        return normalizeFirestoreStore(mergedProfile) as MemberProfile;
       }
     }
     return null;

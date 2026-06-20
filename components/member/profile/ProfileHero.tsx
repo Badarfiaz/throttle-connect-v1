@@ -50,6 +50,7 @@ type ProfileFormValues = {
   province: string;
   city: string;
   area: string;
+  country: string;
   vehicleType: string;
   vehicleBrand: string;
   vehicleModel: string;
@@ -69,7 +70,9 @@ const statBlocks = (
 ): Array<{ label: string; value: string; helper?: string }> => [
   {
     label: "Experience",
-    value: member.experienceYears || "Fresh Rider",
+    value: member.experienceYears !== undefined
+      ? (typeof member.experienceYears === "number" ? `${member.experienceYears} Years` : String(member.experienceYears))
+      : "Fresh Rider",
     helper: "Years riding",
   },
   {
@@ -109,6 +112,20 @@ export default function ProfileHero() {
     .toUpperCase() || "TC";
 
   const defaultValues = useMemo<ProfileFormValues>(() => {
+    // Map numeric experienceYears back to select values
+    let expVal = "0-1";
+    if (profileData?.experienceYears !== undefined) {
+      if (typeof profileData.experienceYears === "number") {
+        const num = profileData.experienceYears;
+        if (num <= 1) expVal = "0-1";
+        else if (num <= 3) expVal = "2-3";
+        else if (num <= 6) expVal = "4-6";
+        else expVal = "7+";
+      } else {
+        expVal = profileData.experienceYears;
+      }
+    }
+
     return {
       memberName: profileData?.memberName ?? user?.name ?? "",
       phone: profileData?.phone ?? "",
@@ -116,16 +133,19 @@ export default function ProfileHero() {
       province: profileData?.location?.province ?? "",
       city: profileData?.location?.city ?? "",
       area: profileData?.location?.area ?? "",
+      country: profileData?.location?.country ?? "",
       vehicleType: profileData?.vehicle?.type ?? "bike",
       vehicleBrand: profileData?.vehicle?.brand ?? "",
       vehicleModel: profileData?.vehicle?.model ?? "",
-      ModelYear: typeof profileData?.vehicle?.year === "string" ? profileData.vehicle.year : "",
-      vehicleImages: typeof profileData?.vehicle?.images === "string" ? profileData.vehicle.images : "",
+      ModelYear: profileData?.vehicle?.year !== undefined ? String(profileData.vehicle.year) : "",
+      vehicleImages: Array.isArray(profileData?.vehicle?.images)
+        ? (profileData.vehicle.images[0] ?? "")
+        : (profileData?.vehicle?.images ?? ""),
       drivingLicenseImage: profileData?.drivingLicenseImage ?? "",
       emergencyContactName: profileData?.emergencyContact?.name ?? "",
       emergencyContactPhone: profileData?.emergencyContact?.phone ?? "",
       bloodGroup: profileData?.emergencyContact?.bloodGroup ?? "O+",
-      experienceYears: profileData?.experienceYears ?? "0-1",
+      experienceYears: expVal,
       interests: profileData?.interests ?? [],
       profileImage: profileData?.profileImage ?? "",
     };
@@ -155,41 +175,53 @@ export default function ProfileHero() {
 
   const handleSave = form.handleSubmit(async (values) => {
     setSaving(true);
-    const memberData = {
-      completed: true,
-      ownerUid: user.userId,
-      userId: user.userId,
+    
+    // Map experienceYears string to a number
+    const exp = values.experienceYears;
+    const experienceYearsNum = exp === "0-1" ? 1 : exp === "2-3" ? 2 : exp === "4-6" ? 5 : exp === "7+" ? 7 : (parseInt(exp, 10) || 2);
+
+    const userDocData = {
+      name: values.memberName?.trim() ?? "",
       email: user.email,
-      memberName: values.memberName?.trim() ?? "",
       phone: values.phone?.trim() ?? "",
       whatsapp: values.whatsapp?.trim() ?? "",
-      location: {
-        city: values.city?.trim() ?? "",
-        province: values.province?.trim() ?? "",
-        area: values.area?.trim() ?? "",
+      profileImage: values.profileImage?.trim() ?? "",
+      
+      profileData: {
+        completed: true,
+        createdAt: profileData?.createdAt ?? new Date().toISOString(),
+        experienceYears: experienceYearsNum,
+        interests: values.interests ?? [],
+        drivingLicenseImage: values.drivingLicenseImage?.trim() ?? "",
       },
-      vehicle: {
-        type: values.vehicleType ?? "bike",
-        brand: values.vehicleBrand?.trim() ?? "",
-        model: values.vehicleModel?.trim() ?? "",
-        year: values.ModelYear?.trim() ?? "",
-        images: values.vehicleImages?.trim() ?? "",
-      },
+
       emergencyContact: {
         name: values.emergencyContactName?.trim() ?? "",
         phone: values.emergencyContactPhone?.trim() ?? "",
         bloodGroup: values.bloodGroup ?? "O+",
       },
-      profileImage: values.profileImage?.trim() ?? "",
-      experienceYears: values.experienceYears ?? "0-1",
-      interests: values.interests ?? [],
-      drivingLicenseImage: values.drivingLicenseImage?.trim() ?? "",
-      createdAt: profileData?.createdAt ?? new Date().toISOString(),
+
+      location: {
+        city: values.city?.trim() ?? "",
+        province: values.province?.trim() ?? "",
+        country: values.country?.trim() ?? "UAE",
+        area: values.area?.trim() ?? "",
+      },
+
+      vehicle: {
+        type: values.vehicleType ?? "bike",
+        brand: values.vehicleBrand?.trim() ?? "",
+        model: values.vehicleModel?.trim() ?? "",
+        year: /^\d+$/.test(values.ModelYear) ? parseInt(values.ModelYear, 10) : (parseInt(values.ModelYear, 10) || 2023),
+        images: values.vehicleImages ? [values.vehicleImages.trim()] : [],
+      },
+
+      userId: user.userId,
     };
 
     try {
       const userDocRef = doc(db, "users", user.userId);
-      await setDoc(userDocRef, { profileData: memberData }, { merge: true });
+      await setDoc(userDocRef, userDocData, { merge: true });
 
       toast.success("Profile Saved", {
         description: "Your profile details have been saved successfully in users collection.",
@@ -257,8 +289,9 @@ export default function ProfileHero() {
                   </Badge>
                   <span className="flex items-center gap-2 text-slate-400 font-medium">
                     <MapPin className="h-4 w-4 text-primary" />
-                    {profileData?.location?.city || "City"},{" "}
-                    {profileData?.location?.area || "Area"}
+                    {profileData?.location?.city || "City"}
+                    {profileData?.location?.area ? `, ${profileData.location.area}` : ""}
+                    {profileData?.location?.country ? `, ${profileData.location.country}` : ""}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 mt-1">
@@ -380,16 +413,16 @@ export default function ProfileHero() {
                       className="border-slate-200 focus-visible:ring-1 focus-visible:ring-[#19376D]"
                     />
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="space-y-1 col-span-1">
-                      <label className="text-[10px] font-bold text-slate-500">Province *</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500">Province</label>
                       <Input
                         placeholder="Sindh"
-                        {...form.register("province", { required: true })}
+                        {...form.register("province")}
                         className="border-slate-200 text-xs px-2"
                       />
                     </div>
-                    <div className="space-y-1 col-span-1">
+                    <div className="space-y-1">
                       <label className="text-[10px] font-bold text-slate-500">City *</label>
                       <Input
                         placeholder="Karachi"
@@ -397,11 +430,19 @@ export default function ProfileHero() {
                         className="border-slate-200 text-xs px-2"
                       />
                     </div>
-                    <div className="space-y-1 col-span-1">
-                      <label className="text-[10px] font-bold text-slate-500">Area *</label>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500">Area</label>
                       <Input
                         placeholder="DHA Phase 6"
-                        {...form.register("area", { required: true })}
+                        {...form.register("area")}
+                        className="border-slate-200 text-xs px-2"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500">Country *</label>
+                      <Input
+                        placeholder="UAE"
+                        {...form.register("country", { required: true })}
                         className="border-slate-200 text-xs px-2"
                       />
                     </div>

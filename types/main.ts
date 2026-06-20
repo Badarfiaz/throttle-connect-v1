@@ -15,7 +15,7 @@ export type Club = {
   image: string;
   location: string;
   memberCount: number;
-  logoUrl: string;
+  logoUrl?: string;
   description: string;
   createdBy: string;
 };

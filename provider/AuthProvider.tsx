@@ -30,6 +30,26 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             userData.marketplace,
             userData.networking,
           );
+          const mergedProfile = userData
+            ? {
+                completed: userData.profileData?.completed,
+                createdAt: userData.profileData?.createdAt,
+                experienceYears: userData.profileData?.experienceYears,
+                interests: userData.profileData?.interests,
+                drivingLicenseImage: userData.profileData?.drivingLicenseImage || "",
+                memberName: userData.name || "",
+                name: userData.name || "",
+                email: userData.email || "",
+                phone: userData.phone || "",
+                whatsapp: userData.whatsapp || "",
+                profileImage: userData.profileImage || "",
+                emergencyContact: userData.emergencyContact || null,
+                location: userData.location || null,
+                vehicle: userData.vehicle || null,
+                userId: userData.userId || user.uid,
+              }
+            : null;
+
           dispatch(
             setUser({
               userId: user.uid,
@@ -37,7 +57,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               name: user.displayName || user.email?.split("@")[0] || "",
               marketplace: normalizeFirestoreStore(userData.marketplace),
               networking: normalizeFirestoreStore(userData.networking),
-              profileData: userData.profileData ? normalizeFirestoreStore(userData.profileData) : null,
+              profileData: mergedProfile ? normalizeFirestoreStore(mergedProfile) : null,
             }),
           );
         } catch (error) {
