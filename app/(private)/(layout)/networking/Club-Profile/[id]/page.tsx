@@ -59,7 +59,7 @@ export default function ClubProfile() {
         id: id as string,
         name: dbClub.clubName || "Unnamed Club",
         categoryType: (dbClub.clubType === "car" ? "sedans" : dbClub.clubType === "bike" ? "bikes" : "offroad") as any,
-        image: "/images/category/offroad.webp",
+        image: dbClub.bannerUrl ,
         location: dbClub.city || "Unknown Location",
         memberCount: 1,
         description: dbClub.description || "No description provided.",
@@ -193,13 +193,28 @@ export default function ClubProfile() {
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
 
-        <div className="absolute bottom-6 left-6 text-white">
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
-            {club.name}
-          </h1>
-          <p className="text-sm mt-1 opacity-90">{club.categoryType}</p>
+        <div className="absolute bottom-6 left-6 flex items-center gap-4 text-white">
+          {dbClub?.logoUrl ? (
+            <img
+              src={dbClub.logoUrl}
+              alt={`${club.name} Logo`}
+              className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-white/80 bg-white/10 backdrop-blur-md shadow-lg shrink-0"
+            />
+          ) : (
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-2xl sm:text-3xl font-bold border-2 border-white/80 shadow-lg shrink-0">
+              {club.name.split(" ").filter(Boolean).slice(0, 2).map((w: string) => w[0].toUpperCase()).join("") || "AC"}
+            </div>
+          )}
+          <div>
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+              {club.name}
+            </h1>
+            <p className="text-xs sm:text-sm mt-1 opacity-90 uppercase tracking-wider font-semibold">
+              {club.categoryType.replace("-", " ")}
+            </p>
+          </div>
         </div>
       </div>
 

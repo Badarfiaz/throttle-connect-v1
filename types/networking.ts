@@ -23,4 +23,6 @@ export type NetworkingStore = {
   pageType?: string | null;
   onBoardType?: string | null;
   completed?: boolean;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
 };

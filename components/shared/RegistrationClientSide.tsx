@@ -84,7 +84,7 @@ export default function RegistrationClientSide() {
       <section
         className="
           grid gap-12 max-w-6xl mx-auto
-          md:grid-cols-3
+          md:grid-cols-2
           items-stretch
         "
       >
@@ -117,17 +117,8 @@ export default function RegistrationClientSide() {
           link="/networking/registration"
           onButtonClick={handleNetworkingClick}
         />
-
-        <OnboardingCard
-          icon="🚗"
-          title="Join as member"
-          description="Become a member to connect with car & bike enthusiasts, clubs, events, and mechanics."
-          benefits={["member"]}
-          buttonText="Join as Member"
-          link="/member-registration"
-          onButtonClick={handleMemberClick}
-        />
       </section>
+
 
       <AlertDialogShared
         isOpen={isDialogOpen}

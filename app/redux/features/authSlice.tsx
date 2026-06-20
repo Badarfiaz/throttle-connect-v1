@@ -1,5 +1,5 @@
 import { db } from "@/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { MarketplaceStore } from "@/types/marketplace";
 import { NetworkingStore } from "@/types/networking";
 import {
@@ -66,9 +66,18 @@ export const fetchNetworkingForUser = createAsyncThunk(
 export const fetchUserProfileData = createAsyncThunk(
   "auth/fetchUserProfileData",
   async (userId: string) => {
-    return await getStoreData<MemberProfile>("members", userId);
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      if (userData && userData.profileData) {
+        return normalizeFirestoreStore(userData.profileData) as MemberProfile;
+      }
+    }
+    return null;
   },
 );
+
 
 const authSlice = createSlice({
   name: "auth",

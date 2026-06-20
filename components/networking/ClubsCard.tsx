@@ -29,7 +29,7 @@ const ClubCard = ({ club }: ClubCardProps) => {
         {/* Image Section */}
         <div className="relative w-full h-48 xs:h-52 sm:h-56 overflow-hidden">
           <Image
-            src={club.image}
+            src={club.logoUrl}
             alt={club.name}
             fill
             className="object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"

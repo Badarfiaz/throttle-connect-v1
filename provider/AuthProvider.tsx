@@ -37,6 +37,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               name: user.displayName || user.email?.split("@")[0] || "",
               marketplace: normalizeFirestoreStore(userData.marketplace),
               networking: normalizeFirestoreStore(userData.networking),
+              profileData: userData.profileData ? normalizeFirestoreStore(userData.profileData) : null,
             }),
           );
         } catch (error) {

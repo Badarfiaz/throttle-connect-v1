@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useAppSelector, useAppDispatch } from "@/app/redux/hooks";
 import { DashboardContainer } from "@/components/shared/DashboardContainer";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
@@ -33,6 +33,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useNetworkingStore } from "@/hooks/useNetworkingStore";
 import { setNetworkingStore } from "@/app/redux/features/authSlice";
+import { readImagePreview, uploadImage } from "@/ulity/imageUpload";
 
 type DashboardTab = "profile" | "members" | "events";
 
@@ -51,6 +52,8 @@ type ProfileFormValues = {
     instagram: string;
     other: string;
   };
+  logoUrl?: string;
+  bannerUrl?: string;
 };
 
 const networkingNavItems = [
@@ -83,6 +86,61 @@ export default function NetworkingDashboardContainer() {
   
   const { updateNetworkingStore, updating, updateError } = useNetworkingStore();
 
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [bannerUploading, setBannerUploading] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!user) return;
+    setLogoUploading(true);
+    try {
+      const { url } = await uploadImage(file, {
+        ownerId: user.userId,
+        folder: "logo",
+        basePath: "networkingStores",
+      });
+      const preview = await readImagePreview(file);
+      setLogoPreview(preview);
+      form.setValue("logoUrl", url);
+      toast.success("Logo uploaded successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Logo upload failed");
+    } finally {
+      setLogoUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!user) return;
+    setBannerUploading(true);
+    try {
+      const { url } = await uploadImage(file, {
+        ownerId: user.userId,
+        folder: "banner",
+        basePath: "networkingStores",
+      });
+      const preview = await readImagePreview(file);
+      setBannerPreview(preview);
+      form.setValue("bannerUrl", url);
+      toast.success("Banner uploaded successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Banner upload failed");
+    } finally {
+      setBannerUploading(false);
+      e.target.value = "";
+    }
+  };
+
   const defaultValues = useMemo<ProfileFormValues>(() => {
     return {
       clubName: club?.clubName ?? "",
@@ -99,6 +157,8 @@ export default function NetworkingDashboardContainer() {
         instagram: club?.socialPlatforms?.instagram ?? "",
         other: club?.socialPlatforms?.other ?? "",
       },
+      logoUrl: club?.logoUrl ?? "",
+      bannerUrl: club?.bannerUrl ?? "",
     };
   }, [club, user]);
 
@@ -163,16 +223,20 @@ export default function NetworkingDashboardContainer() {
         instagram: values.socialPlatforms?.instagram?.trim() ?? "",
         other: values.socialPlatforms?.other?.trim() ?? "",
       },
+      logoUrl: values.logoUrl ?? "",
+      bannerUrl: values.bannerUrl ?? "",
       completed: true,
       ownerUid: user.userId,
       onBoardType: "networking",
       pageType: "networking",
     };
-
+console.log('input', input)
     try {
       const updated = await updateNetworkingStore(clubId, input);
       if (updated) {
         dispatch(setNetworkingStore(updated));
+        setLogoPreview(null);
+        setBannerPreview(null);
         toast.success("Profile Updated", {
           description: "Your club profile details have been saved successfully.",
         });
@@ -186,6 +250,8 @@ export default function NetworkingDashboardContainer() {
 
   const handleCancel = () => {
     form.reset(defaultValues);
+    setLogoPreview(null);
+    setBannerPreview(null);
     setIsEditing(false);
   };
 
@@ -413,6 +479,92 @@ export default function NetworkingDashboardContainer() {
               </Card>
             </div>
 
+            {/* Club Branding Card */}
+            <Card className="border border-slate-200/80 shadow-xs bg-white mt-6">
+              <CardHeader className="pb-3 border-b border-slate-100">
+                <CardTitle className="text-lg font-medium flex items-center gap-2 text-slate-800">
+                  <Compass className="h-5 w-5 text-[#19376D]" />
+                  Club Branding
+                </CardTitle>
+                <CardDescription>Upload a custom logo and banner for your club profile</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-6 md:grid-cols-2 pt-6">
+                {/* Logo Upload */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Club Logo</label>
+                  <div className="flex items-center gap-4 p-4 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                    {logoPreview || form.watch("logoUrl") ? (
+                      <img
+                        src={logoPreview || form.watch("logoUrl")}
+                        alt="Logo Preview"
+                        className="h-16 w-16 rounded-2xl object-cover border bg-white"
+                      />
+                    ) : (
+                      <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center font-bold text-xl shrink-0 shadow-sm">
+                        {initials}
+                      </div>
+                    )}
+                    <div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={logoUploading}
+                        onClick={() => logoInputRef.current?.click()}
+                      >
+                        {logoUploading ? "Uploading..." : "Upload Logo"}
+                      </Button>
+                      <p className="text-[10px] text-slate-400 mt-1">PNG, JPG up to 5MB</p>
+                    </div>
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleLogoUpload}
+                    />
+                  </div>
+                </div>
+
+                {/* Banner Upload */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Club Banner</label>
+                  <div className="flex flex-col gap-3 p-4 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                    {bannerPreview || form.watch("bannerUrl") ? (
+                      <img
+                        src={bannerPreview || form.watch("bannerUrl")}
+                        alt="Banner Preview"
+                        className="h-20 w-full rounded-lg object-cover border bg-white"
+                      />
+                    ) : (
+                      <div className="h-20 w-full rounded-lg bg-slate-200 flex items-center justify-center text-xs text-slate-500 font-medium">
+                        No Banner Uploaded
+                      </div>
+                    )}
+                    <div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={bannerUploading}
+                        onClick={() => bannerInputRef.current?.click()}
+                      >
+                        {bannerUploading ? "Uploading..." : "Upload Banner"}
+                      </Button>
+                      <p className="text-[10px] text-slate-400 mt-1">Recommended size: 1200x300px</p>
+                    </div>
+                    <input
+                      ref={bannerInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleBannerUpload}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Socials Connection Card */}
             <Card className="border border-slate-200/80 shadow-xs bg-white">
               <CardHeader className="pb-3 border-b border-slate-100">
@@ -478,11 +630,28 @@ export default function NetworkingDashboardContainer() {
           <div className="space-y-6">
             {/* Header Card */}
             <Card className="border border-slate-100 shadow-sm overflow-hidden bg-gradient-to-br from-white to-slate-50/50">
+              {club?.bannerUrl && (
+                <div className="w-full h-40 overflow-hidden relative border-b border-slate-100">
+                  <img
+                    src={club.bannerUrl}
+                    alt={`${clubName} Banner`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
               <CardContent className="p-6">
                 <div className="flex flex-col gap-6 md:flex-row md:items-center">
-                  <div className="h-20 w-20 rounded-2xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-3xl font-bold shadow-md shrink-0">
-                    {initials}
-                  </div>
+                  {club?.logoUrl ? (
+                    <img
+                      src={club.logoUrl}
+                      alt={clubName}
+                      className="h-20 w-20 rounded-2xl object-cover border border-slate-200 bg-white shadow-md shrink-0"
+                    />
+                  ) : (
+                    <div className="h-20 w-20 rounded-2xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-3xl font-bold shadow-md shrink-0">
+                      {initials}
+                    </div>
+                  )}
                   <div className="flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-2xl font-semibold text-slate-900">{clubName}</h2>
