@@ -52,6 +52,7 @@ import { toast } from "sonner";
 import { useNetworkingStore } from "@/hooks/useNetworkingStore";
 import { setNetworkingStore } from "@/app/redux/features/authSlice";
 import { readImagePreview, uploadImage } from "@/ulity/imageUpload";
+import Link from "next/link";
 
 type DashboardTab = "profile" | "members" | "events" | "achievements";
 
@@ -1492,7 +1493,7 @@ console.log('input', input)
                   return (
                     <Card key={req.id} className="border border-slate-100 shadow-sm hover:shadow-md transition duration-300 overflow-hidden bg-white rounded-xl">
                       <CardContent className="p-5 space-y-4">
-                        <div className="flex items-start gap-4">
+                        <Link href={`/networking/member/${req.userId}`} className="flex items-start gap-4 hover:opacity-80 transition group flex-1">
                           <Avatar className="h-12 w-12 rounded-xl border border-slate-100 shrink-0">
                             {req.user?.profileImage ? (
                               <AvatarImage src={req.user.profileImage} className="object-cover" />
@@ -1503,7 +1504,10 @@ console.log('input', input)
                             )}
                           </Avatar>
                           <div className="space-y-1">
-                            <h4 className="font-semibold text-slate-900 text-sm">{req.user?.name}</h4>
+                            <h4 className="font-semibold text-slate-900 text-sm group-hover:text-[#19376D] transition flex items-center gap-1">
+                              {req.user?.name}
+                              <Eye className="h-3.5 w-3.5 text-slate-400 group-hover:text-[#19376D] transition-all" />
+                            </h4>
                             <p className="text-xs text-slate-500 flex items-center gap-1">
                               <Phone className="h-3 w-3 text-emerald-500" />
                               {req.user?.phone}
@@ -1511,8 +1515,11 @@ console.log('input', input)
                             <p className="text-[10px] text-slate-400">
                               Requested {new Date(req.createdAt).toLocaleDateString()}
                             </p>
+                            <p className="text-[11px] font-semibold text-[#19376D] hover:underline pt-0.5">
+                              View Profile & Credentials
+                            </p>
                           </div>
-                        </div>
+                        </Link>
 
                         <div className="flex gap-2 pt-2 border-t border-slate-50">
                           <Button
@@ -1591,7 +1598,7 @@ console.log('input', input)
 
                     return (
                       <div key={member.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-slate-50/50 transition gap-4">
-                        <div className="flex items-center gap-3">
+                        <Link href={`/networking/member/${member.id}`} className="flex items-center gap-3 hover:opacity-80 transition group">
                           <Avatar className="h-10 w-10 rounded-lg">
                             {member.profileImage ? (
                               <AvatarImage src={member.profileImage} className="object-cover" />
@@ -1602,7 +1609,10 @@ console.log('input', input)
                             )}
                           </Avatar>
                           <div>
-                            <p className="text-sm font-semibold text-slate-900">{member.name}</p>
+                            <p className="text-sm font-semibold text-slate-900 group-hover:text-[#19376D] transition flex items-center gap-1">
+                              {member.name}
+                              <Eye className="h-3.5 w-3.5 text-slate-400 group-hover:text-[#19376D] transition-all" />
+                            </p>
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 mt-0.5">
                               {member.location?.city && (
                                 <span className="flex items-center gap-0.5 text-slate-400">
@@ -1617,7 +1627,7 @@ console.log('input', input)
                               )}
                             </div>
                           </div>
-                        </div>
+                        </Link>
                         <div className="flex items-center gap-3 self-end sm:self-auto">
                           {member.phone && (
                             <span className="text-xs font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">

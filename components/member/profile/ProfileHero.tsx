@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { 
   Mail, 
@@ -15,9 +15,14 @@ import {
   Compass, 
   MessageSquare,
   Activity,
-  HeartHandshake
+  HeartHandshake,
+  Plus,
+  X,
+  Loader2
 } from "lucide-react";
 import { MemberProfile } from "@/types/member";
+import { readImagePreview, uploadImage } from "@/ulity/imageUpload";
+
 import { useAppSelector, useAppDispatch } from "@/app/redux/hooks";
 import SafetyContactPanel from "./SafetyContactPanel";
 import { Button } from "@/components/ui/button";
@@ -55,7 +60,7 @@ type ProfileFormValues = {
   vehicleBrand: string;
   vehicleModel: string;
   ModelYear: string;
-  vehicleImages: string;
+  vehicleImages: string[];
   drivingLicenseImage: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
@@ -102,6 +107,95 @@ export default function ProfileHero() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // File input refs for uploading
+  const profileFileRef = useRef<HTMLInputElement>(null);
+  const licenseFileRef = useRef<HTMLInputElement>(null);
+  const vehicleFileRef = useRef<HTMLInputElement>(null);
+
+  // Upload loading states
+  const [uploadingProfile, setUploadingProfile] = useState(false);
+  const [uploadingLicense, setUploadingLicense] = useState(false);
+  const [uploadingVehicle, setUploadingVehicle] = useState(false);
+
+  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingProfile(true);
+    try {
+      const { url } = await uploadImage(file, {
+        ownerId: user.userId,
+        folder: "profile",
+        basePath: "members",
+      });
+      form.setValue("profileImage", url, { shouldValidate: true });
+      toast.success("Profile Photo Uploaded", {
+        description: "Your profile photo has been updated.",
+      });
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Upload Failed", { description: err.message || "Failed to upload photo" });
+    } finally {
+      setUploadingProfile(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleLicenseImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLicense(true);
+    try {
+      const { url } = await uploadImage(file, {
+        ownerId: user.userId,
+        folder: "license",
+        basePath: "members",
+      });
+      form.setValue("drivingLicenseImage", url, { shouldValidate: true });
+      toast.success("Driving License Uploaded", {
+        description: "Your driving license has been updated.",
+      });
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Upload Failed", { description: err.message || "Failed to upload license" });
+    } finally {
+      setUploadingLicense(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleVehicleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingVehicle(true);
+    try {
+      const { url } = await uploadImage(file, {
+        ownerId: user.userId,
+        folder: "vehicles",
+        basePath: "members",
+      });
+      const current = form.getValues("vehicleImages") || [];
+      form.setValue("vehicleImages", [...current, url], { shouldValidate: true });
+      toast.success("Vehicle Photo Uploaded", {
+        description: "Vehicle photo added to your garage gallery.",
+      });
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Upload Failed", { description: err.message || "Failed to upload vehicle photo" });
+    } finally {
+      setUploadingVehicle(false);
+      e.target.value = "";
+    }
+  };
+
+  const removeVehicleImage = (indexToRemove: number) => {
+    const current = form.getValues("vehicleImages") || [];
+    form.setValue(
+      "vehicleImages",
+      current.filter((_, idx) => idx !== indexToRemove),
+      { shouldValidate: true }
+    );
+  };
+
   const displayName = profileData?.memberName || user?.name || "Member Name";
   const initials = displayName
     .split(" ")
@@ -128,26 +222,32 @@ export default function ProfileHero() {
 
     return {
       memberName: profileData?.memberName ?? user?.name ?? "",
-      phone: profileData?.phone ?? "",
-      whatsapp: profileData?.whatsapp ?? "",
-      province: profileData?.location?.province ?? "",
-      city: profileData?.location?.city ?? "",
-      area: profileData?.location?.area ?? "",
-      country: profileData?.location?.country ?? "",
-      vehicleType: profileData?.vehicle?.type ?? "bike",
-      vehicleBrand: profileData?.vehicle?.brand ?? "",
-      vehicleModel: profileData?.vehicle?.model ?? "",
-      ModelYear: profileData?.vehicle?.year !== undefined ? String(profileData.vehicle.year) : "",
+      phone: profileData?.phone ?? user?.phone ?? "",
+      whatsapp: profileData?.whatsapp ?? user?.whatsapp ?? "",
+      province: profileData?.location?.province ?? user?.location?.province ?? "",
+      city: profileData?.location?.city ?? user?.location?.city ?? "",
+      area: profileData?.location?.area ?? user?.location?.area ?? "",
+      country: profileData?.location?.country ?? user?.location?.country ?? "",
+      vehicleType: profileData?.vehicle?.type ?? user?.vehicle?.type ?? "bike",
+      vehicleBrand: profileData?.vehicle?.brand ?? user?.vehicle?.brand ?? "",
+      vehicleModel: profileData?.vehicle?.model ?? user?.vehicle?.model ?? "",
+      ModelYear: profileData?.vehicle?.year !== undefined 
+        ? String(profileData.vehicle.year) 
+        : (user?.vehicle?.year !== undefined ? String(user.vehicle.year) : ""),
       vehicleImages: Array.isArray(profileData?.vehicle?.images)
-        ? (profileData.vehicle.images[0] ?? "")
-        : (profileData?.vehicle?.images ?? ""),
-      drivingLicenseImage: profileData?.drivingLicenseImage ?? "",
-      emergencyContactName: profileData?.emergencyContact?.name ?? "",
-      emergencyContactPhone: profileData?.emergencyContact?.phone ?? "",
-      bloodGroup: profileData?.emergencyContact?.bloodGroup ?? "O+",
+        ? profileData.vehicle.images
+        : (Array.isArray(user?.vehicle?.images)
+          ? user.vehicle.images
+          : (profileData?.vehicle?.images
+            ? [profileData.vehicle.images as string]
+            : (user?.vehicle?.images ? [user.vehicle.images as string] : []))),
+      drivingLicenseImage: user?.drivingLicenseImage ?? profileData?.drivingLicenseImage ?? "",
+      emergencyContactName: profileData?.emergencyContact?.name ?? user?.emergencyContact?.name ?? "",
+      emergencyContactPhone: profileData?.emergencyContact?.phone ?? user?.emergencyContact?.phone ?? "",
+      bloodGroup: profileData?.emergencyContact?.bloodGroup ?? user?.emergencyContact?.bloodGroup ?? "O+",
       experienceYears: expVal,
-      interests: profileData?.interests ?? [],
-      profileImage: profileData?.profileImage ?? "",
+      interests: profileData?.interests ?? user?.interests ?? [],
+      profileImage: user?.profileImage ?? profileData?.profileImage ?? "",
     };
   }, [profileData, user]);
 
@@ -186,6 +286,7 @@ export default function ProfileHero() {
       phone: values.phone?.trim() ?? "",
       whatsapp: values.whatsapp?.trim() ?? "",
       profileImage: values.profileImage?.trim() ?? "",
+      drivingLicenseImage: values.drivingLicenseImage?.trim() ?? "",
       
       profileData: {
         completed: true,
@@ -213,7 +314,7 @@ export default function ProfileHero() {
         brand: values.vehicleBrand?.trim() ?? "",
         model: values.vehicleModel?.trim() ?? "",
         year: /^\d+$/.test(values.ModelYear) ? parseInt(values.ModelYear, 10) : (parseInt(values.ModelYear, 10) || 2023),
-        images: values.vehicleImages ? [values.vehicleImages.trim()] : [],
+        images: values.vehicleImages || [],
       },
 
       userId: user.userId,
@@ -449,13 +550,42 @@ export default function ProfileHero() {
                       />
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-500">Profile Image URL</label>
-                    <Input
-                      placeholder="https://images.unsplash.com/..."
-                      {...form.register("profileImage")}
-                      className="border-slate-200 focus-visible:ring-1 focus-visible:ring-[#19376D]"
-                    />
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-slate-500 font-mono uppercase tracking-wider text-[#19376D]">Profile Photo</label>
+                    <div className="flex items-center gap-4 p-3 border border-slate-200 bg-slate-50 rounded-xl">
+                      <div className="relative h-16 w-16 rounded-xl border bg-white shrink-0 overflow-hidden flex items-center justify-center">
+                        {form.watch("profileImage") ? (
+                          <img src={form.watch("profileImage")} alt="Profile Preview" className="h-full w-full object-cover" />
+                        ) : (
+                          <span className="text-xs font-semibold text-slate-400">No Photo</span>
+                        )}
+                        {uploadingProfile && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <Loader2 className="h-5 w-5 animate-spin text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-1.5 flex-1">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => profileFileRef.current?.click()}
+                          disabled={uploadingProfile}
+                          className="h-8 text-xs font-semibold rounded-lg bg-white border-slate-200 hover:bg-slate-50 text-slate-700"
+                        >
+                          {uploadingProfile ? "Uploading..." : "Upload Photo"}
+                        </Button>
+                        <p className="text-[10px] text-slate-400">Square PNG or JPG (max. 5MB)</p>
+                      </div>
+                      <input
+                        ref={profileFileRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleProfileImageUpload}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -506,13 +636,46 @@ export default function ProfileHero() {
                       className="border-slate-200 focus-visible:ring-1 focus-visible:ring-[#19376D]"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-500">Vehicle Images URL</label>
-                    <Input
-                      placeholder="Image URL for your ride"
-                      {...form.register("vehicleImages")}
-                      className="border-slate-200 focus-visible:ring-1 focus-visible:ring-[#19376D]"
-                    />
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-slate-500 font-mono uppercase tracking-wider text-[#19376D]">Vehicle Photos (Multiple)</label>
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap gap-2">
+                        {(form.watch("vehicleImages") || []).map((imgUrl, idx) => (
+                          <div key={idx} className="relative h-16 w-16 rounded-xl border border-slate-200 bg-slate-50 overflow-hidden shrink-0 group">
+                            <img src={imgUrl} alt={`Vehicle Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => removeVehicleImage(idx)}
+                              className="absolute top-0.5 right-0.5 h-4.5 w-4.5 bg-black/70 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => vehicleFileRef.current?.click()}
+                          disabled={uploadingVehicle}
+                          className="h-16 w-16 rounded-xl border-2 border-dashed border-slate-200 hover:border-primary/40 hover:bg-slate-50 flex flex-col items-center justify-center gap-1 text-slate-400 transition"
+                        >
+                          {uploadingVehicle ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-[#19376D]" />
+                          ) : (
+                            <>
+                              <Plus className="h-4 w-4 text-slate-500" />
+                              <span className="text-[10px] font-semibold text-slate-500">Add</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <input
+                        ref={vehicleFileRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleVehicleImageUpload}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -525,13 +688,42 @@ export default function ProfileHero() {
                   <Activity className="h-4 w-4" /> Safety & Documents
                 </h3>
                 <div className="space-y-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-500">Driving License Image URL</label>
-                    <Input
-                      placeholder="https://..."
-                      {...form.register("drivingLicenseImage")}
-                      className="border-slate-200 focus-visible:ring-1 focus-visible:ring-[#19376D]"
-                    />
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-slate-500 font-mono uppercase tracking-wider text-[#19376D]">Driving License Document</label>
+                    <div className="flex flex-col gap-3 p-3 border border-slate-200 bg-slate-50 rounded-xl">
+                      <div className="relative h-32 w-full rounded-xl border bg-white overflow-hidden flex items-center justify-center">
+                        {form.watch("drivingLicenseImage") ? (
+                          <img src={form.watch("drivingLicenseImage")} alt="License Preview" className="h-full w-full object-contain" />
+                        ) : (
+                          <span className="text-xs font-semibold text-slate-400">No License Document Uploaded</span>
+                        )}
+                        {uploadingLicense && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <Loader2 className="h-6 w-6 animate-spin text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => licenseFileRef.current?.click()}
+                          disabled={uploadingLicense}
+                          className="h-8 text-xs font-semibold rounded-lg bg-white border-slate-200 hover:bg-slate-50 text-slate-700"
+                        >
+                          {uploadingLicense ? "Uploading..." : "Upload License Image"}
+                        </Button>
+                        <p className="text-[10px] text-slate-400">Clear snapshot showing credentials (max. 5MB)</p>
+                      </div>
+                      <input
+                        ref={licenseFileRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleLicenseImageUpload}
+                      />
+                    </div>
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-slate-500">Riding Experience</label>
