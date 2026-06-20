@@ -105,6 +105,11 @@ const authSlice = createSlice({
         };
       }
     },
+    setNetworkingStore: (state, action: PayloadAction<NetworkingStore | null>) => {
+      if (state.user) {
+        state.user.networking = action.payload || undefined;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchMarketplaceForUser.fulfilled, (state, action) => {
@@ -129,7 +134,8 @@ const authSlice = createSlice({
 });
 
 // ================== Exports ==================
-export const { logout, clearError, setUser, updateUserOnboarding } =
+export const { logout, clearError, setUser, updateUserOnboarding, setNetworkingStore } =
+
   authSlice.actions;
 
 // Listener middleware: when `setUser` is dispatched with a user, fetch both stores.

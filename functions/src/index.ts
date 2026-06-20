@@ -6,6 +6,8 @@ import marketplaceStoreTypeDefs from "./graphql/marketplaceStore/typeDefs";
 import { GraphQLSchema } from "graphql";
 import marketplaceProductsTypeDefs from "./graphql/marketplaceProducts/typeDef";
 import marketplaceProductsResolvers from "./graphql/marketplaceProducts/resolvers";
+import networkingClubTypeDefs from "./graphql/networkingClub/typeDefs";
+import networkingClubResolvers from "./graphql/networkingClub/resolvers";
 import { COLLECTIONS } from "./constants";
 const db = admin.firestore();
 import { makeSlugUrl } from "../utils/makeSlugUrl";
@@ -22,10 +24,12 @@ async function startApolloServer() {
   const typeDefs = mergeTypeDefs([
     marketplaceStoreTypeDefs,
     marketplaceProductsTypeDefs,
+    networkingClubTypeDefs,
   ]);
   const resolvers = mergeResolvers([
     marketplaceStoreResolvers,
     marketplaceProductsResolvers,
+    networkingClubResolvers,
   ]);
   const schema = makeExecutableSchema({ typeDefs, resolvers });
   return schema;

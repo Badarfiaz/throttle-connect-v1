@@ -26,6 +26,7 @@ const HeaderPrimary: FC = () => {
   const isAuthed = !!user?.userId;
 
   const hasMarketplaceCompleted = user?.marketplace?.completed;
+  const hasNetworkingCompleted = user?.networking?.completed;
 
   const avatarLetter = useMemo(
     () => (isAuthed ? user!.email.trim().charAt(0).toUpperCase() : "?"),
@@ -88,7 +89,16 @@ const HeaderPrimary: FC = () => {
             <Button
               type="button"
               onClick={() => router.push("/marketplace/dashboard")}
-              className="rounded-md bg-[#19376D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B2447] transition-colors"
+              className="rounded-md bg-[#19376D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B3A5B] transition-colors"
+            >
+              Dashboard
+            </Button>
+          )}
+          {pathname === "/networking" && hasNetworkingCompleted && (
+            <Button
+              type="button"
+              onClick={() => router.push("/networking/dashboard")}
+              className="rounded-md bg-[#19376D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B3A5B] transition-colors"
             >
               Dashboard
             </Button>

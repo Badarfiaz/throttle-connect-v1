@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { useForm, UseFormReturn } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import AnimatedStep from "../../shared/registration/AnimatedStep";
 import { useOnboardStep } from "@/hooks/useOnboardStep";
 import SidebarRegistration from "@/components/shared/registration/SidebarRegistration";
@@ -36,6 +38,7 @@ const steps = [
 ];
 
 export default function NetworkingRegistration() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(0);
   const [collectedData, setCollectedData] = useState<Record<string, any>>({});
@@ -88,14 +91,20 @@ export default function NetworkingRegistration() {
               <div className="flex-1 overflow-y-auto pr-2 -mr-2 scrollbar-none">
                 <div className="py-2">
                   {completed ? (
-                    // ✅ Thank You Screen without any button
-                    <div className="text-center py-20">
-                      <h2 className="text-3xl font-bold mb-4">
+                    // ✅ Thank You Screen with Dashboard Button
+                    <div className="text-center py-20 flex flex-col items-center justify-center space-y-4">
+                      <h2 className="text-3xl font-bold mb-2">
                         Thank you for registering!
                       </h2>
-                      <p className="text-muted-foreground mb-6">
+                      <p className="text-muted-foreground mb-4 max-w-md mx-auto">
                         Your club registration has been successfully submitted.
                       </p>
+                      <Button
+                        onClick={() => router.push("/networking/dashboard")}
+                        className="rounded-md bg-[#19376D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#0B3A5B] transition-colors"
+                      >
+                        Go to Networking Dashboard
+                      </Button>
                     </div>
                   ) : (
                     <>

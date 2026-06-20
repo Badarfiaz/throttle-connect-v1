@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { clubs } from "@/dummydata/networking";
+import { db } from "@/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import {
   Card,
   CardHeader,
@@ -30,7 +32,54 @@ import SharedButton from "@/components/shared/SharedButton";
 
 export default function ClubProfile() {
   const { id } = useParams();
-  const club = useMemo(() => clubs.find((c) => c.id === id), [id]);
+  const [dbClub, setDbClub] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchClub = async () => {
+      try {
+        const docRef = doc(db, "networkingStores", id as string);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setDbClub(docSnap.data());
+        }
+      } catch (err) {
+        console.error("Error fetching club profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClub();
+  }, [id]);
+
+  const club = useMemo(() => {
+    if (dbClub) {
+      return {
+        id: id as string,
+        name: dbClub.clubName || "Unnamed Club",
+        categoryType: (dbClub.clubType === "car" ? "sedans" : dbClub.clubType === "bike" ? "bikes" : "offroad") as any,
+        image: "/images/category/offroad.webp",
+        location: dbClub.city || "Unknown Location",
+        memberCount: 1,
+        description: dbClub.description || "No description provided.",
+        createdBy: dbClub.email || "Owner",
+      };
+    }
+    return clubs.find((c) => c.id === id);
+  }, [dbClub, id]);
+
+  if (loading && id && !clubs.some((c) => c.id === id)) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <div className="animate-pulse space-y-4 w-full max-w-md p-6 bg-white rounded-xl shadow-xs border border-slate-100">
+          <div className="h-6 bg-slate-200 rounded-sm w-3/4"></div>
+          <div className="h-4 bg-slate-200 rounded-sm w-1/2"></div>
+          <div className="h-4 bg-slate-200 rounded-sm w-5/6"></div>
+        </div>
+      </div>
+    );
+  }
 
   if (!club) {
     return (
@@ -54,9 +103,9 @@ export default function ClubProfile() {
     </Badge>
   );
 
-  const members = useMemo(() => Array.from({ length: 4 }, (_, i) => i + 1), []);
-  const events = useMemo(() => Array.from({ length: 3 }, (_, i) => i + 1), []);
-  const achievements = useMemo(() => [Trophy, Car, Bike], []);
+  const members = Array.from({ length: 4 }, (_, i) => i + 1);
+  const events = Array.from({ length: 3 }, (_, i) => i + 1);
+  const achievements = [Trophy, Car, Bike];
 
   const renderMembers = () => (
     <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
