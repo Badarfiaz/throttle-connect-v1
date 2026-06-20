@@ -56,7 +56,11 @@ export default function ClubProfile() {
   const [clubEvents, setClubEvents] = useState<any[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
 
+  const [clubAchievements, setClubAchievements] = useState<any[]>([]);
+  const [loadingAchievements, setLoadingAchievements] = useState(true);
+
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
   const [submittingJoin, setSubmittingJoin] = useState(false);
@@ -150,7 +154,27 @@ export default function ClubProfile() {
     return () => unsubscribe();
   }, [id]);
 
+  // Fetch club achievements
+  useEffect(() => {
+    if (!id) return;
+    setLoadingAchievements(true);
+    const q = query(
+      collection(db, "networkingStores", id as string, "achievements")
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      list.sort((a: any, b: any) => (b.date || b.createdAt || "").localeCompare(a.date || a.createdAt || ""));
+      setClubAchievements(list);
+      setLoadingAchievements(false);
+    }, (error) => {
+      console.error("Error fetching club achievements:", error);
+      setLoadingAchievements(false);
+    });
+    return () => unsubscribe();
+  }, [id]);
+
   // Listen to registration status for the selected event
+
   useEffect(() => {
     if (!selectedEvent?.id || !user?.userId) {
       setIsRegistered(false);
@@ -451,9 +475,6 @@ export default function ClubProfile() {
     </Badge>
   );
 
-  const events = Array.from({ length: 3 }, (_, i) => i + 1);
-  const achievements = [Trophy, Car, Bike];
-
   const renderMembers = () => (
     <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
       <CardHeader>
@@ -571,20 +592,37 @@ export default function ClubProfile() {
         <CardDescription>Celebrating milestones and victories</CardDescription>
       </CardHeader>
       <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {achievements.map((Icon, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent/20 transition"
-          >
-            <Icon className="w-6 h-6 text-primary" />
-            <div>
-              <p className="font-semibold">Achievement {i + 1}</p>
-              <p className="text-sm text-muted-foreground">
-                Outstanding performance & dedication
-              </p>
-            </div>
+        {loadingAchievements ? (
+          <div className="col-span-full flex flex-col items-center justify-center p-6">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <p className="text-xs text-muted-foreground mt-1 animate-pulse font-medium">Loading achievements...</p>
           </div>
-        ))}
+        ) : clubAchievements.length === 0 ? (
+          <p className="col-span-full text-sm text-muted-foreground text-center py-8">No achievements celebrated yet.</p>
+        ) : (
+          clubAchievements.map((ach) => {
+            const Icon = ach.awardType === "car" ? Car : ach.awardType === "bike" ? Bike : Trophy;
+            return (
+              <div
+                key={ach.id}
+                className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent/20 transition bg-white"
+              >
+                <Icon className="w-6 h-6 text-primary shrink-0" />
+                <div className="min-w-0">
+                  <p className="font-semibold text-slate-900 truncate">{ach.title}</p>
+                  {ach.date && (
+                    <p className="text-[10px] text-slate-400 font-medium">
+                      {new Date(ach.date).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                    </p>
+                  )}
+                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mt-1">
+                    {ach.description}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        )}
       </CardContent>
     </Card>
   );

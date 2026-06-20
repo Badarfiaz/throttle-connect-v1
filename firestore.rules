@@ -39,7 +39,14 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberCount', 'pendingRequestsCount', 'upcomingEventsCount'])
       );
       allow delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+
+      // Achievements subcollection
+      match /achievements/{achievementId} {
+        allow read: if true;
+        allow write: if isClubOwner(clubId);
+      }
     }
+
 
     // 3. Membership Requests Collection
     match /membershipRequests/{requestId} {
