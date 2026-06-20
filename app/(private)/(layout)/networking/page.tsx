@@ -5,22 +5,24 @@ import { db } from "@/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { Club } from "@/types/main";
 import ClubCard from "@/components/networking/ClubsCard";
-import CategorySection from "@/components/shared/CategorySection";
 import FeaturedSection from "@/components/shared/FeaturedSection";
 import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 import ProfileRequiredBanner from "@/components/networking/ProfileRequiredBanner";
+import UpcomingEventsSection from "@/components/networking/UpcomingEventsSection";
 
 import {
   cardDataNetworking,
   vehicleCategories,
 } from "@/dummydata/networking";
 
+
 function Home() {
   const [dbClubs, setDbClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchClubs = async () => {
@@ -64,6 +66,8 @@ function Home() {
 
       <ProfileRequiredBanner />
 
+ 
+
       <div className="max-w-5xl mt-20 mx-auto px-6">
         {/* Section Heading */}
         <Title
@@ -90,6 +94,8 @@ function Home() {
       </div>
 
       <FeaturedSection />
+      {/* Upcoming Events Component */}
+    
 
       <div className="bg-background text-text py-12 xs:py-16 px-4 xs:px-6">
         <div className="max-w-6xl mx-auto text-center space-y-6 xs:space-y-8">
@@ -118,14 +124,11 @@ function Home() {
         </div>
       </div>
       <RegistureClubBanner
-        title="Join the Throttle Connect Club Network"
-        description="Whether you’re looking to register your own club or discover new
-            ones, we’ve got you covered. Connect with auto enthusiasts, explore
-            meetups, and grow your community."
-        ctaButton1="Register Club"
-        ctaButton2="Find a Club"
         cardData={cardDataNetworking}
       />
+   <UpcomingEventsSection />
+
+
     </div>
   );
 }

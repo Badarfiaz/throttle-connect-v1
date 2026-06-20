@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { db } from "@/firebase";
-import { collection, query, where, onSnapshot, doc, getDoc, runTransaction } from "firebase/firestore";
+import { collection, query, where, onSnapshot, doc, getDoc, runTransaction, getDocs } from "firebase/firestore";
 import { Loader2 } from "lucide-react";
 import {
   Select,
@@ -32,8 +32,18 @@ import {
   Check,
   X,
   Users,
-  ShieldCheck
+  ShieldCheck,
+  Trash2,
+  Eye
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useNetworkingStore } from "@/hooks/useNetworkingStore";
@@ -59,6 +69,23 @@ type ProfileFormValues = {
   };
   logoUrl?: string;
   bannerUrl?: string;
+};
+
+type EventFormValues = {
+  title: string;
+  description: string;
+  eventType: string;
+  status: string;
+  city: string;
+  locationName: string;
+  locationCity: string;
+  latitude: string;
+  longitude: string;
+  startDateTime: string;
+  endDateTime: string;
+  maxParticipants: string;
+  visibility: string;
+  coverImage?: string;
 };
 
 const networkingNavItems = [
@@ -93,6 +120,26 @@ export default function NetworkingDashboardContainer() {
   const [activeMembers, setActiveMembers] = useState<any[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
   const [loadingMembers, setLoadingMembers] = useState(false);
+  const [actioningRequests, setActioningRequests] = useState<string[]>([]);
+  const [removingIds, setRemovingIds] = useState<string[]>([]);
+
+  // Events state
+  const [eventsList, setEventsList] = useState<any[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<any | null>(null);
+  const [savingEvent, setSavingEvent] = useState(false);
+  
+  // Participants state
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [participantsList, setParticipantsList] = useState<any[]>([]);
+  const [loadingParticipants, setLoadingParticipants] = useState(false);
+  const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
+  
+  // Event cover image state
+  const eventCoverInputRef = useRef<HTMLInputElement>(null);
+  const [eventCoverUploading, setEventCoverUploading] = useState(false);
+  const [eventCoverPreview, setEventCoverPreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (!club?.id) return;
@@ -171,7 +218,7 @@ export default function NetworkingDashboardContainer() {
 
   const handleApprove = async (requestId: string, requesterId: string) => {
     if (!club?.id || !user?.userId) return;
-
+    setActioningRequests((prev) => [...prev, requestId]);
     try {
       const requestRef = doc(db, "membershipRequests", requestId);
       const userRef = doc(db, "users", requesterId);
@@ -235,12 +282,14 @@ export default function NetworkingDashboardContainer() {
     } catch (e: any) {
       console.error("Error approving request", e);
       toast.error(e.message || "Failed to approve request");
+    } finally {
+      setActioningRequests((prev) => prev.filter((id) => id !== requestId));
     }
   };
 
   const handleReject = async (requestId: string, requesterId: string) => {
     if (!club?.id || !user?.userId) return;
-
+    setActioningRequests((prev) => [...prev, requestId]);
     try {
       const requestRef = doc(db, "membershipRequests", requestId);
       const userRef = doc(db, "users", requesterId);
@@ -276,8 +325,301 @@ export default function NetworkingDashboardContainer() {
     } catch (e: any) {
       console.error("Error rejecting request", e);
       toast.error(e.message || "Failed to reject request");
+    } finally {
+      setActioningRequests((prev) => prev.filter((id) => id !== requestId));
     }
   };
+
+  const handleRemoveMember = async (memberId: string) => {
+    if (!club?.id || !user?.userId) return;
+    setRemovingIds((prev) => [...prev, memberId]);
+    try {
+      const userRef = doc(db, "users", memberId);
+      const clubRef = doc(db, "networkingStores", club.id);
+
+      // Query request document to mark it as rejected
+      const q = query(
+        collection(db, "membershipRequests"),
+        where("userId", "==", memberId),
+        where("clubId", "==", club.id)
+      );
+      const querySnap = await getDocs(q);
+
+      await runTransaction(db, async (transaction) => {
+        const clubDoc = await transaction.get(clubRef);
+        const userDoc = await transaction.get(userRef);
+
+        if (!clubDoc.exists() || !userDoc.exists()) {
+          throw new Error("Club or member document does not exist.");
+        }
+
+        const clubData = clubDoc.data();
+        const userData = userDoc.data();
+
+        // Rule 2: Only owner can remove
+        if (clubData.ownerUid !== user.userId) {
+          throw new Error("Unauthorized: Only the club owner can remove members.");
+        }
+
+        // Update member user doc to rejected and remove from club
+        transaction.update(userRef, {
+          clubId: null,
+          membershipStatus: "rejected",
+        });
+
+        // Decrement club memberCount
+        const currentMemberCount = clubData.memberCount || 0;
+        transaction.update(clubRef, {
+          memberCount: Math.max(0, currentMemberCount - 1),
+        });
+
+        // Update corresponding request(s) status to rejected
+        querySnap.forEach((doc) => {
+          transaction.update(doc.ref, {
+            status: "rejected"
+          });
+        });
+      });
+
+      toast.success("Member Removed", {
+        description: "Rider has been removed from the club."
+      });
+    } catch (e: any) {
+      console.error("Error removing member", e);
+      toast.error(e.message || "Failed to remove member");
+    } finally {
+      setRemovingIds((prev) => prev.filter((id) => id !== memberId));
+    }
+  };
+
+  // Events and participants fetching effects
+  useEffect(() => {
+    if (!club?.id) return;
+
+    setLoadingEvents(true);
+    const q = query(
+      collection(db, "events"),
+      where("clubId", "==", club.id)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setEventsList(list);
+      setLoadingEvents(false);
+    }, (error) => {
+      console.error("Error fetching events:", error);
+      setLoadingEvents(false);
+    });
+
+    return () => unsubscribe();
+  }, [club?.id]);
+
+  useEffect(() => {
+    if (!selectedEvent?.id || !isParticipantsModalOpen) return;
+
+    setLoadingParticipants(true);
+    const q = query(
+      collection(db, "eventParticipants"),
+      where("eventId", "==", selectedEvent.id)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setParticipantsList(list);
+      setLoadingParticipants(false);
+    }, (error) => {
+      console.error("Error fetching participants:", error);
+      setLoadingParticipants(false);
+    });
+
+    return () => unsubscribe();
+  }, [selectedEvent?.id, isParticipantsModalOpen]);
+
+  const handleEventCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!user) return;
+    setEventCoverUploading(true);
+    try {
+      const { url } = await uploadImage(file, {
+        ownerId: user.userId,
+        folder: "eventCover",
+        basePath: "events",
+      });
+      const preview = await readImagePreview(file);
+      setEventCoverPreview(preview);
+      eventForm.setValue("coverImage", url);
+      toast.success("Event cover image uploaded successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Cover image upload failed");
+    } finally {
+      setEventCoverUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const eventForm = useForm<EventFormValues>({
+    defaultValues: {
+      title: "",
+      description: "",
+      eventType: "ride",
+      status: "upcoming",
+      city: "",
+      locationName: "",
+      locationCity: "",
+      latitude: "",
+      longitude: "",
+      startDateTime: "",
+      endDateTime: "",
+      maxParticipants: "",
+      visibility: "public",
+      coverImage: "",
+    }
+  });
+
+  // Reset form when editingEvent changes
+  useEffect(() => {
+    if (editingEvent) {
+      eventForm.reset({
+        title: editingEvent.title || "",
+        description: editingEvent.description || "",
+        eventType: editingEvent.eventType || "ride",
+        status: editingEvent.status || "upcoming",
+        city: editingEvent.city || "",
+        locationName: editingEvent.location?.name || "",
+        locationCity: editingEvent.location?.city || "",
+        latitude: editingEvent.location?.latitude?.toString() || "",
+        longitude: editingEvent.location?.longitude?.toString() || "",
+        startDateTime: editingEvent.startDateTime || "",
+        endDateTime: editingEvent.endDateTime || "",
+        maxParticipants: editingEvent.maxParticipants?.toString() || "",
+        visibility: editingEvent.visibility || "public",
+        coverImage: editingEvent.coverImage || "",
+      });
+      setEventCoverPreview(editingEvent.coverImage || null);
+    } else {
+      eventForm.reset({
+        title: "",
+        description: "",
+        eventType: "ride",
+        status: "upcoming",
+        city: club?.city || "",
+        locationName: "",
+        locationCity: club?.city || "",
+        latitude: "",
+        longitude: "",
+        startDateTime: "",
+        endDateTime: "",
+        maxParticipants: "",
+        visibility: "public",
+        coverImage: "",
+      });
+      setEventCoverPreview(null);
+    }
+  }, [editingEvent, club, eventForm]);
+
+  const handleSaveEvent = eventForm.handleSubmit(async (values) => {
+    if (!club?.id || !user?.userId) return;
+    setSavingEvent(true);
+    try {
+      const isEdit = !!editingEvent;
+      const eventRef = isEdit ? doc(db, "events", editingEvent.id) : doc(collection(db, "events"));
+      const eventId = eventRef.id;
+      const clubRef = doc(db, "networkingStores", club.id);
+
+      const eventData = {
+        id: eventId,
+        title: values.title.trim(),
+        description: values.description.trim(),
+        eventType: values.eventType,
+        status: values.status || "upcoming",
+        clubId: club.id,
+        clubName: club.clubName || "Unnamed Club",
+        clubLogo: club.logoUrl || "",
+        organizerUid: user.userId,
+        city: values.city.trim(),
+        coverImage: values.coverImage || "",
+        location: {
+          name: values.locationName.trim(),
+          city: values.locationCity.trim(),
+          latitude: values.latitude ? parseFloat(values.latitude) : null,
+          longitude: values.longitude ? parseFloat(values.longitude) : null,
+        },
+        startDateTime: values.startDateTime,
+        endDateTime: values.endDateTime,
+        maxParticipants: values.maxParticipants ? parseInt(values.maxParticipants) : null,
+        participantCount: isEdit ? (editingEvent.participantCount || 0) : 0,
+        visibility: values.visibility || "public",
+        updatedAt: new Date().toISOString(),
+        createdAt: isEdit ? (editingEvent.createdAt || new Date().toISOString()) : new Date().toISOString(),
+      };
+
+      await runTransaction(db, async (transaction) => {
+        const clubDoc = await transaction.get(clubRef);
+        if (!clubDoc.exists()) {
+          throw new Error("Club document does not exist.");
+        }
+
+        if (isEdit) {
+          transaction.update(eventRef, eventData);
+        } else {
+          transaction.set(eventRef, eventData);
+          const clubData = clubDoc.data();
+          const currentUpcomingCount = clubData.upcomingEventsCount || 0;
+          transaction.update(clubRef, {
+            upcomingEventsCount: currentUpcomingCount + 1,
+            latestEventId: eventId,
+          });
+        }
+      });
+
+      toast.success(isEdit ? "Event Updated" : "Event Created", {
+        description: isEdit ? "Your event has been updated successfully." : "Your event has been created successfully."
+      });
+      
+      setIsEventModalOpen(false);
+      setEditingEvent(null);
+    } catch (e: any) {
+      console.error("Error saving event", e);
+      toast.error(e.message || "Failed to save event");
+    } finally {
+      setSavingEvent(false);
+    }
+  });
+
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!club?.id) return;
+    if (!confirm("Are you sure you want to delete this event? This action cannot be undone.")) return;
+    
+    try {
+      const eventRef = doc(db, "events", eventId);
+      const clubRef = doc(db, "networkingStores", club.id);
+
+      await runTransaction(db, async (transaction) => {
+        const clubDoc = await transaction.get(clubRef);
+        if (!clubDoc.exists()) {
+          throw new Error("Club document does not exist.");
+        }
+        
+        const clubData = clubDoc.data();
+        const upcomingCount = clubData.upcomingEventsCount || 0;
+        
+        transaction.delete(eventRef);
+        transaction.update(clubRef, {
+          upcomingEventsCount: Math.max(0, upcomingCount - 1)
+        });
+      });
+
+      toast.success("Event Deleted", {
+        description: "Event has been deleted successfully."
+      });
+    } catch (e: any) {
+      console.error("Error deleting event", e);
+      toast.error(e.message || "Failed to delete event");
+    }
+  };
+
   
   const { updateNetworkingStore, updating, updateError } = useNetworkingStore();
 
@@ -509,10 +851,10 @@ console.log('input', input)
         id: "events",
         label: "Club Events",
         description: "Organize runs & meets",
-        badge: "3",
+        badge: eventsList.filter(e => e.status === "upcoming").length > 0 ? String(eventsList.filter(e => e.status === "upcoming").length) : undefined,
       },
     ];
-  }, [pendingRequests.length]);
+  }, [pendingRequests.length, eventsList]);
 
   return (
     <DashboardContainer
@@ -1044,18 +1386,34 @@ console.log('input', input)
                         <div className="flex gap-2 pt-2 border-t border-slate-50">
                           <Button
                             size="sm"
+                            disabled={actioningRequests.includes(req.id)}
                             onClick={() => handleApprove(req.id, req.userId)}
-                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-xs"
+                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-xs flex items-center justify-center gap-1.5"
                           >
-                            Approve
+                            {actioningRequests.includes(req.id) ? (
+                              <>
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                                Processing...
+                              </>
+                            ) : (
+                              "Approve"
+                            )}
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
+                            disabled={actioningRequests.includes(req.id)}
                             onClick={() => handleReject(req.id, req.userId)}
-                            className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-medium rounded-lg text-xs"
+                            className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-medium rounded-lg text-xs flex items-center justify-center gap-1.5"
                           >
-                            Reject
+                            {actioningRequests.includes(req.id) ? (
+                              <>
+                                <Loader2 className="h-3 w-3 animate-spin text-red-600" />
+                                Processing...
+                              </>
+                            ) : (
+                              "Reject"
+                            )}
                           </Button>
                         </div>
                       </CardContent>
@@ -1138,6 +1496,22 @@ console.log('input', input)
                           <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium rounded-full text-[10px]">
                             Active Member
                           </Badge>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={removingIds.includes(member.id)}
+                            onClick={() => handleRemoveMember(member.id)}
+                            className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-medium rounded-lg text-xs flex items-center gap-1.5"
+                          >
+                            {removingIds.includes(member.id) ? (
+                              <>
+                                <Loader2 className="h-3 w-3 animate-spin text-red-600" />
+                                Removing...
+                              </>
+                            ) : (
+                              "Remove Member"
+                            )}
+                          </Button>
                         </div>
                       </div>
                     );
@@ -1150,43 +1524,431 @@ console.log('input', input)
       )}
 
       {activeTab === "events" && (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in fade-in duration-300">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-slate-900">Events Schedule</h3>
               <p className="text-sm text-slate-500">Create meetups, drives, and exhibitions</p>
             </div>
-            <Button size="sm" className="bg-[#19376D] hover:bg-[#0B2447] text-white">
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditingEvent(null);
+                setIsEventModalOpen(true);
+              }}
+              className="bg-[#19376D] hover:bg-[#0B2447] text-white"
+            >
               <Plus className="h-4 w-4 mr-1.5" />
               Plan Event
             </Button>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {dummyEvents.map((event, i) => (
-              <Card key={i} className="border border-slate-100 shadow-sm hover:shadow-md transition duration-200">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <Badge className={event.status === "Upcoming" ? "bg-amber-500 text-white" : "bg-slate-500 text-white"}>
-                      {event.status}
-                    </Badge>
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{event.type}</span>
+          {loadingEvents ? (
+            <Card className="p-8 flex justify-center items-center">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </Card>
+          ) : eventsList.length === 0 ? (
+            <Card className="border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center rounded-xl">
+              <p className="text-sm text-slate-500">No events created yet. Click "Plan Event" to get started.</p>
+            </Card>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {eventsList.map((event) => (
+                <Card key={event.id} className="border border-slate-100 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between h-full bg-white rounded-xl overflow-hidden">
+                  <div>
+                    {event.coverImage ? (
+                      <div className="w-full h-32 relative">
+                        <img
+                          src={event.coverImage}
+                          alt={event.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-2 right-2">
+                          <Badge className="bg-slate-900/80 text-white backdrop-blur-xs capitalize text-[10px]">
+                            {event.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-full h-32 bg-slate-100 flex items-center justify-center relative">
+                        <Calendar className="h-8 w-8 text-slate-300" />
+                        <div className="absolute top-2 right-2">
+                          <Badge className="bg-slate-900/80 text-white backdrop-blur-xs capitalize text-[10px]">
+                            {event.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    )}
+                    <CardHeader className="pb-2 pt-3">
+                      <div className="flex justify-between items-start gap-1">
+                        <span className="text-[10px] font-semibold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded-full">
+                          {event.eventType?.replace("_", " ")}
+                        </span>
+                        <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{event.visibility}</span>
+                      </div>
+                      <CardTitle className="text-base font-bold text-slate-900 mt-2 line-clamp-1">{event.title}</CardTitle>
+                      <CardDescription className="flex items-center gap-1 mt-1 text-slate-500 text-xs">
+                        <Calendar className="h-3.5 w-3.5 shrink-0" />
+                        {new Date(event.startDateTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                      </CardDescription>
+                      <CardDescription className="flex items-center gap-1 mt-0.5 text-slate-500 text-xs">
+                        <Compass className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+                        <span className="line-clamp-1">{event.location?.name || "No location name"}</span>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="text-xs text-slate-600 space-y-2 py-2">
+                      <p className="line-clamp-2">{event.description}</p>
+                      <div className="flex items-center justify-between text-xs pt-1">
+                        <span>Participants:</span>
+                        <span className="font-semibold text-slate-950">{event.participantCount || 0} {event.maxParticipants ? `/ ${event.maxParticipants}` : ""}</span>
+                      </div>
+                    </CardContent>
                   </div>
-                  <CardTitle className="text-base font-semibold text-slate-900 mt-2 line-clamp-1">{event.title}</CardTitle>
-                  <CardDescription className="flex items-center gap-1 mt-1 text-slate-500">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {event.date}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="text-sm text-slate-600 space-y-2">
-                  <p><strong>Time:</strong> {event.time}</p>
-                  <p className="line-clamp-2"><strong>Location:</strong> {event.location}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  <div className="flex gap-2 p-4 border-t border-slate-50 bg-slate-50/50">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      type="button"
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setIsParticipantsModalOpen(true);
+                      }}
+                      className="flex-1 text-xs py-1"
+                    >
+                      <Users className="h-3.5 w-3.5 mr-1" />
+                      Riders
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      type="button"
+                      onClick={() => {
+                        setEditingEvent(event);
+                        setIsEventModalOpen(true);
+                      }}
+                      className="text-xs"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      type="button"
+                      onClick={() => handleDeleteEvent(event.id)}
+                      className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       )}
+
+      {/* Create / Edit Event Dialog */}
+      <Dialog open={isEventModalOpen} onOpenChange={setIsEventModalOpen}>
+        <DialogContent className="max-w-lg rounded-2xl bg-white p-6 shadow-xl border overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-900">
+              {editingEvent ? "Edit Event" : "Plan New Event"}
+            </DialogTitle>
+            <DialogDescription>
+              Configure details, date, time and cover image for your event.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleSaveEvent} className="space-y-4 overflow-y-auto px-1 py-1 max-h-[70vh]">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Event Title <span className="text-red-500">*</span></label>
+              <Input
+                placeholder="e.g. Sunday Morning Breakfast Run"
+                {...eventForm.register("title", { required: "Title is required" })}
+                className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+              />
+              {eventForm.formState.errors.title && (
+                <p className="text-xs text-red-500 font-medium">{eventForm.formState.errors.title.message}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Event Type <span className="text-red-500">*</span></label>
+                <Select
+                  value={eventForm.watch("eventType")}
+                  onValueChange={(val) => eventForm.setValue("eventType", val, { shouldValidate: true })}
+                >
+                  <SelectTrigger className="w-full border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ride">🏍 Ride</SelectItem>
+                    <SelectItem value="drive">🚗 Drive</SelectItem>
+                    <SelectItem value="meetup">🤝 Meetup</SelectItem>
+                    <SelectItem value="breakfast_run">🍳 Breakfast Run</SelectItem>
+                    <SelectItem value="road_trip">🗺 Road Trip</SelectItem>
+                    <SelectItem value="track_day">🏁 Track Day</SelectItem>
+                    <SelectItem value="charity_event">❤️ Charity Event</SelectItem>
+                    <SelectItem value="workshop">🔧 Workshop</SelectItem>
+                    <SelectItem value="offroad">🏜 Offroad</SelectItem>
+                    <SelectItem value="exhibition">🎪 Exhibition</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</label>
+                <Select
+                  value={eventForm.watch("status")}
+                  onValueChange={(val) => eventForm.setValue("status", val, { shouldValidate: true })}
+                >
+                  <SelectTrigger className="w-full border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="upcoming">Upcoming</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description <span className="text-red-500">*</span></label>
+              <Textarea
+                placeholder="Tell riders what to expect, route details, etc..."
+                rows={3}
+                {...eventForm.register("description", { required: "Description is required" })}
+                className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+              />
+              {eventForm.formState.errors.description && (
+                <p className="text-xs text-red-500 font-medium">{eventForm.formState.errors.description.message}</p>
+              )}
+            </div>
+
+            {/* Event Cover Image Upload */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Event Cover Image</label>
+              <div className="flex flex-col gap-3 p-4 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                {eventCoverPreview ? (
+                  <img
+                    src={eventCoverPreview}
+                    alt="Cover Preview"
+                    className="h-24 w-full rounded-lg object-cover border bg-white"
+                  />
+                ) : (
+                  <div className="h-24 w-full rounded-lg bg-slate-100 flex items-center justify-center text-xs text-slate-400 font-medium">
+                    No Image Uploaded
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={eventCoverUploading}
+                    onClick={() => eventCoverInputRef.current?.click()}
+                  >
+                    {eventCoverUploading ? "Uploading..." : "Upload Cover Image"}
+                  </Button>
+                  <p className="text-[10px] text-slate-400">PNG, JPG up to 5MB</p>
+                </div>
+                <input
+                  ref={eventCoverInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleEventCoverUpload}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Start Date & Time <span className="text-red-500">*</span></label>
+                <Input
+                  type="datetime-local"
+                  {...eventForm.register("startDateTime", { required: "Start date is required" })}
+                  className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+                />
+                {eventForm.formState.errors.startDateTime && (
+                  <p className="text-xs text-red-500 font-medium">{eventForm.formState.errors.startDateTime.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">End Date & Time <span className="text-red-500">*</span></label>
+                <Input
+                  type="datetime-local"
+                  {...eventForm.register("endDateTime", { required: "End date is required" })}
+                  className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+                />
+                {eventForm.formState.errors.endDateTime && (
+                  <p className="text-xs text-red-500 font-medium">{eventForm.formState.errors.endDateTime.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">City (General Location) <span className="text-red-500">*</span></label>
+              <Input
+                placeholder="e.g. Lahore"
+                {...eventForm.register("city", { required: "City is required" })}
+                className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+              />
+              {eventForm.formState.errors.city && (
+                <p className="text-xs text-red-500 font-medium">{eventForm.formState.errors.city.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Specific Location / Venue Name <span className="text-red-500">*</span></label>
+              <Input
+                placeholder="e.g. McDonald's M2 Motorway"
+                {...eventForm.register("locationName", { required: "Venue name is required" })}
+                className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+              />
+              {eventForm.formState.errors.locationName && (
+                <p className="text-xs text-red-500 font-medium">{eventForm.formState.errors.locationName.message}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Location City <span className="text-red-500">*</span></label>
+                <Input
+                  placeholder="e.g. Lahore"
+                  {...eventForm.register("locationCity", { required: "Location City is required" })}
+                  className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+                />
+                {eventForm.formState.errors.locationCity && (
+                  <p className="text-xs text-red-500 font-medium">{eventForm.formState.errors.locationCity.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Max Participants (Optional)</label>
+                <Input
+                  type="number"
+                  placeholder="e.g. 50 (blank for unlimited)"
+                  {...eventForm.register("maxParticipants")}
+                  className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Latitude (Optional)</label>
+                <Input
+                  placeholder="e.g. 31.5204"
+                  {...eventForm.register("latitude")}
+                  className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Longitude (Optional)</label>
+                <Input
+                  placeholder="e.g. 74.3587"
+                  {...eventForm.register("longitude")}
+                  className="border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Visibility</label>
+                <Select
+                  value={eventForm.watch("visibility")}
+                  onValueChange={(val) => eventForm.setValue("visibility", val, { shouldValidate: true })}
+                >
+                  <SelectTrigger className="w-full border-slate-200/80 focus-visible:ring-1 focus-visible:ring-[#19376D]">
+                    <SelectValue placeholder="Select visibility" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">🌐 Public</SelectItem>
+                    <SelectItem value="private">🔒 Private (Members Only)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <DialogFooter className="pt-4 border-t border-slate-50 flex items-center justify-end gap-2">
+              <Button type="button" variant="ghost" onClick={() => setIsEventModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-[#19376D] hover:bg-[#0B2447] text-white" disabled={savingEvent}>
+                {savingEvent ? "Saving..." : "Save Event"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Participants Dialog */}
+      <Dialog open={isParticipantsModalOpen} onOpenChange={setIsParticipantsModalOpen}>
+        <DialogContent className="max-w-md rounded-2xl bg-white p-6 shadow-xl border overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-slate-900">
+              Event Participants
+            </DialogTitle>
+            <DialogDescription>
+              Registered riders for this event.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 overflow-y-auto px-1 py-1 max-h-[70vh]">
+            <div>
+              <h4 className="font-bold text-slate-800 text-sm line-clamp-1">{selectedEvent?.title}</h4>
+              <p className="text-xs text-slate-500">List of registered riders participating in this event.</p>
+            </div>
+
+            {loadingParticipants ? (
+              <div className="flex justify-center items-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : participantsList.length === 0 ? (
+              <div className="text-center py-8 text-slate-400 text-sm border border-dashed rounded-xl">
+                No riders registered for this event yet.
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 border rounded-xl overflow-hidden bg-white">
+                {participantsList.map((p) => {
+                  const initials = p.userName
+                    ?.split(" ")
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((w: string) => w[0]?.toUpperCase())
+                    .join("") || "R";
+                  
+                  return (
+                    <div key={p.id} className="flex items-center gap-3 p-3 hover:bg-slate-50/50 transition">
+                      <Avatar className="h-8 w-8 rounded-lg">
+                        {p.profileImage ? (
+                          <AvatarImage src={p.profileImage} className="object-cover" />
+                        ) : (
+                          <AvatarFallback className="bg-slate-100 text-[#19376D] font-bold text-xs">
+                            {initials}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-slate-900 truncate">{p.userName}</p>
+                        <p className="text-[10px] text-slate-400">Registered {new Date(p.registeredAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardContainer>
   );
 }

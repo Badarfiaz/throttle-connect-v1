@@ -25,4 +25,59 @@ export type NetworkingStore = {
   completed?: boolean;
   logoUrl?: string | null;
   bannerUrl?: string | null;
+  upcomingEventsCount?: number | null;
+  latestEventId?: string | null;
+};
+
+export type NetworkingEventType =
+  | "ride"
+  | "drive"
+  | "meetup"
+  | "breakfast_run"
+  | "road_trip"
+  | "track_day"
+  | "charity_event"
+  | "workshop"
+  | "offroad"
+  | "exhibition";
+
+export type NetworkingEventStatus = "upcoming" | "active" | "completed" | "cancelled";
+
+export type NetworkingEventLocation = {
+  name: string;
+  city: string;
+  latitude?: number | null;
+  longitude?: number | null;
+};
+
+export type NetworkingEvent = {
+  id: string;
+  title: string;
+  description: string;
+  eventType: NetworkingEventType;
+  status: NetworkingEventStatus;
+  clubId: string;
+  clubName: string;
+  clubLogo?: string | null;
+  organizerUid: string;
+  city: string;
+  coverImage?: string | null;
+  location: NetworkingEventLocation;
+  startDateTime: string;
+  endDateTime: string;
+  maxParticipants?: number | null;
+  participantCount: number;
+  visibility: "public" | "private";
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type NetworkingEventParticipant = {
+  id: string;
+  eventId: string;
+  userId: string;
+  userName: string;
+  profileImage?: string | null;
+  status: "registered";
+  registeredAt: string;
 };
