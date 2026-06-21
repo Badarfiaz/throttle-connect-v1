@@ -6,11 +6,12 @@ import CardLinkWrapper from "../shared/CardLinkWapper";
 import { MarketplaceProduct } from "@/types/marketplace";
 import { Card } from "@/components/ui/card";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { MapPin } from "lucide-react";
+import { MapPin, User, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PriceLabel from "./PriceLabel";
 import CategoryLabel from "./CategoryLabel";
 import HeartButton from "./HeartButton";
+import { Badge } from "@/components/ui/badge";
 
 type ProductCardProps = {
   product: MarketplaceProduct;
@@ -36,23 +37,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandi
       .filter(Boolean)
       .join(", ") || "Lahore";
 
+  const conditionLabel = (product as any).condition || "New";
+
   return (
     <CardLinkWrapper link={`/marketplace/product/${product.id}`}>
       <TooltipProvider>
         <Card
           className={cn(
             "relative overflow-hidden cursor-pointer mb-2.5",
-            "bg-[#F5F9FB] border border-[#0C679266] rounded-xl",
-            "shadow-[0_4px_6px_0_rgba(3,26,37,0.16)]",
-            "transition-all duration-200 ease-out",
-            "hover:shadow-[0_8px_20px_rgba(12,103,146,0.18)] hover:-translate-y-0.5",
+            "bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-xl",
+            "shadow-sm hover:shadow-lg",
+            "transition-all duration-200 ease-out hover:-translate-y-0.5",
             isLandingPage ? "w-full" : sizeStyles[size],
           )}
         >
           {/* ── Image ── */}
           <div
             className={cn(
-              "relative w-full overflow-hidden rounded-t-xl",
+              "relative w-full overflow-hidden bg-slate-50 dark:bg-slate-950",
               imageHeightStyles[size],
             )}
           >
@@ -60,44 +62,84 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandi
               src={product.imageurl?.url || "/images/logos/segalmotors.jpg"}
               alt={product.productName}
               fill
-              className="object-contain rounded-2xl"
+              className="object-contain p-2 rounded-t-xl transition-transform duration-350 hover:scale-102"
             />
 
             {/* Heart / Favourite */}
             <div className="absolute top-2.5 right-2.5 z-10">
               <HeartButton />
             </div>
+
+            {/* Condition Badge overlay on image */}
+            <div className="absolute top-2.5 left-2.5 z-10">
+              <Badge className="bg-slate-900/80 dark:bg-slate-900/90 text-white border border-white/10 backdrop-blur-xs text-[9px] uppercase tracking-wider font-bold rounded px-1.5 py-0.5">
+                {conditionLabel}
+              </Badge>
+            </div>
           </div>
 
           {/* ── Content ── */}
-          <div className="px-3 py-2.5 bg-[#F5F9FB] flex flex-col gap-1.5">
+          <div className="px-3.5 py-3 flex flex-col gap-2">
             {/* Title row */}
             <div className="flex items-start justify-between gap-1">
-              <h3 className="text-base font-medium text-[#031A25] leading-snug line-clamp-1 flex-1">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-1 flex-1">
                 {product.productName || "Product Title"}
               </h3>
             </div>
 
             {/* Price */}
-            <PriceLabel price={product.price} />
+            <div className="flex items-center justify-between">
+              <PriceLabel price={product.price} />
+              {product.stock <= 3 && product.stock > 0 && (
+                <span className="text-[9px] text-red-500 font-bold bg-red-50 dark:bg-red-950/20 px-1.5 py-0.5 rounded">
+                  Only {product.stock} left
+                </span>
+              )}
+            </div>
 
             {/* Category */}
-            <CategoryLabel type="category" label={product.category ?? ""} />
+            <div className="flex items-center justify-between mt-1">
+              <CategoryLabel type="category" label={product.category ?? ""} />
+            </div>
 
             {/* Location */}
             {locationText && (
-              <div className="flex items-center gap-1 mt-0.5">
+              <div className="flex items-center gap-1">
                 <MapPin
                   size={13}
-                  className="text-[#0C6792] shrink-0"
-                  fill="currentColor"
-                  stroke="none"
+                  className="text-slate-400 shrink-0"
                 />
-                <span className="text-[12px] font-medium text-[#68767C] truncate">
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate">
                   {locationText}
                 </span>
               </div>
             )}
+
+            {/* Seller Info Footer inside card */}
+            <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 min-w-0">
+                {product.owner?.logoUrl ? (
+                  <img
+                    src={product.owner.logoUrl}
+                    alt={product.owner.title}
+                    className="w-5 h-5 rounded-full object-cover shrink-0 border border-slate-200 dark:border-slate-700"
+                  />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+                    <User className="w-3 h-3 text-slate-400" />
+                  </div>
+                )}
+                <span className="text-[10px] text-slate-550 dark:text-slate-400 font-bold truncate">
+                  {product.owner?.title || "Independent Seller"}
+                </span>
+              </div>
+
+              {product.owner?.completed && (
+                <Badge variant="outline" className="h-4 p-0 px-1 border-0 text-emerald-500 font-semibold bg-emerald-500/5 text-[8px] flex items-center gap-0.5 uppercase shrink-0">
+                  <ShieldCheck className="h-2.5 w-2.5" /> Verified
+                </Badge>
+              )}
+            </div>
           </div>
         </Card>
       </TooltipProvider>
