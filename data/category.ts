@@ -106,3 +106,61 @@ export const marketplaceCategories: Category[] = [
     imageUrl: "/images/categories/Used Parts.jpeg",
   },
 ];
+
+export const networkingCategories: Category[] = [
+  {
+    name: "Vespa Scooter",
+    slug: "vespa-scooter",
+    imageUrl: "/images/category/vespa_scooter.png",
+  },
+  {
+    name: "Sports Car",
+    slug: "sports-car",
+    imageUrl: "/images/category/sports_car.png",
+  },
+  {
+    name: "DIY Tools",
+    slug: "diy-tools",
+    imageUrl: "/images/category/diy_tools.png",
+  },
+  {
+    name: "Wrench",
+    slug: "wrench",
+    imageUrl: "/images/category/wrench.png",
+  },
+  {
+    name: "Racing Flag",
+    slug: "racing-flag",
+    imageUrl: "/images/category/racing_flag.png",
+  },
+  {
+    name: "Jeep",
+    slug: "jeep",
+    imageUrl: "/images/category/jeep.png",
+  },
+  {
+    name: "Electric Car",
+    slug: "electric-car",
+    imageUrl: "/images/category/electric_car.png",
+  },
+  {
+    name: "Vintage Car",
+    slug: "vintage-car",
+    imageUrl: "/images/category/vintage_car.png",
+  },
+  {
+    name: "Electric Bike",
+    slug: "electric-bike",
+    imageUrl: "/images/category/electric_bike.png",
+  },
+  {
+    name: "Cafe Racer",
+    slug: "cafe-racer",
+    imageUrl: "/images/category/cafe_racer.png",
+  },
+  {
+    name: "Modified Bike",
+    slug: "modified-bike",
+    imageUrl: "/images/category/modified_bike.png",
+  },
+];

@@ -29,6 +29,8 @@ import {
   Car,
   Bike,
   Loader2,
+  ChevronRight,
+  Calendar,
 } from "lucide-react";
 import SharedButton from "@/components/shared/SharedButton";
 import { useAppSelector, useAppDispatch } from "@/app/redux/hooks";
@@ -465,115 +467,114 @@ export default function ClubProfile() {
     );
   }
 
-  const renderBadge = (
-    Icon: any,
-    label: string,
-    variant: "outline" | "secondary" = "outline"
-  ) => (
-    <Badge variant={variant} className="flex items-center gap-2">
-      <Icon className="w-4 h-4" /> {label}
-    </Badge>
-  );
-
   const renderMembers = () => (
-    <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
-      <CardHeader>
-        <CardTitle>Featured Members</CardTitle>
-        <CardDescription>Meet the passionate team</CardDescription>
+    <Card className="bg-white border border-slate-200/60 shadow-sm rounded-2xl overflow-hidden">
+      <CardHeader className="py-4 px-6 border-b border-slate-100">
+        <CardTitle className="text-base font-extrabold text-slate-900">Featured Members</CardTitle>
+        <CardDescription className="text-xs text-slate-400 font-medium">Enthusiasts registered in this club</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-wrap gap-6 justify-center p-6">
+      <CardContent className="p-6">
         {loadingMembers ? (
-          <div className="flex flex-col items-center justify-center p-4">
+          <div className="flex flex-col items-center justify-center py-10">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            <p className="text-xs text-muted-foreground mt-1">Loading members...</p>
+            <p className="text-xs text-muted-foreground mt-2 animate-pulse font-semibold">Loading members...</p>
           </div>
         ) : clubMembers.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-6">No active members in this club yet.</p>
+          <div className="text-center py-12 border border-dashed border-slate-200 bg-slate-50/50 rounded-xl">
+            <Users className="size-8 text-slate-300 mx-auto mb-2" />
+            <p className="text-sm text-slate-500 font-medium">No members listed yet.</p>
+          </div>
         ) : (
-          clubMembers.map((m) => {
-            const initials = m.name
-              ?.split(" ")
-              .filter(Boolean)
-              .slice(0, 2)
-              .map((w: string) => w[0]?.toUpperCase())
-              .join("") || "M";
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            {clubMembers.map((m) => {
+              const initials = m.name
+                ?.split(" ")
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((w: string) => w[0]?.toUpperCase())
+                .join("") || "M";
 
-            return (
-              <div key={m.id} className="flex flex-col items-center space-y-2 w-24">
-                <Avatar className="w-16 h-16 border border-slate-200 shadow-xs rounded-xl">
-                  {m.profileImage ? (
-                    <AvatarImage src={m.profileImage} className="object-cover rounded-xl" />
+              return (
+                <div key={m.id} className="flex flex-col items-center text-center p-4 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-xs transition bg-slate-50/20">
+                  <Avatar className="w-16 h-16 border-2 border-white shadow-md rounded-2xl overflow-hidden shrink-0">
+                    {m.profileImage ? (
+                      <AvatarImage src={m.profileImage} className="object-cover rounded-2xl" />
+                    ) : (
+                      <AvatarFallback className="bg-[#19376D]/10 text-[#19376D] font-black text-lg rounded-2xl">
+                        {initials}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <p className="text-xs font-bold text-slate-950 truncate w-full mt-3">{m.name || "Member"}</p>
+                  {m.vehicle?.brand ? (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-semibold bg-primary/5 text-primary border border-primary/5 mt-1 truncate max-w-full">
+                      🚗 {m.vehicle.brand} {m.vehicle.model}
+                    </span>
                   ) : (
-                    <AvatarFallback className="bg-slate-100 text-[#19376D] font-bold rounded-xl">
-                      {initials}
-                    </AvatarFallback>
+                    <span className="text-[9px] text-slate-400 mt-1">Rider</span>
                   )}
-                </Avatar>
-                <p className="text-xs font-semibold text-foreground text-center truncate w-full">{m.name || "Member"}</p>
-                {m.vehicle?.brand && (
-                  <p className="text-[10px] text-slate-400 text-center truncate w-full">
-                    {m.vehicle.brand} {m.vehicle.model}
-                  </p>
-                )}
-              </div>
-            );
-          })
+                </div>
+              );
+            })}
+          </div>
         )}
       </CardContent>
     </Card>
   );
 
   const renderEvents = () => (
-    <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
-      <CardHeader className="mt-5">
-        <CardTitle>Upcoming Events</CardTitle>
-        <CardDescription className="mb-5">
-          Ride outs, meetups & track days
-        </CardDescription>
+    <Card className="bg-white border border-slate-200/60 shadow-sm rounded-2xl overflow-hidden">
+      <CardHeader className="py-4 px-6 border-b border-slate-100">
+        <CardTitle className="text-base font-extrabold text-slate-900">Upcoming Events</CardTitle>
+        <CardDescription className="text-xs text-slate-400 font-medium">Ride outs, breakfast runs, track days, and meetups</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 mb-5">
+      <CardContent className="p-6 space-y-4">
         {loadingEvents ? (
-          <div className="flex flex-col items-center justify-center p-6">
+          <div className="flex flex-col items-center justify-center py-10">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            <p className="text-xs text-muted-foreground mt-1 animate-pulse font-medium">Loading events...</p>
+            <p className="text-xs text-muted-foreground mt-2 animate-pulse font-semibold">Loading events...</p>
           </div>
         ) : clubEvents.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No events scheduled for this club yet.</p>
+          <div className="text-center py-12 border border-dashed border-slate-200 bg-slate-50/50 rounded-xl">
+            <CalendarDays className="size-8 text-slate-350 mx-auto mb-2" />
+            <p className="text-sm text-slate-500 font-medium">No upcoming events scheduled.</p>
+          </div>
         ) : (
           clubEvents.map((event) => (
             <div
               key={event.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border rounded-xl p-4 hover:bg-slate-50 transition cursor-pointer group"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-150 rounded-2xl p-4 hover:border-slate-300 hover:shadow-xs transition bg-slate-50/10 cursor-pointer group"
               onClick={() => {
                 setSelectedEvent(event);
                 setIsDetailsOpen(true);
               }}
             >
-              <div className="flex items-start gap-3 min-w-0">
-                <div className="p-3 bg-slate-100 rounded-xl text-primary shrink-0 group-hover:bg-primary/10 transition">
+              <div className="flex items-start gap-4 min-w-0">
+                <div className="p-3.5 bg-slate-100 text-slate-700 rounded-xl shrink-0 group-hover:bg-[#19376D]/10 group-hover:text-[#19376D] transition duration-200">
                   <CalendarDays className="w-6 h-6" />
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 space-y-1">
                   <h4 className="font-bold text-slate-900 group-hover:text-primary transition truncate">{event.title}</h4>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 font-medium mt-1">
-                    <span className="flex items-center gap-1">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400 font-semibold">
+                    <span className="flex items-center gap-1 bg-slate-100/60 px-1.5 py-0.5 rounded-md text-slate-500">
                       <Clock className="w-3.5 h-3.5" />
-                      {new Date(event.startDateTime).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} · {new Date(event.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(event.startDateTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} · {new Date(event.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
-                    <span>•</span>
-                    <span className="truncate">{event.location?.name}, {event.location?.city}</span>
-                    <span>•</span>
-                    <Badge className="bg-slate-100 hover:bg-slate-150 text-slate-600 font-semibold py-0 px-2 capitalize text-[9px] border border-slate-200">
+                    <span className="flex items-center gap-1 bg-slate-100/60 px-1.5 py-0.5 rounded-md text-slate-500 truncate max-w-[150px]">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{event.location?.name || event.city}</span>
+                    </span>
+                    <Badge className="bg-slate-100 hover:bg-slate-150 text-slate-600 font-bold px-2 py-0.5 capitalize text-[9px] border border-slate-200 rounded-md shrink-0">
                       {event.eventType?.replace("_", " ")}
                     </Badge>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+              <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-3 sm:pt-0 border-t border-slate-100 sm:border-0">
                 <span className="text-xs font-semibold text-slate-500">
-                  {event.participantCount || 0} joined
+                  {event.participantCount || 0} enthusiasts registered
                 </span>
-                <Button size="sm" variant="outline" className="rounded-lg font-semibold text-xs py-1 h-8">
+                <Button size="sm" variant="outline" className="rounded-xl font-bold text-xs h-9 bg-white cursor-pointer hover:bg-slate-50">
                   Details
                 </Button>
               </div>
@@ -584,44 +585,52 @@ export default function ClubProfile() {
     </Card>
   );
 
-
   const renderAchievements = () => (
-    <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
-      <CardHeader>
-        <CardTitle>Achievements</CardTitle>
-        <CardDescription>Celebrating milestones and victories</CardDescription>
+    <Card className="bg-white border border-slate-200/60 shadow-sm rounded-2xl overflow-hidden">
+      <CardHeader className="py-4 px-6 border-b border-slate-100">
+        <CardTitle className="text-base font-extrabold text-slate-900">Achievements & Milestones</CardTitle>
+        <CardDescription className="text-xs text-slate-400 font-medium">Celebrating club awards, ride milestones, and credentials</CardDescription>
       </CardHeader>
-      <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <CardContent className="p-6">
         {loadingAchievements ? (
-          <div className="col-span-full flex flex-col items-center justify-center p-6">
+          <div className="flex flex-col items-center justify-center py-10">
             <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            <p className="text-xs text-muted-foreground mt-1 animate-pulse font-medium">Loading achievements...</p>
+            <p className="text-xs text-muted-foreground mt-2 animate-pulse font-semibold">Loading awards...</p>
           </div>
         ) : clubAchievements.length === 0 ? (
-          <p className="col-span-full text-sm text-muted-foreground text-center py-8">No achievements celebrated yet.</p>
+          <div className="text-center py-12 border border-dashed border-slate-200 bg-slate-50/50 rounded-xl">
+            <Trophy className="size-8 text-slate-350 mx-auto mb-2 animate-bounce" />
+            <p className="text-sm text-slate-500 font-medium">No achievements celebrations posted yet.</p>
+          </div>
         ) : (
-          clubAchievements.map((ach) => {
-            const Icon = ach.awardType === "car" ? Car : ach.awardType === "bike" ? Bike : Trophy;
-            return (
-              <div
-                key={ach.id}
-                className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent/20 transition bg-white"
-              >
-                <Icon className="w-6 h-6 text-primary shrink-0" />
-                <div className="min-w-0">
-                  <p className="font-semibold text-slate-900 truncate">{ach.title}</p>
-                  {ach.date && (
-                    <p className="text-[10px] text-slate-400 font-medium">
-                      {new Date(ach.date).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+          <div className="grid sm:grid-cols-2 gap-4">
+            {clubAchievements.map((ach) => {
+              const Icon = ach.awardType === "car" ? Car : ach.awardType === "bike" ? Bike : Trophy;
+              return (
+                <div
+                  key={ach.id}
+                  className="flex items-start gap-4 p-4 rounded-2xl border border-slate-150 hover:border-slate-250 transition bg-slate-50/20"
+                >
+                  <div className="p-3 bg-amber-500/10 text-amber-600 rounded-xl shrink-0">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-bold text-slate-900 truncate">{ach.title}</p>
+                      {ach.date && (
+                        <span className="text-[9px] font-bold text-slate-400 shrink-0 bg-slate-100 px-1.5 py-0.5 rounded-md">
+                          {new Date(ach.date).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      {ach.description}
                     </p>
-                  )}
-                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mt-1">
-                    {ach.description}
-                  </p>
+                  </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </CardContent>
     </Card>
@@ -630,20 +639,23 @@ export default function ClubProfile() {
   const renderGallery = () => {
     const galleryList = dbClub?.gallery || [];
     return (
-      <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
-        <CardHeader>
-          <CardTitle>Club Gallery</CardTitle>
-          <CardDescription>Moments from our runs and meets</CardDescription>
+      <Card className="bg-white border border-slate-200/60 shadow-sm rounded-2xl overflow-hidden">
+        <CardHeader className="py-4 px-6 border-b border-slate-100">
+          <CardTitle className="text-base font-extrabold text-slate-900">Club Moments</CardTitle>
+          <CardDescription className="text-xs text-slate-400 font-medium">Pictures and moments captured on runs and meets (limit 10)</CardDescription>
         </CardHeader>
         <CardContent className="p-6">
           {galleryList.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">No moments posted by this club yet.</p>
+            <div className="text-center py-12 border border-dashed border-slate-200 bg-slate-50/50 rounded-xl">
+              <Calendar className="size-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm text-slate-500 font-medium">No moments uploaded yet.</p>
+            </div>
           ) : (
             <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {galleryList.map((url: string, idx: number) => (
                 <div 
                   key={idx} 
-                  className="relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs group cursor-pointer animate-in fade-in duration-200" 
+                  className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200/60 bg-white shadow-xs group cursor-pointer animate-in fade-in duration-200" 
                   onClick={() => window.open(url, "_blank")}
                 >
                   <img
@@ -661,259 +673,300 @@ export default function ClubProfile() {
     );
   };
 
-
   return (
-    <section className="max-w-6xl mx-auto px-6 py-12 space-y-10">
+    <section className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-in fade-in duration-300">
       {/* 🔹 Hero Section */}
-      <div className="relative w-full h-72 sm:h-96 rounded-2xl overflow-hidden shadow-xl">
+      <div className="relative w-full h-64 sm:h-80 md:h-96 rounded-3xl overflow-hidden shadow-lg border border-slate-200/40 bg-slate-900">
         <Image
-          src={club.image}
+          src={club.image || "/images/category/offroad.webp"}
           alt={club.name}
           fill
           priority
-          className="object-cover"
+          sizes="100vw"
+          className="object-cover opacity-80"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
 
-        <div className="absolute bottom-6 left-6 flex items-center gap-4 text-white">
-          {dbClub?.logoUrl ? (
-            <img
-              src={dbClub.logoUrl}
-              alt={`${club.name} Logo`}
-              className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-white/80 bg-white/10 backdrop-blur-md shadow-lg shrink-0"
-            />
-          ) : (
-            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-2xl sm:text-3xl font-bold border-2 border-white/80 shadow-lg shrink-0">
-              {club.name.split(" ").filter(Boolean).slice(0, 2).map((w: string) => w[0].toUpperCase()).join("") || "AC"}
+        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 flex flex-col md:flex-row md:items-end justify-between gap-6 z-10">
+          <div className="flex items-center gap-4 text-white">
+            {dbClub?.logoUrl ? (
+              <img
+                src={dbClub.logoUrl}
+                alt={`${club.name} Logo`}
+                className="w-18 h-18 sm:w-24 sm:h-24 rounded-2xl object-cover border-4 border-white/20 bg-slate-950/40 backdrop-blur-md shadow-xl shrink-0"
+              />
+            ) : (
+              <div className="w-18 h-18 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-2xl sm:text-3xl font-bold border-4 border-white/20 shadow-xl shrink-0">
+                {club.name.split(" ").filter(Boolean).slice(0, 2).map((w: string) => w[0].toUpperCase()).join("") || "AC"}
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/10 bg-white/10 backdrop-blur-md text-white">
+                {club.categoryType.replace("-", " ")}
+              </span>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight drop-shadow-xs">
+                {club.name}
+              </h1>
+              <p className="text-xs sm:text-sm opacity-90 font-semibold flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-red-550 shrink-0" />
+                {club.location}
+              </p>
             </div>
-          )}
-          <div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
-              {club.name}
-            </h1>
-            <p className="text-xs sm:text-sm mt-1 opacity-90 uppercase tracking-wider font-semibold">
-              {club.categoryType.replace("-", " ")}
-            </p>
+          </div>
+
+          {/* Action buttons embedded inside Hero right-corner */}
+          <div className="shrink-0 max-w-xs w-full sm:w-auto">
+            {loadingRequest ? (
+              <Button disabled className="w-full bg-white/15 text-white/50 border border-white/5 backdrop-blur-md rounded-xl font-bold h-11">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Checking Status...
+              </Button>
+            ) : myRequest ? (
+              <div className="flex flex-col gap-2">
+                {myRequest.status === "pending" && (
+                  <Button disabled className="w-full bg-amber-505 text-white font-bold cursor-not-allowed px-6 h-11 rounded-xl shadow-md border border-amber-400/20">
+                    Request Pending Approval
+                  </Button>
+                )}
+                {myRequest.status === "approved" && (
+                  <Button
+                    onClick={handleLeaveClub}
+                    disabled={submitting}
+                    variant="outline"
+                    className="w-full border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-600 hover:text-white font-bold h-11 px-6 rounded-xl transition-all cursor-pointer"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Leaving...
+                      </>
+                    ) : (
+                      "Leave Club"
+                    )}
+                  </Button>
+                )}
+                {myRequest.status === "rejected" && (
+                  <Button disabled className="w-full bg-red-600/80 text-white font-bold cursor-not-allowed px-6 h-11 rounded-xl">
+                    Request Rejected
+                  </Button>
+                )}
+              </div>
+            ) : user?.profileData?.clubId === id ? (
+              <Button
+                onClick={handleLeaveClub}
+                disabled={submitting}
+                variant="outline"
+                className="w-full border-red-500/30 bg-red-500/10 text-red-200 hover:bg-red-600 hover:text-white font-bold h-11 px-6 rounded-xl transition-all cursor-pointer"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Leaving...
+                  </>
+                ) : (
+                  "Leave Club"
+                )}
+              </Button>
+            ) : user?.profileData?.clubId != null ? (
+              <Button disabled className="w-full bg-white/10 text-white/50 border border-white/5 backdrop-blur-md rounded-xl font-bold h-11 cursor-not-allowed">
+                Already Member of Another Club
+              </Button>
+            ) : dbClub?.ownerUid === user?.userId ? (
+              <Button disabled className="w-full bg-white/10 text-white/50 border border-white/5 backdrop-blur-md rounded-xl font-bold h-11 cursor-not-allowed">
+                You own this club
+              </Button>
+            ) : (
+              <Button
+                onClick={handleJoinRequest}
+                disabled={submitting}
+                className="w-full bg-white hover:bg-slate-50 text-[#0B2447] font-bold shadow-lg transition-all h-11 px-6 rounded-xl cursor-pointer"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Sending Request...
+                  </>
+                ) : (
+                  "Join Club"
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 🔹 Overview Section */}
-      <Card className="bg-white/80 backdrop-blur-md border border-border/30 shadow-md rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl mt-5 font-semibold text-primary">
-            Club Overview
-          </CardTitle>
-          <CardDescription className="text-muted-foreground p-3">
-            A brief look into what makes {club.name} special.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex flex-wrap gap-3">
-            {renderBadge(MapPin, club.location, "secondary")}
-            {renderBadge(Users, `${club.memberCount} Members`)}
-            {renderBadge(ShieldCheck, `Created by ${club.createdBy}`)}
-          </div>
-          <Separator />
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 mt-1 text-primary" />
-            <p className="text-muted-foreground mb-5 leading-relaxed">
-              {club.description}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 🔹 Tabs Section */}
-      <Tabs defaultValue="members" className="w-full">
-        <TabsList className="flex flex-wrap justify-center mb-6">
-          <TabsTrigger value="members">Members</TabsTrigger>
-          <TabsTrigger value="events">Events</TabsTrigger>
-          <TabsTrigger value="achievements">Achievements</TabsTrigger>
-          <TabsTrigger value="gallery">Gallery</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="members">{renderMembers()}</TabsContent>
-        <TabsContent value="events">{renderEvents()}</TabsContent>
-        <TabsContent value="achievements">{renderAchievements()}</TabsContent>
-        <TabsContent value="gallery">{renderGallery()}</TabsContent>
-      </Tabs>
-
-      {/* 🔹 CTA Section */}
-      <div className="text-center space-y-4 max-w-md mx-auto pt-6 border-t border-border/20">
-        <h3 className="text-lg font-semibold text-primary">
-          Ready to ride with {club.name}?
-        </h3>
+      {/* Grid Layout: Main Columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {loadingRequest ? (
-          <Button disabled className="w-full bg-slate-100 text-slate-400">
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            Loading request status...
-          </Button>
-        ) : myRequest ? (
-          <div className="space-y-2">
-            {myRequest.status === "pending" && (
-              <>
-                <Button disabled className="w-full bg-amber-500 text-white font-semibold cursor-not-allowed">
-                  Pending Approval
-                </Button>
-                <p className="text-xs text-amber-600 font-medium">Request Sent</p>
-              </>
-            )}
-            {myRequest.status === "approved" && (
-              <div className="space-y-2">
-                <Button disabled className="w-full bg-emerald-600 text-white font-semibold cursor-not-allowed">
-                  Approved (Member)
-                </Button>
-                <Button
-                  onClick={handleLeaveClub}
-                  disabled={submitting}
-                  variant="outline"
-                  className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-semibold py-4 rounded-xl"
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Leaving Club...
-                    </>
-                  ) : (
-                    "Leave Club"
-                  )}
-                </Button>
+        {/* Left Column: Details & Tabs Content (Main column) */}
+        <div className="lg:col-span-8 space-y-6">
+          <Tabs defaultValue="members" className="w-full">
+            <TabsList className="grid grid-cols-4 w-full bg-slate-100/80 p-1 rounded-xl mb-6">
+              <TabsTrigger value="members" className="rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider cursor-pointer">Members</TabsTrigger>
+              <TabsTrigger value="events" className="rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider cursor-pointer">Events</TabsTrigger>
+              <TabsTrigger value="achievements" className="rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider cursor-pointer">Awards</TabsTrigger>
+              <TabsTrigger value="gallery" className="rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider cursor-pointer">Gallery</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="members" className="focus-visible:outline-none">{renderMembers()}</TabsContent>
+            <TabsContent value="events" className="focus-visible:outline-none">{renderEvents()}</TabsContent>
+            <TabsContent value="achievements" className="focus-visible:outline-none">{renderAchievements()}</TabsContent>
+            <TabsContent value="gallery" className="focus-visible:outline-none">{renderGallery()}</TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Right Column: Statistics, Overview Info */}
+        <div className="lg:col-span-4 space-y-6">
+          
+          {/* Quick Metrics Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white border border-slate-200/60 p-5 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center">
+              <Users className="size-6 text-[#19376D] mb-1.5 shrink-0" />
+              <span className="text-2xl font-black text-slate-900 leading-none">{club.memberCount}</span>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5">Members</span>
+            </div>
+            
+            <div className="bg-white border border-slate-200/60 p-5 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center">
+              <CalendarDays className="size-6 text-emerald-600 mb-1.5 shrink-0" />
+              <span className="text-2xl font-black text-slate-900 leading-none">{clubEvents.length}</span>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5">Events</span>
+            </div>
+          </div>
+
+          {/* Overview Info Card */}
+          <Card className="bg-white border border-slate-200/60 shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-4 px-6">
+              <CardTitle className="text-md font-bold text-slate-900 flex items-center gap-2">
+                <Info className="size-4.5 text-[#0B2447]" />
+                Club Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="py-5 px-6 space-y-5">
+              <div className="space-y-3.5">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
+                  <Badge variant="outline" className="flex items-center gap-1.5 border-slate-200 bg-slate-50 text-slate-600 rounded-lg">
+                    <MapPin className="w-3.5 h-3.5 text-red-500" /> {club.location}
+                  </Badge>
+                  <Badge variant="outline" className="flex items-center gap-1.5 border-slate-200 bg-slate-50 text-slate-600 rounded-lg">
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-600" /> Owner: {club.createdBy.split("@")[0]}
+                  </Badge>
+                </div>
+                <Separator className="bg-slate-100" />
+                <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                  {club.description}
+                </p>
               </div>
-            )}
-            {myRequest.status === "rejected" && (
-              <Button disabled className="w-full bg-red-600 text-white font-semibold cursor-not-allowed">
-                Rejected
-              </Button>
-            )}
-          </div>
-        ) : user?.profileData?.clubId === id ? (
-          <div className="space-y-2">
-            <Button disabled className="w-full bg-emerald-600 text-white font-semibold cursor-not-allowed">
-              Approved (Member)
-            </Button>
-            <Button
-              onClick={handleLeaveClub}
-              disabled={submitting}
-              variant="outline"
-              className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-semibold py-4 rounded-xl"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Leaving Club...
-                </>
-              ) : (
-                "Leave Club"
-              )}
-            </Button>
-          </div>
-        ) : user?.profileData?.clubId != null ? (
-          <Button disabled className="w-full bg-slate-200 text-slate-500 font-medium cursor-not-allowed">
-            Already in a Club
-          </Button>
-        ) : dbClub?.ownerUid === user?.userId ? (
-          <Button disabled className="w-full bg-slate-200 text-slate-500 font-medium cursor-not-allowed">
-            You own this club
-          </Button>
-        ) : (
-          <Button 
-            onClick={handleJoinRequest} 
-            disabled={submitting} 
-            className="w-full bg-[#19376D] hover:bg-[#0B2447] text-white font-semibold shadow-md transition py-6 rounded-xl"
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Sending Request...
-              </>
-            ) : (
-              "Join Club"
-            )}
-          </Button>
-        )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* 🔹 Event Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-lg rounded-2xl bg-white p-6 shadow-xl border overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-slate-900">
+        <DialogContent className="max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
+          <DialogHeader className="pb-4 border-b border-slate-100">
+            <DialogTitle className="text-xl font-extrabold text-slate-900 tracking-tight">
               Event Details
             </DialogTitle>
           </DialogHeader>
 
           {selectedEvent && (
-            <div className="space-y-4 overflow-y-auto pr-1 py-1 max-h-[75vh]">
+            <div className="space-y-5 overflow-y-auto pr-1 py-3 max-h-[70vh]">
               {selectedEvent.coverImage ? (
-                <div className="w-full h-48 relative rounded-xl overflow-hidden border">
+                <div className="w-full h-52 relative rounded-xl overflow-hidden border border-slate-100 shadow-sm">
                   <img
                     src={selectedEvent.coverImage}
                     alt={selectedEvent.title}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-3 right-3">
-                    <Badge className="bg-slate-900/80 text-white backdrop-blur-xs capitalize text-xs">
+                    <Badge className="bg-slate-900/80 text-white backdrop-blur-sm capitalize text-xs px-2.5 py-1 border border-white/10 font-semibold rounded-lg shadow-sm">
                       {selectedEvent.eventType?.replace("_", " ")}
                     </Badge>
                   </div>
                 </div>
               ) : (
-                <div className="w-full h-48 bg-slate-50 rounded-xl flex items-center justify-center relative border border-dashed">
+                <div className="w-full h-52 bg-slate-50 rounded-xl flex items-center justify-center relative border border-dashed border-slate-200">
                   <CalendarDays className="h-12 w-12 text-slate-300" />
                   <div className="absolute top-3 right-3">
-                    <Badge className="bg-slate-900/80 text-white backdrop-blur-xs capitalize text-xs">
+                    <Badge className="bg-slate-900/80 text-white backdrop-blur-sm capitalize text-xs px-2.5 py-1 border border-white/10 font-semibold rounded-lg shadow-sm">
                       {selectedEvent.eventType?.replace("_", " ")}
                     </Badge>
                   </div>
                 </div>
               )}
 
-              <div className="space-y-2">
-                <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">{selectedEvent.title}</h3>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 font-medium">
-                  <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md">
-                    <Clock className="w-3.5 h-3.5 text-primary" />
-                    {new Date(selectedEvent.startDateTime).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                  <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                    {selectedEvent.location?.name}, {selectedEvent.location?.city}
-                  </span>
-                  <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md">
-                    <Users className="w-3.5 h-3.5 text-blue-600" />
-                    {selectedEvent.participantCount || 0} Joined {selectedEvent.maxParticipants ? `/ ${selectedEvent.maxParticipants}` : ""}
-                  </span>
+              <div className="space-y-3">
+                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">{selectedEvent.title}</h3>
+                
+                {/* Event Metadata Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 p-3 rounded-xl">
+                    <div className="p-2 bg-blue-500/10 text-blue-600 rounded-lg shrink-0">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Date & Time</p>
+                      <p className="text-xs font-semibold text-slate-700 truncate mt-0.5">
+                        {new Date(selectedEvent.startDateTime).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 p-3 rounded-xl">
+                    <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-lg shrink-0">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Location</p>
+                      <p className="text-xs font-semibold text-slate-700 truncate mt-0.5">
+                        {selectedEvent.location?.name || selectedEvent.city}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 p-3 rounded-xl sm:col-span-2">
+                    <div className="p-2 bg-purple-500/10 text-purple-600 rounded-lg shrink-0">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Attendance</p>
+                      <p className="text-xs font-semibold text-slate-700 mt-0.5">
+                        {selectedEvent.participantCount || 0} Enthusiasts Joined {selectedEvent.maxParticipants ? `(Limit: ${selectedEvent.maxParticipants})` : ""}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">About the Event</h5>
-                <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">{selectedEvent.description}</p>
+              <div className="space-y-2">
+                <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">About the Event</h5>
+                <p className="text-sm text-slate-655 leading-relaxed bg-slate-50/50 p-4 rounded-xl border border-slate-100/60 font-medium">
+                  {selectedEvent.description}
+                </p>
               </div>
 
               {/* Organizer Card */}
               <div className="space-y-2">
-                <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Organizer Information</h5>
-                <div className="flex items-center justify-between p-4 border border-slate-100 rounded-xl bg-white shadow-xs">
+                <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Organized By</h5>
+                <div className="flex items-center justify-between p-4 border border-slate-100 rounded-xl bg-slate-50/40 shadow-xs">
                   <div className="flex items-center gap-3">
                     {dbClub?.logoUrl ? (
                       <img
                         src={dbClub.logoUrl}
                         alt={dbClub.clubName}
-                        className="w-12 h-12 rounded-xl object-cover border"
+                        className="w-11 h-11 rounded-xl object-cover border border-slate-200"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-lg font-bold border">
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-md font-bold border shrink-0">
                         {club.name?.split(" ").filter(Boolean).slice(0, 2).map((w: string) => w[0].toUpperCase()).join("") || "C"}
                       </div>
                     )}
                     <div>
                       <p className="text-sm font-bold text-slate-900">{club.name}</p>
-                      <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                        Verified Networking Club
+                      <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5 font-medium">
+                        <ShieldCheck className="w-3.5 h-3.5 text-blue-655" />
+                        Verified Automotive Club
                       </p>
                     </div>
                   </div>
@@ -921,19 +974,19 @@ export default function ClubProfile() {
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-                <Button variant="ghost" type="button" onClick={() => setIsDetailsOpen(false)}>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                <Button variant="ghost" className="rounded-xl text-slate-500 hover:text-slate-700 font-semibold cursor-pointer" type="button" onClick={() => setIsDetailsOpen(false)}>
                   Close
                 </Button>
                 {isRegistered ? (
                   <Button
                     onClick={handleLeaveEvent}
                     disabled={submittingJoin}
-                    className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl px-6 flex items-center gap-1.5"
+                    className="bg-red-50 hover:bg-red-100 text-red-655 hover:text-red-750 font-bold border border-red-200/50 rounded-xl px-5 flex items-center gap-1.5 cursor-pointer transition-colors"
                   >
                     {submittingJoin ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                         Leaving...
                       </>
                     ) : (
@@ -944,7 +997,7 @@ export default function ClubProfile() {
                   <Button
                     onClick={handleJoinEvent}
                     disabled={submittingJoin || (selectedEvent.maxParticipants && selectedEvent.participantCount >= selectedEvent.maxParticipants)}
-                    className="bg-[#19376D] hover:bg-[#0B2447] text-white font-semibold rounded-xl px-6 flex items-center gap-1.5"
+                    className="bg-[#0B2447] hover:bg-[#19376D] text-white font-semibold rounded-xl px-6 flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     {submittingJoin ? (
                       <>
@@ -966,4 +1019,3 @@ export default function ClubProfile() {
     </section>
   );
 }
-

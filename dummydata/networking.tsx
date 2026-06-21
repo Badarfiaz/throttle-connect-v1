@@ -53,6 +53,17 @@ export const categories: CategoryType[] = [
   "electric-bikes",
   "superbikes",
   "cruisers",
+  "vespa-scooter",
+  "sports-car",
+  "diy-tools",
+  "wrench",
+  "racing-flag",
+  "jeep",
+  "electric-car",
+  "vintage-car",
+  "electric-bike",
+  "cafe-racer",
+  "modified-bike",
 ];
 
 export const clubs: Club[] = [

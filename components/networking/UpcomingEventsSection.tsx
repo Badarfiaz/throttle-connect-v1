@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Calendar, Clock, MapPin, Users, Loader2, ShieldCheck } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Loader2, ShieldCheck, ChevronRight } from "lucide-react";
 import Title from "@/components/shared/Title";
 import {
   Dialog,
@@ -179,179 +179,240 @@ export default function UpcomingEventsSection() {
           </div>
         ) : upcomingEvents.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {upcomingEvents.map((event) => (
-              <Card key={event.id} className="border border-slate-200/80 shadow-xs hover:shadow-md transition duration-300 flex flex-col justify-between h-full bg-white rounded-xl overflow-hidden cursor-pointer group" onClick={() => handleOpenEventDetails(event)}>
-                <div>
-                  {event.coverImage ? (
-                    <div className="w-full h-44 relative overflow-hidden">
-                      <img
-                        src={event.coverImage}
-                        alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                      />
-                      <div className="absolute top-3 right-3">
-                        <Badge className="bg-slate-900/80 text-white backdrop-blur-xs capitalize text-[10px] py-1 px-2.5 font-medium border border-white/15">
-                          {event.eventType?.replace("_", " ")}
-                        </Badge>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full h-44 bg-slate-50 flex items-center justify-center relative">
-                      <Calendar className="h-10 w-10 text-slate-300 group-hover:scale-110 transition duration-500" />
-                      <div className="absolute top-3 right-3">
-                        <Badge className="bg-slate-900/80 text-white backdrop-blur-xs capitalize text-[10px] py-1 px-2.5 font-medium border border-white/15">
-                          {event.eventType?.replace("_", " ")}
-                        </Badge>
-                      </div>
-                    </div>
-                  )}
-                  <div className="p-5 space-y-3">
-                    <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
-                        {new Date(event.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span className="truncate">{event.city}</span>
-                      </span>
-                    </div>
-                    <h4 className="font-bold text-slate-900 text-lg group-hover:text-primary transition line-clamp-1">{event.title}</h4>
-                    <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">{event.description}</p>
-                    
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        {event.clubLogo ? (
+            {upcomingEvents.map((event) => {
+              const eventDate = new Date(event.startDateTime);
+              const day = eventDate.getDate();
+              const month = eventDate.toLocaleDateString([], { month: "short" }).toUpperCase();
+              const formattedTime = eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+              return (
+                <Card
+                  key={event.id}
+                  className="border border-slate-200/60 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full bg-white rounded-2xl overflow-hidden cursor-pointer group"
+                  onClick={() => handleOpenEventDetails(event)}
+                >
+                  <div className="flex flex-col h-full justify-between">
+                    <div>
+                      {/* Banner Image Section */}
+                      <div className="w-full h-44 relative overflow-hidden bg-slate-50 border-b border-slate-100">
+                        {event.coverImage ? (
                           <img
-                            src={event.clubLogo}
-                            alt={event.clubName}
-                            className="w-6 h-6 rounded-md object-cover border shrink-0"
+                            src={event.coverImage}
+                            alt={event.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
-                          <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
-                            {event.clubName?.split(" ").filter(Boolean).slice(0, 2).map((w: string) => w[0].toUpperCase()).join("") || "C"}
+                          <div className="w-full h-full flex items-center justify-center bg-slate-50">
+                            <Calendar className="h-10 w-10 text-slate-300 group-hover:scale-110 transition duration-500" />
                           </div>
                         )}
-                        <span className="text-xs font-semibold text-slate-700 truncate">{event.clubName}</span>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                        
+                        {/* Premium Date Overlay Badge */}
+                        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-xl px-2.5 py-1.5 flex flex-col items-center justify-center text-center shadow-md border border-slate-100 min-w-[48px]">
+                          <span className="text-[10px] font-bold text-red-500 tracking-wider leading-none uppercase">{month}</span>
+                          <span className="text-lg font-extrabold text-slate-900 leading-none mt-1">{day}</span>
+                        </div>
+
+                        {/* Event Category Tag */}
+                        <div className="absolute top-3 right-3">
+                          <Badge className="bg-slate-900/80 text-white backdrop-blur-sm capitalize text-[10px] py-1 px-2.5 font-semibold border border-white/15 rounded-lg shadow-sm">
+                            {event.eventType?.replace("_", " ")}
+                          </Badge>
+                        </div>
                       </div>
-                      <span className="text-xs font-medium text-slate-400 shrink-0">
-                        {event.participantCount || 0} registered
-                      </span>
+
+                      {/* Content Section */}
+                      <div className="p-5 space-y-3">
+                        <div className="flex flex-wrap items-center justify-between text-xs text-slate-400 font-semibold gap-2">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-slate-400" />
+                            {formattedTime}
+                          </span>
+                          <span className="flex items-center gap-1 min-w-0">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span className="truncate max-w-[120px]">{event.city}</span>
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-slate-900 text-lg group-hover:text-primary transition-colors duration-250 line-clamp-1 leading-snug">
+                          {event.title}
+                        </h4>
+                        <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
+                          {event.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Organization Banner + CTA Button */}
+                    <div className="px-5 pb-5">
+                      <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {event.clubLogo ? (
+                            <img
+                              src={event.clubLogo}
+                              alt={event.clubName}
+                              className="w-6 h-6 rounded-md object-cover border border-slate-150 shrink-0"
+                            />
+                          ) : (
+                            <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+                              {event.clubName?.split(" ").filter(Boolean).slice(0, 2).map((w: string) => w[0].toUpperCase()).join("") || "C"}
+                            </div>
+                          )}
+                          <span className="text-xs font-semibold text-slate-700 truncate">{event.clubName}</span>
+                        </div>
+                        
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="h-8 rounded-lg text-xs font-bold text-primary bg-primary/5 hover:bg-primary hover:text-white border-none flex items-center gap-1 transition-all duration-300 shrink-0 cursor-pointer"
+                        >
+                          Details
+                          <ChevronRight className="size-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         ) : (
-          <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-            <p className="text-slate-500 text-sm">No upcoming events scheduled at the moment.</p>
+          <div className="text-center py-16 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+            <Calendar className="h-8 w-8 text-slate-350 mx-auto mb-2" />
+            <p className="text-slate-500 text-sm font-medium">No upcoming events scheduled at the moment.</p>
           </div>
         )}
       </div>
 
       {/* 🔹 Event Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-lg rounded-2xl bg-white p-6 shadow-xl border overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-slate-900">
+        <DialogContent className="max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
+          <DialogHeader className="pb-4 border-b border-slate-100">
+            <DialogTitle className="text-xl font-extrabold text-slate-900 tracking-tight">
               Event Details
             </DialogTitle>
           </DialogHeader>
 
           {selectedEvent && (
-            <div className="space-y-4 overflow-y-auto pr-1 py-1 max-h-[75vh]">
+            <div className="space-y-5 overflow-y-auto pr-1 py-3 max-h-[70vh]">
               {selectedEvent.coverImage ? (
-                <div className="w-full h-48 relative rounded-xl overflow-hidden border">
+                <div className="w-full h-52 relative rounded-xl overflow-hidden border border-slate-100 shadow-sm">
                   <img
                     src={selectedEvent.coverImage}
                     alt={selectedEvent.title}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-3 right-3">
-                    <Badge className="bg-slate-900/80 text-white backdrop-blur-xs capitalize text-xs">
+                    <Badge className="bg-slate-900/80 text-white backdrop-blur-sm capitalize text-xs px-2.5 py-1 border border-white/10 font-semibold rounded-lg shadow-sm">
                       {selectedEvent.eventType?.replace("_", " ")}
                     </Badge>
                   </div>
                 </div>
               ) : (
-                <div className="w-full h-48 bg-slate-50 rounded-xl flex items-center justify-center relative border border-dashed">
+                <div className="w-full h-52 bg-slate-50 rounded-xl flex items-center justify-center relative border border-dashed border-slate-200">
                   <Calendar className="h-12 w-12 text-slate-300" />
                   <div className="absolute top-3 right-3">
-                    <Badge className="bg-slate-900/80 text-white backdrop-blur-xs capitalize text-xs">
+                    <Badge className="bg-slate-900/80 text-white backdrop-blur-sm capitalize text-xs px-2.5 py-1 border border-white/10 font-semibold rounded-lg shadow-sm">
                       {selectedEvent.eventType?.replace("_", " ")}
                     </Badge>
                   </div>
                 </div>
               )}
 
-              <div className="space-y-2">
-                <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">{selectedEvent.title}</h3>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 font-medium">
-                  <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md">
-                    <Clock className="w-3.5 h-3.5 text-primary" />
-                    {new Date(selectedEvent.startDateTime).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                  <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                    {selectedEvent.location?.name}, {selectedEvent.location?.city}
-                  </span>
-                  <span className="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded-md">
-                    <Users className="w-3.5 h-3.5 text-blue-600" />
-                    {selectedEvent.participantCount || 0} Joined {selectedEvent.maxParticipants ? `/ ${selectedEvent.maxParticipants}` : ""}
-                  </span>
+              <div className="space-y-3">
+                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">{selectedEvent.title}</h3>
+                
+                {/* Event Metadata Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 p-3 rounded-xl">
+                    <div className="p-2 bg-blue-500/10 text-blue-600 rounded-lg shrink-0">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Date & Time</p>
+                      <p className="text-xs font-semibold text-slate-700 truncate mt-0.5">
+                        {new Date(selectedEvent.startDateTime).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 p-3 rounded-xl">
+                    <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-lg shrink-0">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Location</p>
+                      <p className="text-xs font-semibold text-slate-700 truncate mt-0.5">
+                        {selectedEvent.location?.name || selectedEvent.city}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 p-3 rounded-xl sm:col-span-2">
+                    <div className="p-2 bg-purple-500/10 text-purple-600 rounded-lg shrink-0">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Attendance</p>
+                      <p className="text-xs font-semibold text-slate-700 mt-0.5">
+                        {selectedEvent.participantCount || 0} Enthusiasts Joined {selectedEvent.maxParticipants ? `(Limit: ${selectedEvent.maxParticipants})` : ""}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">About the Event</h5>
-                <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">{selectedEvent.description}</p>
+              <div className="space-y-2">
+                <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">About the Event</h5>
+                <p className="text-sm text-slate-600 leading-relaxed bg-slate-50/50 p-4 rounded-xl border border-slate-100/60 font-medium">
+                  {selectedEvent.description}
+                </p>
               </div>
 
               {/* Organizer Card */}
               <div className="space-y-2">
-                <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Organizer Information</h5>
-                <div className="flex items-center justify-between p-4 border border-slate-100 rounded-xl bg-white shadow-xs">
+                <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Organized By</h5>
+                <div className="flex items-center justify-between p-4 border border-slate-100 rounded-xl bg-slate-50/40 shadow-xs">
                   <div className="flex items-center gap-3">
                     {selectedEvent.clubLogo ? (
                       <img
                         src={selectedEvent.clubLogo}
                         alt={selectedEvent.clubName}
-                        className="w-12 h-12 rounded-xl object-cover border"
+                        className="w-11 h-11 rounded-xl object-cover border border-slate-200"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-lg font-bold border">
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#19376D] to-[#0B2447] text-white flex items-center justify-center text-md font-bold border shrink-0">
                         {selectedEvent.clubName?.split(" ").filter(Boolean).slice(0, 2).map((w: string) => w[0].toUpperCase()).join("") || "C"}
                       </div>
                     )}
                     <div>
                       <p className="text-sm font-bold text-slate-900">{selectedEvent.clubName}</p>
-                      <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                        Verified Networking Club
+                      <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5 font-medium">
+                        <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                        Verified Automotive Club
                       </p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" type="button" onClick={() => window.location.href = `/networking/Club-Profile/${selectedEvent.clubId}`}>
+                  <Button size="sm" variant="outline" type="button" className="rounded-lg text-xs font-semibold h-8 bg-white" onClick={() => window.location.href = `/networking/Club-Profile/${selectedEvent.clubId}`}>
                     View Club
                   </Button>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-                <Button variant="ghost" type="button" onClick={() => setIsDetailsOpen(false)}>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                <Button variant="ghost" className="rounded-xl text-slate-500 hover:text-slate-700 font-semibold cursor-pointer" type="button" onClick={() => setIsDetailsOpen(false)}>
                   Close
                 </Button>
                 {isRegistered ? (
                   <Button
                     onClick={handleLeaveEvent}
                     disabled={submittingJoin}
-                    className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl px-6 flex items-center gap-1.5"
+                    className="bg-red-50 hover:bg-red-100 text-red-650 hover:text-red-750 font-bold border border-red-200/50 rounded-xl px-5 flex items-center gap-1.5 cursor-pointer transition-colors"
                   >
                     {submittingJoin ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                         Leaving...
                       </>
                     ) : (
@@ -362,7 +423,7 @@ export default function UpcomingEventsSection() {
                   <Button
                     onClick={handleJoinEvent}
                     disabled={submittingJoin || (selectedEvent.maxParticipants && selectedEvent.participantCount >= selectedEvent.maxParticipants)}
-                    className="bg-[#19376D] hover:bg-[#0B2447] text-white font-semibold rounded-xl px-6 flex items-center gap-1.5"
+                    className="bg-[#0B2447] hover:bg-[#19376D] text-white font-semibold rounded-xl px-6 flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     {submittingJoin ? (
                       <>
