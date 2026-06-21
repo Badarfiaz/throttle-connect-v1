@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -14,9 +16,10 @@ import SharedButton from "../shared/SharedButton";
 
 interface ClubCardProps {
   club: Club;
+  isLandingPage?: boolean;
 }
 
-const ClubCard = ({ club }: ClubCardProps) => {
+const ClubCard = ({ club, isLandingPage }: ClubCardProps) => {
   return (
     <AnimateMotion
       whileHover={{ y: -6 }}

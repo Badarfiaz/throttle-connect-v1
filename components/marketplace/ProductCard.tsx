@@ -15,9 +15,10 @@ import HeartButton from "./HeartButton";
 type ProductCardProps = {
   product: MarketplaceProduct;
   size?: "sm" | "md" | "lg";
+  isLandingPage?: boolean;
 };
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md" }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandingPage = false }) => {
   const sizeStyles = {
     sm: "w-[200px]",
     md: "w-[252px]",
@@ -45,7 +46,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md" }) => {
             "shadow-[0_4px_6px_0_rgba(3,26,37,0.16)]",
             "transition-all duration-200 ease-out",
             "hover:shadow-[0_8px_20px_rgba(12,103,146,0.18)] hover:-translate-y-0.5",
-            sizeStyles[size],
+            isLandingPage ? "w-full" : sizeStyles[size],
           )}
         >
           {/* ── Image ── */}
