@@ -8,6 +8,8 @@ const corsHandler = cors({
     "http://localhost:3000",
     "http://localhost:3002",
     "https://throttle-connect-v1.vercel.app",
+    "https://www.throttleconnect.xyz"
+    ,
   ],
   credentials: true,
   methods: ["GET", "POST", "OPTIONS"],
