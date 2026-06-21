@@ -381,7 +381,7 @@ export default function MemberProfileView() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    {vehicleImages.map((imgUrl, index) => (
+                    {vehicleImages.map((imgUrl: string, index: number) => (
                       <div
                         key={index}
                         className="relative h-20 rounded-xl overflow-hidden border bg-slate-50 cursor-zoom-in hover:scale-[1.02] transition"

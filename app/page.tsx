@@ -1,53 +1,711 @@
-import React from 'react'
-type product = {
-  name: string
-  price: number
-  description: string
-  inStock: boolean
-} 
-const marketplace: product = {  
-  name: 'product1',
-  price: 0,
-  description: 'best product ever',
-  inStock: true
-}
-const network = {
-  name: 'network1',
-  price: 0, 
-  description: 'best network ever',
-  inStock: true
-}
-type headerprops = {
-  title?:string
-  age?:number
-  showTitle?:boolean
-data?: product
- }
-function Header({title, age, showTitle = false, data}:headerprops) {
-  return (
-    <div>
-      {showTitle && <h1 style={{ color: 'white' , background: 'red', marginTop: '100px' , padding: '20px' }}>
-        This is a header: {title}
-         <span style={{backgroundColor: 'yellow' , color: 'black' }}> Age: {age}</span></h1>} 
+"use client";
 
-      {data && <div>
-        <h2>{data.name}</h2>
-        <p>{data.description}</p>
-        <p>Price: ${data.price}</p>
-        <p>{data.inStock ? 'In Stock' : 'Out of Stock'}</p>
-      </div>}
-     </div>
-  )
-}
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { 
+  Users, 
+  Calendar, 
+  ShoppingBag, 
+  ShieldCheck, 
+  MapPin, 
+  Star, 
+  TrendingUp, 
+  ArrowRight,
+  Plus,
+  Car,
+  Compass,
+  ArrowUpRight,
+  Loader2
+} from "lucide-react";
+import { db } from "@/firebase";
+import { collection, query, where, getDocs, limit } from "firebase/firestore";
+import { getMarketplaceFeaturedProducts } from "@/ulity/marketplaceProducts";
+import UpcomingEventsSection from "@/components/networking/UpcomingEventsSection";
 
-function page() {
+export default function LandingPage() {
+  const [eventsList, setEventsList] = useState<any[]>([]);
+  const [clubsList, setClubsList] = useState<any[]>([]);
+  const [productsList, setProductsList] = useState<any[]>([]);
+
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [loadingClubs, setLoadingClubs] = useState(true);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  // Fetch Dynamic Events
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const q = query(
+          collection(db, "events"),
+          where("status", "==", "upcoming"),
+          limit(3)
+        );
+        const querySnapshot = await getDocs(q);
+        const list = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          let locationStr = "TBA Location";
+          if (data.location) {
+            if (typeof data.location === "object") {
+              locationStr = [data.location.name, data.location.city].filter(Boolean).join(", ") || "TBA Location";
+            } else {
+              locationStr = String(data.location);
+            }
+          }
+
+          return {
+            id: doc.id,
+            title: data.title || "Untitled Run",
+            date: data.date || "Upcoming Date",
+            time: data.time || "TBA",
+            location: locationStr,
+            organizer: data.clubName || "ThrottleConnect Host",
+            image: data.coverUrl || "https://images.unsplash.com/photo-1542362567-b07eac790acd?auto=format&fit=crop&q=80&w=600",
+            tag: data.tag || "Ride & Drive"
+          };
+        });
+        setEventsList(list);
+      } catch (err) {
+        console.error("Error fetching dynamic events:", err);
+      } finally {
+        setLoadingEvents(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  // Fetch Dynamic Featured Clubs
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const q = query(
+          collection(db, "networkingStores"),
+          where("completed", "==", true),
+          limit(3)
+        );
+        const querySnapshot = await getDocs(q);
+        const list = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          const cityStr = (data.city && typeof data.city === "object")
+            ? (data.city.city || data.city.name || "Pakistan")
+            : (data.city || "Pakistan");
+
+          return {
+            id: doc.id,
+            name: data.clubName || "Unnamed Club",
+            type: data.clubType === "both" ? "All Vehicles Club" : `${data.clubType} Club`,
+            members: `${data.memberCount || 1} Members`,
+            city: cityStr,
+            icon: data.clubType === "car" ? "🚗" : data.clubType === "bike" ? "🏍️" : "🏎️",
+            logoUrl: data.logoUrl || null,
+            bgGradient: data.clubType === "car" ? "from-blue-500/10 to-indigo-500/5" : "from-orange-500/10 to-red-500/5"
+          };
+        });
+        setClubsList(list);
+      } catch (err) {
+        console.error("Error fetching dynamic clubs:", err);
+      } finally {
+        setLoadingClubs(false);
+      }
+    };
+    fetchClubs();
+  }, []);
+
+  // Fetch Dynamic Products
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const products = await getMarketplaceFeaturedProducts();
+        if (products && products.length > 0) {
+          const list = products.slice(0, 4).map((p: any) => ({
+            id: p.id,
+            name: p.productName || "Premium Part",
+            category: p.category || "Automotive",
+            price: p.price ? `Rs ${p.price.toLocaleString()}` : "Contact Seller",
+            rating: "4.9",
+            reviews: "Verified Item",
+            image: p.imageurl?.url || p.image || "https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&q=80&w=400"
+          }));
+          setProductsList(list);
+        }
+      } catch (err) {
+        console.error("Error fetching dynamic products:", err);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  // Static fallback data to guarantee premium layout under all conditions
+  const staticEvents = [
+    {
+      title: "Sunday Morning Breakfast Run",
+      organizer: "Elite Angle Badar",
+      date: "June 28, 2026",
+      time: "06:30 AM",
+      location: "McDonald's M2 Motorway, Lahore",
+      image: "https://images.unsplash.com/photo-1542362567-b07eac790acd?auto=format&fit=crop&q=80&w=600",
+      tag: "Community Run"
+    },
+    {
+      title: "Margalla Hills Sunset Drive",
+      organizer: "Islamabad Club Drivers",
+      date: "July 05, 2026",
+      time: "05:00 PM",
+      location: "Highland Resort, Islamabad",
+      image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600",
+      tag: "Car Meetup"
+    },
+    {
+      title: "Karachi Track Day",
+      organizer: "Speed Society Karachi",
+      date: "July 12, 2026",
+      time: "09:00 AM",
+      location: "Omni Karting Circuit, Karachi",
+      image: "https://images.unsplash.com/photo-1568605115459-4b731184f961?auto=format&fit=crop&q=80&w=600",
+      tag: "Track Day"
+    }
+  ];
+
+  const staticClubs = [
+    {
+      name: "Elite Angles",
+      type: "Motorcycle Club",
+      members: "125 Members",
+      city: "Lahore",
+      icon: "🏍️",
+      logoUrl: null,
+      bgGradient: "from-orange-500/10 to-red-500/5"
+    },
+    {
+      name: "GearHeads Pakistan",
+      type: "Performance Car Club",
+      members: "340 Members",
+      city: "Islamabad",
+      icon: "🚗",
+      logoUrl: null,
+      bgGradient: "from-blue-500/10 to-indigo-500/5"
+    },
+    {
+      name: "Karachi Offroaders",
+      type: "4x4 SUV Club",
+      members: "95 Members",
+      city: "Karachi",
+      icon: "🚜",
+      logoUrl: null,
+      bgGradient: "from-emerald-500/10 to-teal-500/5"
+    }
+  ];
+
+  const staticProducts = [
+    {
+      name: "MT Stinger Helmet",
+      category: "Riding Gear",
+      price: "Rs 12,500",
+      rating: "4.9",
+      reviews: "42 reviews",
+      image: "https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+      name: "Alpinestars Jacket",
+      category: "Riding Jacket",
+      price: "Rs 28,000",
+      rating: "4.8",
+      reviews: "19 reviews",
+      image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+      name: "Dainese Leather Gloves",
+      category: "Bike Gloves",
+      price: "Rs 6,500",
+      rating: "4.7",
+      reviews: "31 reviews",
+      image: "https://images.unsplash.com/photo-1627384113710-424c9181ebbb?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+      name: "Carbon Fiber Spoiler",
+      category: "Car Accessories",
+      price: "Rs 18,500",
+      rating: "5.0",
+      reviews: "12 reviews",
+      image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=400"
+    }
+  ];
+
+  const services = [
+    {
+      name: "Auto Masters Lahore",
+      rating: "5.0",
+      specialty: "Vehicle Maintenance & Performance Tuning",
+      location: "DHA Phase 5, Lahore",
+      tags: ["Tuning", "Diagnostics", "Repairs"]
+    },
+    {
+      name: "Detailer's Zone Karachi",
+      rating: "4.9",
+      specialty: "Paint Protection, Wrap & Ceramic Coating",
+      location: "Clifton, Karachi",
+      tags: ["Ceramic Coating", "PPF", "Detailing"]
+    },
+    {
+      name: "Islamabad Tuning Lab",
+      rating: "4.8",
+      specialty: "ECU Remapping & Exhaust Upgrades",
+      location: "I-9 Sector, Islamabad",
+      tags: ["Remapping", "Exhaust", "Dyno"]
+    }
+  ];
+
+  const galleryImages = [
+    "https://images.openai.com/static-rsc-4/vpXiLi-Kuh9b_IDW3V83vZAZDw6Wp_XOTZvSVPu-9-aWbfqRDIOa1KK9jsmZYYE2RadjnkqirnbT_F0FFnrKE3fVp0yje9aYbufOjCT9e7RROhsxwrSToVr9Fb8GbGLunzHGD9C76YbXWrF4lU4pWShfFZAx9ShE55zodHtE7uzfYl4uE_LhqjabFc7W2QPE?purpose=fullsize",
+    "https://images.openai.com/static-rsc-4/AbctnWLNFCgC6xdqi-IMI5vW2hup74u3l36WFgQVzSa-IVoMWL4ktf28BWKS-ZvRmtzT3QoprgpFeF5y10u88MWw7DyJKI9e3euzxRfROpCM6t0UJyytaR_b9O7_s3lkUtQ2xZUBLESSPa0cIiWuLEZ1z9_Z-DLuGn_rTtXsvv5XQ1woc4biGVHgURcbRdjR?purpose=fullsize",
+    "https://images.openai.com/static-rsc-4/6kfX-CdTdDBDAaby-vHwP08SJvMofgBZp96t1LoTiFcbCRzqDx56AeiuKke8G9gebe5ijYnnN7FFUG5GxZt_aIsRmURt7UEOl0HiVWp3jZnRIfi8O_UuxaVMF8zdv7dcyTrOoefOYODzkIE7W3TVJzT0fJvkrL0hhD_lMOMFvPSrDYbkISTSgRuXHd_g7bkT?purpose=fullsize",
+    "https://images.openai.com/static-rsc-4/skyrhE7s8CB-TBzzLbgH3DRri4CbohA4urmH3a0yXDVtJb3mJyZSROqhNRAUwMTqDkzIZvges9CYkGBUySsyeZ6pw17hv1zZfTl0ynFk-gSdmn2Ci7D687qL-POMlHnwtRV9O_VVnjuUADEZgzpmY1U6mPOtjUQEeqx8kN0cOOAZZrA7GpnynClWS4JD3LBH?purpose=fullsize",
+    "https://images.openai.com/static-rsc-4/Yb4s5RqbcA9W7p64A6Z1BKJ2SNNyLs2p2CqZzDDKq_7FyF7OOUWphFNBImUBoJqRVzroAb7MZfiZLm04hNtaLbGme40V90oixTinSeuYmQybjDQUIFDEIy_6CWTBGl276UBonawGi3Jz7nEHp1P9IOxAhcFuXc1a_6UhXBb9fKddZLN-WbzQ6uOzRv0GNq4H?purpose=fullsize",
+    "https://images.openai.com/static-rsc-4/SdNuW9CgHCTHbT3Lw1kX9M-WH9Ogk_h6NpgvwC5EBUYGb4vl0pzFaP7UIqi5VtwXwLChGv7yFn9tODQJ2MwLwAGXrRF67KKmQzPWKT43Q9LTX_UMvcChysOvmUNiIUlBeLnv_TnsShJx3sUjEgr1q-DfyHEdfeiz4GGC9afXSQdCdAdkWd3nyXRqyIY2V4tj?purpose=fullsize"
+  ];
+
+  const finalEvents = eventsList.length > 0 ? eventsList : staticEvents;
+  const finalClubs = clubsList.length > 0 ? clubsList : staticClubs;
+  const finalProducts = productsList.length > 0 ? productsList : staticProducts;
+
   return (
-    <div>
-      <Header title='Marketplace' age={25} showTitle data={marketplace}/>
-      <Header title='Network' age={30}  showTitle data={network}/>
-      
+    <div className="bg-[#f8fcff] text-[#0B2447] min-h-screen overflow-x-hidden antialiased">
+      {/* Brand highlight gradient overlay */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none opacity-30 bg-[radial-gradient(circle_at_top,rgba(25,55,109,0.08),transparent_60%)] z-0" />
+
+      {/* Hero Section */}
+      <section className="relative min-h-[85vh] flex flex-col justify-center items-center px-6 pt-12 pb-16 overflow-hidden border-b border-[#0C6792]/10">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&q=80&w=1920" 
+            alt="Automotive Group" 
+            className="w-full h-full object-cover object-center opacity-5"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#f8fcff] via-[#f8fcff]/90 to-[#f8fcff]/40" />
+        </div>
+
+        <div className="relative z-10 max-w-5xl mx-auto text-center space-y-6 pt-8">
+          <span className="inline-block bg-[#19376D]/10 text-[#19376D] border border-[#19376D]/20 px-4 py-1 text-xs font-mono uppercase tracking-widest rounded-full font-bold shadow-xs">
+            🇵🇰 Pakistan's Automotive Network
+          </span>
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#0B2447] leading-tight">
+            Pakistan's Automotive <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#19376D] via-[#0C6792] to-[#19376D]">
+              Community & Marketplace
+            </span>
+          </h1>
+          <p className="text-base sm:text-xl text-[#0B2447]/70 max-w-3xl mx-auto leading-relaxed font-medium">
+            Connect with clubs, discover exciting events, find trusted workshops, and buy/sell automotive products—all in one unified platform.
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-6">
+            <Link 
+              href="/networking" 
+              className="w-full sm:w-auto px-8 py-4 bg-[#19376D] hover:bg-[#0B2447] text-white font-bold rounded-2xl shadow-[0_4px_16px_rgba(25,55,109,0.2)] transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+            >
+              <Users className="h-5 w-5" />
+              Join The Community
+            </Link>
+            <Link 
+              href="/marketplace" 
+              className="w-full sm:w-auto px-8 py-4 bg-white border border-slate-200 hover:bg-slate-50 text-[#19376D] font-bold rounded-2xl shadow-xs transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+            >
+              <ShoppingBag className="h-5 w-5" />
+              Explore Marketplace
+            </Link>
+          </div>
+        </div>
+
+        {/* Hero Stats */}
+        <div className="relative z-10 w-full max-w-5xl mx-auto mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-white/70 backdrop-blur-md border border-[#0C6792]/10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+          {[
+            { label: "Members", value: "5000+" },
+            { label: "Clubs", value: "100+" },
+            { label: "Events", value: "300+" },
+            { label: "Products", value: "1000+" }
+          ].map((stat, idx) => (
+            <div key={idx} className="text-center p-3">
+              <p className="text-3xl sm:text-4xl font-extrabold text-[#19376D] tracking-tight">{stat.value}</p>
+              <p className="text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-widest mt-1">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 2: What Is ThrottleConnect? */}
+      <section className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="grid gap-12 lg:grid-cols-2 items-center">
+          <div className="relative h-[300px] sm:h-[450px] w-full rounded-3xl overflow-hidden border border-slate-200 shadow-xl bg-white">
+            <img 
+              src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&q=80&w=800" 
+              alt="Automotive Community" 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+            <div className="absolute bottom-6 left-6 p-4 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/65 shadow-md">
+              <p className="text-sm font-bold text-[#0B2447] flex items-center gap-1.5">
+                <Compass className="h-4 w-4 text-[#0C6792]" /> Connecting Enthusiasts Nationwide
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <span className="inline-block bg-[#19376D]/10 text-[#19376D] border border-[#19376D]/20 px-3 py-0.5 rounded-full font-mono text-[11px] uppercase tracking-wider font-semibold">
+              About ThrottleConnect
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0B2447] leading-tight">
+              More Than Just <br className="hidden sm:inline" />
+              a Marketplace
+            </h2>
+            <div className="h-1 w-20 bg-[#19376D] rounded-full" />
+            <p className="text-slate-600 text-base sm:text-lg leading-relaxed font-medium">
+              ThrottleConnect brings together riders, drivers, clubs, workshops, creators, and automotive businesses. 
+            </p>
+            <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+              Whether you want to join verified clubs, attend upcoming events, discover auto detailing/maintenance services, or shop high-quality products from trusted local sellers, everything is engineered into a single unified platform.
+            </p>
+            <div className="grid grid-cols-2 gap-4 pt-4">
+              <div className="flex items-start gap-2.5">
+                <div className="p-1.5 bg-[#19376D]/10 text-[#19376D] rounded-lg mt-1 shrink-0 border border-[#19376D]/20">
+                  <ShieldCheck className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[#0B2447]">Verified Clubs</p>
+                  <p className="text-xs text-slate-500 font-medium">Only authentic clubs and hosts.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <div className="p-1.5 bg-[#19376D]/10 text-[#19376D] rounded-lg mt-1 shrink-0 border border-[#19376D]/20">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-[#0B2447]">Top Marketplace</p>
+                  <p className="text-xs text-slate-500 font-medium">Secure listings for gear & parts.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 3: Two Main Pillars */}
+      <section className="py-16 bg-[#eef5f9] border-y border-[#0C6792]/10">
+        <div className="max-w-7xl mx-auto px-6 grid gap-8 md:grid-cols-2">
+          {/* Card 1: Networking */}
+          <div className="relative group overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 hover:border-[#19376D]/30 transition duration-300 flex flex-col justify-between shadow-xs">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#19376D]/5 rounded-bl-full pointer-events-none group-hover:scale-150 transition-transform duration-500" />
+            
+            <div className="space-y-4">
+              <div className="text-4xl">🏍️</div>
+              <h3 className="text-2xl font-extrabold text-[#0B2447]">Networking</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">Expand your automotive connections. Join group rides, meet like-minded drivers, and become a part of active local auto clubs.</p>
+              <ul className="space-y-2 pt-2">
+                {["Join Auto & Riding Clubs", "Attend Meetups & Runs", "Meet Riders & Drivers", "Discover Automotive Communities"].map((feat, i) => (
+                  <li key={i} className="text-xs text-slate-600 flex items-center gap-2 font-medium">
+                    <span className="h-1.5 w-1.5 bg-[#19376D] rounded-full" />
+                    {feat}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="pt-6">
+              <Link 
+                href="/networking" 
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-[#19376D] hover:text-[#0B2447] transition"
+              >
+                Explore Clubs <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Card 2: Marketplace */}
+          <div className="relative group overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 hover:border-[#19376D]/30 transition duration-300 flex flex-col justify-between shadow-xs">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#19376D]/5 rounded-bl-full pointer-events-none group-hover:scale-150 transition-transform duration-500" />
+
+            <div className="space-y-4">
+              <div className="text-4xl">🛒</div>
+              <h3 className="text-2xl font-extrabold text-[#0B2447]">Marketplace</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">Buy and sell automotive parts, helmets, riding jackets, riding gear, and accessories. Connect with trusted sellers across Pakistan.</p>
+              <ul className="space-y-2 pt-2">
+                {["Buy & Sell Products", "Automotive Accessories", "Premium Parts & Riding Gear", "Trusted & Verified Sellers"].map((feat, i) => (
+                  <li key={i} className="text-xs text-slate-600 flex items-center gap-2 font-medium">
+                    <span className="h-1.5 w-1.5 bg-[#19376D] rounded-full" />
+                    {feat}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="pt-6">
+              <Link 
+                href="/marketplace" 
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-[#19376D] hover:text-[#0B2447] transition"
+              >
+                Browse Marketplace <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+ 
+   <UpcomingEventsSection
+   />
+      {/* Section 5: Featured Clubs */}
+      <section className="py-20 bg-[#eef5f9] border-y border-[#0C6792]/10 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center space-y-3 mb-16">
+            <span className="inline-block bg-[#19376D]/10 text-[#19376D] border border-[#19376D]/20 px-3 py-0.5 rounded-full font-mono text-[11px] uppercase tracking-wider font-semibold">
+              Clubs roster
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0B2447]">Featured Auto Clubs</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto text-sm sm:text-base font-medium">Find groups with similar passion, verify credentials, submit requests, and join club runs.</p>
+          </div>
+
+          {loadingClubs ? (
+            <div className="h-48 border border-dashed border-slate-200 rounded-3xl bg-white flex flex-col items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-[#19376D] mb-1" />
+              <p className="text-xs text-slate-500 font-semibold animate-pulse">Loading featured clubs...</p>
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {finalClubs.map((club, idx) => (
+                <div 
+                  key={idx} 
+                  className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 flex flex-col justify-between group hover:border-[#19376D]/20 transition duration-300 shadow-xs"
+                >
+                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${club.bgGradient} blur-2xl rounded-full pointer-events-none`} />
+                  <div className="space-y-4">
+                    <div className="h-12 w-12 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-2xl shadow-xs overflow-hidden shrink-0">
+                      {club.logoUrl ? (
+                        <img src={club.logoUrl} alt="Logo" className="h-full w-full object-cover" />
+                      ) : (
+                        club.icon
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-[#0B2447] text-lg">{club.name}</h4>
+                      <p className="text-xs text-[#0C6792] font-semibold mt-0.5">{club.type}</p>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-slate-500 font-medium">
+                      <span className="flex items-center gap-1">
+                        <Users className="h-3.5 w-3.5 text-slate-400" /> {club.members}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5 text-slate-400" /> {club.city}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="pt-6">
+                    <Link 
+                      href="/networking" 
+                      className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-[#19376D] text-xs font-bold rounded-xl border border-slate-200 hover:border-slate-300 transition flex items-center justify-center gap-1.5 shadow-xs"
+                    >
+                      Join Club
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Section 6: Marketplace Preview */}
+      <section className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+          <div className="space-y-2">
+            <span className="inline-block bg-[#19376D]/10 text-[#19376D] border border-[#19376D]/20 px-3 py-0.5 rounded-full font-mono text-[11px] uppercase tracking-wider font-semibold">
+              Auto shop
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0B2447]">Popular Listings in Marketplace</h2>
+          </div>
+          <Link 
+            href="/marketplace" 
+            className="inline-flex items-center gap-1 text-sm font-bold text-[#19376D] hover:underline shrink-0"
+          >
+            Explore Marketplace <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        {loadingProducts ? (
+          <div className="h-48 border border-dashed border-slate-200 rounded-3xl bg-white flex flex-col items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-[#19376D] mb-1" />
+            <p className="text-xs text-slate-500 font-semibold animate-pulse">Loading featured parts...</p>
+          </div>
+        ) : (
+          <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
+            {finalProducts.map((prod, idx) => (
+              <div key={idx} className="group border border-slate-200 bg-white rounded-2xl overflow-hidden flex flex-col justify-between hover:border-[#19376D]/20 transition duration-300 shadow-xs">
+                <div className="relative h-40 sm:h-48 bg-slate-50 overflow-hidden border-b border-slate-100">
+                  <img 
+                    src={prod.image} 
+                    alt={prod.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  />
+                  <span className="absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-xs text-[10px] text-slate-600 font-bold px-2.5 py-0.5 rounded-md border border-slate-200/50 shadow-xs">
+                    {prod.category}
+                  </span>
+                </div>
+                <div className="p-3.5 flex-1 flex flex-col justify-between space-y-2 bg-white">
+                  <div>
+                    <h5 className="font-bold text-[#0B2447] text-xs sm:text-sm line-clamp-1 leading-snug">{prod.name}</h5>
+                    <div className="flex items-center gap-1 mt-1 text-[11px] text-slate-500 font-medium">
+                      <Star className="h-3 w-3 fill-amber-500 stroke-amber-500 shrink-0" />
+                      <span>{prod.rating}</span>
+                      <span className="text-slate-400 text-[10px]">({prod.reviews})</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-1 text-xs">
+                    <span className="font-extrabold text-[#0B2447] text-sm">{prod.price}</span>
+                    <Link href="/marketplace" className="text-[#19376D] font-extrabold hover:underline">View</Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Section 7: Service Providers */}
+      <section className="py-20 bg-[#eef5f9] border-y border-[#0C6792]/10 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center space-y-3 mb-16">
+            <span className="inline-block bg-[#19376D]/10 text-[#19376D] border border-[#19376D]/20 px-3 py-0.5 rounded-full font-mono text-[11px] uppercase tracking-wider font-semibold">
+              Trusted Experts
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0B2447]">Verified Service Providers</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto text-sm sm:text-base font-medium">Find professional workshops, detailers, mechanics, and tire shops in your city.</p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {services.map((srv, idx) => (
+              <div 
+                key={idx} 
+                className="border border-slate-200 bg-white p-6 rounded-2xl space-y-4 hover:border-[#19376D]/20 transition duration-300 shadow-xs"
+              >
+                <div className="flex items-center justify-between">
+                  <h4 className="font-extrabold text-[#0B2447] text-base">{srv.name}</h4>
+                  <div className="flex items-center gap-1 text-xs text-amber-500 font-extrabold">
+                    <Star className="h-3.5 w-3.5 fill-amber-500 stroke-amber-500" />
+                    {srv.rating}
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500 min-h-[2.5rem] leading-relaxed font-medium">{srv.specialty}</p>
+                <p className="text-[11px] text-slate-400 flex items-center gap-1 font-semibold">
+                  <MapPin className="h-3.5 w-3.5" /> {srv.location}
+                </p>
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {srv.tags.map((t, i) => (
+                    <span key={i} className="inline-block bg-[#eef5f9] text-[#19376D] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-[#19376D]/10">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 8: Why ThrottleConnect? */}
+      <section className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="text-center space-y-3 mb-16">
+          <span className="inline-block bg-[#19376D]/10 text-[#19376D] border border-[#19376D]/20 px-3 py-0.5 rounded-full font-mono text-[11px] uppercase tracking-wider font-semibold">
+            Key Features
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0B2447]">Why ThrottleConnect?</h2>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              title: "Automotive Focused",
+              desc: "Built specifically for Pakistan's growing riding, driving, and performance tuning community.",
+              icon: <Car className="h-6 w-6" />
+            },
+            {
+              title: "Trusted Clubs",
+              desc: "Interact with verified motorcycle and car clubs, verify credentials, and apply safely.",
+              icon: <ShieldCheck className="h-6 w-6" />
+            },
+            {
+              title: "Premium Marketplace",
+              desc: "Quickly browse, buy, and sell automotive gear, helmets, custom exhausts, and spares.",
+              icon: <ShoppingBag className="h-6 w-6" />
+            },
+            {
+              title: "Discover Events",
+              desc: "Never miss breakfast runs, auto shows, track days, and multi-club meetups in your area.",
+              icon: <Calendar className="h-6 w-6" />
+            }
+          ].map((why, idx) => (
+            <div 
+              key={idx} 
+              className="border border-slate-200 bg-white p-6 rounded-2xl space-y-3 hover:border-[#19376D]/20 transition duration-300 shadow-xs"
+            >
+              <div className="h-10 w-10 bg-[#19376D]/5 text-[#19376D] rounded-xl flex items-center justify-center border border-[#19376D]/20 shrink-0">
+                {why.icon}
+              </div>
+              <h4 className="font-extrabold text-[#0B2447] text-base">{why.title}</h4>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">{why.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 9: Community Gallery */}
+      <section className="py-20 bg-[#eef5f9] border-t border-[#0C6792]/10 px-6">
+        <div className="max-w-7xl mx-auto space-y-12">
+          <div className="text-center space-y-3">
+            <span className="inline-block bg-[#19376D]/10 text-[#19376D] border border-[#19376D]/20 px-3 py-0.5 rounded-full font-mono text-[11px] uppercase tracking-wider font-semibold">
+              Enthusiasts Grid
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0B2447]">Community Moments</h2>
+          </div>
+
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
+            {galleryImages.map((imgUrl, idx) => (
+              <div key={idx} className="relative h-48 sm:h-64 rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-xs hover:scale-[1.02] transition duration-300">
+                <img src={imgUrl} alt={`Community moment ${idx + 1}`} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-slate-900/10 hover:bg-slate-900/0 transition duration-300" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 10: Final CTA */}
+      <section className="relative overflow-hidden py-24 px-6 border-t border-slate-200 text-center bg-white">
+        {/* Glow highlight */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-[#19376D]/5 blur-[120px] rounded-full pointer-events-none" />
+
+        <div className="relative z-10 max-w-4xl mx-auto space-y-8">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0B2447] leading-tight">
+            Ready to Join Pakistan's <br className="hidden sm:inline" />
+            Automotive Community?
+          </h2>
+          <p className="text-slate-500 text-base sm:text-lg max-w-2xl mx-auto font-semibold">
+            Connect with enthusiasts, discover events, and grow your automotive network.
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <Link 
+              href="/networking" 
+              className="w-full sm:w-auto px-8 py-3.5 bg-[#19376D] hover:bg-[#0B2447] text-white font-bold rounded-xl shadow-[0_4px_16px_rgba(25,55,109,0.15)] transition transform hover:-translate-y-0.5 flex items-center justify-center gap-1.5"
+            >
+              Get Started
+            </Link>
+            <Link 
+              href="/networking" 
+              className="w-full sm:w-auto px-8 py-3.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-[#19376D] font-bold rounded-xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-1.5 shadow-xs"
+            >
+              <Plus className="h-4 w-4" /> Create Club
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
-  )
+  );
 }
-
-export default page

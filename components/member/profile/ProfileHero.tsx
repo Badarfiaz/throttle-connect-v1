@@ -123,7 +123,7 @@ export default function ProfileHero() {
     setUploadingProfile(true);
     try {
       const { url } = await uploadImage(file, {
-        ownerId: user.userId,
+        ownerId: user!.userId,
         folder: "profile",
         basePath: "members",
       });
@@ -146,7 +146,7 @@ export default function ProfileHero() {
     setUploadingLicense(true);
     try {
       const { url } = await uploadImage(file, {
-        ownerId: user.userId,
+        ownerId: user!.userId,
         folder: "license",
         basePath: "members",
       });
@@ -169,7 +169,7 @@ export default function ProfileHero() {
     setUploadingVehicle(true);
     try {
       const { url } = await uploadImage(file, {
-        ownerId: user.userId,
+        ownerId: user!.userId,
         folder: "vehicles",
         basePath: "members",
       });
@@ -222,32 +222,28 @@ export default function ProfileHero() {
 
     return {
       memberName: profileData?.memberName ?? user?.name ?? "",
-      phone: profileData?.phone ?? user?.phone ?? "",
-      whatsapp: profileData?.whatsapp ?? user?.whatsapp ?? "",
-      province: profileData?.location?.province ?? user?.location?.province ?? "",
-      city: profileData?.location?.city ?? user?.location?.city ?? "",
-      area: profileData?.location?.area ?? user?.location?.area ?? "",
-      country: profileData?.location?.country ?? user?.location?.country ?? "",
-      vehicleType: profileData?.vehicle?.type ?? user?.vehicle?.type ?? "bike",
-      vehicleBrand: profileData?.vehicle?.brand ?? user?.vehicle?.brand ?? "",
-      vehicleModel: profileData?.vehicle?.model ?? user?.vehicle?.model ?? "",
-      ModelYear: profileData?.vehicle?.year !== undefined 
-        ? String(profileData.vehicle.year) 
-        : (user?.vehicle?.year !== undefined ? String(user.vehicle.year) : ""),
+      phone: profileData?.phone ?? "",
+      whatsapp: profileData?.whatsapp ?? "",
+      province: profileData?.location?.province ?? "",
+      city: profileData?.location?.city ?? "",
+      area: profileData?.location?.area ?? "",
+      country: profileData?.location?.country ?? "",
+      vehicleType: profileData?.vehicle?.type ?? "bike",
+      vehicleBrand: profileData?.vehicle?.brand ?? "",
+      vehicleModel: profileData?.vehicle?.model ?? "",
+      ModelYear: profileData?.vehicle?.year !== undefined ? String(profileData.vehicle.year) : "",
       vehicleImages: Array.isArray(profileData?.vehicle?.images)
         ? profileData.vehicle.images
-        : (Array.isArray(user?.vehicle?.images)
-          ? user.vehicle.images
-          : (profileData?.vehicle?.images
-            ? [profileData.vehicle.images as string]
-            : (user?.vehicle?.images ? [user.vehicle.images as string] : []))),
-      drivingLicenseImage: user?.drivingLicenseImage ?? profileData?.drivingLicenseImage ?? "",
-      emergencyContactName: profileData?.emergencyContact?.name ?? user?.emergencyContact?.name ?? "",
-      emergencyContactPhone: profileData?.emergencyContact?.phone ?? user?.emergencyContact?.phone ?? "",
-      bloodGroup: profileData?.emergencyContact?.bloodGroup ?? user?.emergencyContact?.bloodGroup ?? "O+",
+        : (profileData?.vehicle?.images
+          ? [profileData.vehicle.images as string]
+          : []),
+      drivingLicenseImage: profileData?.drivingLicenseImage ?? "",
+      emergencyContactName: profileData?.emergencyContact?.name ?? "",
+      emergencyContactPhone: profileData?.emergencyContact?.phone ?? "",
+      bloodGroup: profileData?.emergencyContact?.bloodGroup ?? "O+",
       experienceYears: expVal,
-      interests: profileData?.interests ?? user?.interests ?? [],
-      profileImage: user?.profileImage ?? profileData?.profileImage ?? "",
+      interests: profileData?.interests ?? [],
+      profileImage: profileData?.profileImage ?? "",
     };
   }, [profileData, user]);
 
