@@ -27,6 +27,7 @@ export type NetworkingStore = {
   bannerUrl?: string | null;
   upcomingEventsCount?: number | null;
   latestEventId?: string | null;
+  gallery?: string[] | null;
 };
 
 export type NetworkingEventType =

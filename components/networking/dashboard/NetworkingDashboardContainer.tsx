@@ -13,14 +13,16 @@ import { useMembershipRequests } from "./hooks/useMembershipRequests";
 import { useClubMembers } from "./hooks/useClubMembers";
 import { useClubEvents } from "./hooks/useClubEvents";
 import { useClubAchievements } from "./hooks/useClubAchievements";
+import { useClubGallery } from "./hooks/useClubGallery";
 
 // Tabs
 import ClubProfileTab from "./ClubProfileTab";
 import MembersTab from "./MembersTab";
 import EventsTab from "./EventsTab";
 import AchievementsTab from "./AchievementsTab";
+import GalleryTab from "./GalleryTab";
 
-type DashboardTab = "profile" | "members" | "events" | "achievements";
+type DashboardTab = "profile" | "members" | "events" | "achievements" | "gallery";
 
 export default function NetworkingDashboardContainer() {
   const [activeTab, setActiveTab] = useState<DashboardTab>("profile");
@@ -100,6 +102,15 @@ export default function NetworkingDashboardContainer() {
     achievementForm
   } = useClubAchievements(club?.id, user?.userId);
 
+  // Gallery Hook
+  const {
+    galleryList,
+    uploading: galleryUploading,
+    fileInputRef: galleryFileInputRef,
+    handleUpload: handleGalleryUpload,
+    handleDelete: handleGalleryDelete
+  } = useClubGallery(club, user);
+
   if (!user) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-50">
@@ -136,8 +147,14 @@ export default function NetworkingDashboardContainer() {
         label: "Achievements",
         description: "Celebrate milestones & trophies",
       },
+      {
+        id: "gallery",
+        label: "Club Gallery",
+        description: "Post club moments (max 10)",
+        badge: club?.gallery?.length ? `${club.gallery.length}/10` : undefined,
+      },
     ];
-  }, [pendingRequests.length, eventsList]);
+  }, [pendingRequests.length, eventsList, club?.gallery]);
 
   return (
     <DashboardContainer
@@ -250,6 +267,16 @@ export default function NetworkingDashboardContainer() {
           handleSaveAchievement={handleSaveAchievement}
           handleDeleteAchievement={handleDeleteAchievement}
           achievementForm={achievementForm}
+        />
+      )}
+
+      {activeTab === "gallery" && (
+        <GalleryTab
+          galleryList={galleryList}
+          uploading={galleryUploading}
+          fileInputRef={galleryFileInputRef}
+          handleUpload={handleGalleryUpload}
+          handleDelete={handleGalleryDelete}
         />
       )}
     </DashboardContainer>

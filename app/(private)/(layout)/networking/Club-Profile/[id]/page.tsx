@@ -627,6 +627,41 @@ export default function ClubProfile() {
     </Card>
   );
 
+  const renderGallery = () => {
+    const galleryList = dbClub?.gallery || [];
+    return (
+      <Card className="bg-background/60 backdrop-blur-md border rounded-xl">
+        <CardHeader>
+          <CardTitle>Club Gallery</CardTitle>
+          <CardDescription>Moments from our runs and meets</CardDescription>
+        </CardHeader>
+        <CardContent className="p-6">
+          {galleryList.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">No moments posted by this club yet.</p>
+          ) : (
+            <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {galleryList.map((url: string, idx: number) => (
+                <div 
+                  key={idx} 
+                  className="relative aspect-square rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs group cursor-pointer animate-in fade-in duration-200" 
+                  onClick={() => window.open(url, "_blank")}
+                >
+                  <img
+                    src={url}
+                    alt={`Club Moment ${idx + 1}`}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition duration-300" />
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
+
+
   return (
     <section className="max-w-6xl mx-auto px-6 py-12 space-y-10">
       {/* 🔹 Hero Section */}
@@ -695,11 +730,13 @@ export default function ClubProfile() {
           <TabsTrigger value="members">Members</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="achievements">Achievements</TabsTrigger>
+          <TabsTrigger value="gallery">Gallery</TabsTrigger>
         </TabsList>
 
         <TabsContent value="members">{renderMembers()}</TabsContent>
         <TabsContent value="events">{renderEvents()}</TabsContent>
         <TabsContent value="achievements">{renderAchievements()}</TabsContent>
+        <TabsContent value="gallery">{renderGallery()}</TabsContent>
       </Tabs>
 
       {/* 🔹 CTA Section */}
