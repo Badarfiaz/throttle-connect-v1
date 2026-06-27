@@ -74,6 +74,7 @@ export default function ClubProfile() {
       try {
         const docRef = doc(db, "networkingStores", id as string);
         const docSnap = await getDoc(docRef);
+        console.log("Fetched club data:", docSnap.data());
         if (docSnap.exists()) {
           setDbClub(docSnap.data());
         }
