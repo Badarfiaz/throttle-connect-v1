@@ -53,3 +53,49 @@ export const UPDATE_NETWORKING_CLUB_MUTATION = `
     }
   }
 `;
+
+/**
+ * Paginated club search query — supports server-side category filtering.
+ */
+export const GET_CLUBS_PAGINATED_QUERY = `
+  query GetClubs(
+    $where: ClubWhereInput
+    $page: Int
+    $limit: Int
+  ) {
+    clubs(where: $where, page: $page, limit: $limit) {
+      items {
+        id
+        clubName
+        clubType
+        otherClubType
+        description
+        city
+        phone
+        email
+        contactMethod
+        socialPlatforms {
+          website
+          linkedin
+          instagram
+          other
+        }
+        onBoardType
+        pageType
+        ownerUid
+        completed
+        createdAt
+        slugUrl
+        logoUrl
+        bannerUrl
+      }
+      pagination {
+        page
+        limit
+        totalCount
+        hasNextPage
+      }
+    }
+  }
+`;
+

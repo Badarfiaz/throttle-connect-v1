@@ -30,6 +30,28 @@ const networkingClubTypeDefs = /* GraphQL */ `
     completed: Boolean
     createdAt: String
     slugUrl: String
+    logoUrl: String
+    bannerUrl: String
+  }
+
+  # Pagination metadata for networking clubs
+  type NetworkingPaginationInfo {
+    page: Int!
+    limit: Int!
+    totalCount: Int!
+    hasNextPage: Boolean!
+  }
+
+  # Paginated networking clubs result
+  type NetworkingClubsPage {
+    items: [NetworkingClub!]!
+    pagination: NetworkingPaginationInfo!
+  }
+
+  # Filter input for club queries
+  input ClubWhereInput {
+    category: String
+    city: String
   }
 
   input UpdateNetworkingClubInput {
@@ -48,6 +70,8 @@ const networkingClubTypeDefs = /* GraphQL */ `
     networkingClubs: [NetworkingClub!]!
     networkingAllClubs: [NetworkingClub!]!
     networkingClubProfile(slugUrl: String!): [NetworkingClub!]!
+    # New paginated query with where-filter support
+    clubs(where: ClubWhereInput, page: Int, limit: Int): NetworkingClubsPage!
   }
 
   type Mutation {

@@ -276,3 +276,49 @@ export const GET_FEATURED_PRODUCTS_QUERY = `
     }
   }
 `;
+
+/**
+ * Paginated product search query — supports server-side category filtering.
+ */
+export const GET_PRODUCTS_PAGINATED_QUERY = `
+  query GetProducts(
+    $where: ProductWhereInput
+    $page: Int
+    $limit: Int
+  ) {
+    products(where: $where, page: $page, limit: $limit) {
+      items {
+        id
+        ownerUid
+        productName
+        imageurl {
+          ref
+          url
+        }
+        stock
+        price
+        category
+        description
+        owner {
+          id
+          title
+          contactMethod
+          logoUrl
+          slugUrl
+          phone
+          email
+          location { area city province }
+        }
+        createdAt
+        updatedAt
+      }
+      pagination {
+        page
+        limit
+        totalCount
+        hasNextPage
+      }
+    }
+  }
+`;
+

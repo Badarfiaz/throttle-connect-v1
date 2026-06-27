@@ -23,6 +23,26 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
     updatedAt: String
   }
 
+  # Pagination metadata returned alongside paginated results
+  type PaginationInfo {
+    page: Int!
+    limit: Int!
+    totalCount: Int!
+    hasNextPage: Boolean!
+  }
+
+  # Paginated product result wrapper
+  type MarketplaceProductsPage {
+    items: [MarketplaceProduct!]!
+    pagination: PaginationInfo!
+  }
+
+  # Filter input for product queries
+  input ProductWhereInput {
+    category: String
+    ownerUid: ID
+  }
+
   input CreateMarketplaceProductInput {
     productName: String!
     imageurl: ImageUrlInput
@@ -47,6 +67,8 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
     marketplaceProduct(id: ID!): MarketplaceProduct
     getMarketplaceFeaturedProducts: [MarketplaceProduct!]!
     getProductsByCategory(category: String!): [MarketplaceProduct!]!
+    # New paginated query with where-filter support
+    products(where: ProductWhereInput, page: Int, limit: Int): MarketplaceProductsPage!
   }
 
   type Mutation {

@@ -15,7 +15,7 @@ type CategoryCardProps = {
 function CategoryGridCard({ name, slug, imageUrl }: CategoryCardProps) {
   return (
     <Link
-      href={`/networking/Club-list/${slug}`}
+      href={`/networking/search?category=${slug}`}
       className="flex flex-col items-center group w-full"
     >
       <div className="w-[88px] h-[88px] md:w-[104px] md:h-[104px] bg-[#f2f4f5] rounded-[24px] flex items-center justify-center mb-3 transition-all duration-300 group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group-hover:-translate-y-1 relative overflow-hidden">

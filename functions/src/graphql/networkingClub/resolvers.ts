@@ -78,6 +78,62 @@ const networkingClubResolvers = {
         };
       });
     },
+
+    /**
+     * Paginated, server-side filtered club query.
+     * Supports where: { category, city }, page (1-indexed), limit.
+     * category maps to the clubType field in Firestore.
+     */
+    clubs: async (
+      _: any,
+      args: {
+        where?: { category?: string; city?: string };
+        page?: number;
+        limit?: number;
+      },
+    ) => {
+      const page = Math.max(1, args.page ?? 1);
+      const limit = Math.min(50, Math.max(1, args.limit ?? 10));
+      const { where } = args;
+
+      let baseQuery: FirebaseFirestore.Query = db
+        .collection(COLLECTIONS.NETWORKING_CLUBS)
+        .where("completed", "==", true)
+        .orderBy("createdAt", "desc");
+
+      if (where?.category && where.category.trim() !== "") {
+        baseQuery = baseQuery.where("clubType", "==", where.category.trim());
+      }
+
+      if (where?.city && where.city.trim() !== "") {
+        baseQuery = baseQuery.where("city", "==", where.city.trim());
+      }
+
+      const countSnapshot = await baseQuery.count().get();
+      const totalCount = countSnapshot.data().count;
+
+      const offset = (page - 1) * limit;
+      const snapshot = await baseQuery.offset(offset).limit(limit).get();
+
+      const items = snapshot.docs.map((doc) => {
+        const data = doc.data() as any;
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: normalizeCreatedAt(data?.createdAt),
+        };
+      });
+
+      return {
+        items,
+        pagination: {
+          page,
+          limit,
+          totalCount,
+          hasNextPage: offset + items.length < totalCount,
+        },
+      };
+    },
   },
 
   Mutation: {

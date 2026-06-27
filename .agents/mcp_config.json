@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "firebase": {
+      "command": "firebase",
+      "args": [
+        "experimental:mcp",
+        "--dir",
+        "/home/badar/projects/throttle-connect-v1"
+      ]
+    }
+  }
+}

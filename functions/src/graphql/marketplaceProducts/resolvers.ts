@@ -141,6 +141,64 @@ const marketplaceProductsResolvers = {
         };
       });
     },
+
+    /**
+     * Paginated, server-side filtered product query.
+     * Supports where: { category, ownerUid }, page (1-indexed), limit.
+     */
+    products: async (
+      _: any,
+      args: {
+        where?: { category?: string; ownerUid?: string };
+        page?: number;
+        limit?: number;
+      },
+    ) => {
+      const page = Math.max(1, args.page ?? 1);
+      const limit = Math.min(50, Math.max(1, args.limit ?? 10));
+      const { where } = args;
+
+      // Build base query with optional category filter
+      let baseQuery: FirebaseFirestore.Query = db
+        .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
+        .orderBy("createdAt", "desc");
+
+      if (where?.category && where.category.trim() !== "") {
+        baseQuery = baseQuery.where("category", "==", where.category.trim());
+      }
+
+      if (where?.ownerUid && where.ownerUid.trim() !== "") {
+        baseQuery = baseQuery.where("ownerUid", "==", where.ownerUid.trim());
+      }
+
+      // Get total count for pagination metadata
+      const countSnapshot = await baseQuery.count().get();
+      const totalCount = countSnapshot.data().count;
+
+      // Fetch the correct page via offset
+      const offset = (page - 1) * limit;
+      const snapshot = await baseQuery.offset(offset).limit(limit).get();
+
+      const items = snapshot.docs.map((doc) => {
+        const data = doc.data() as any;
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: normalizeTimestamp(data?.createdAt),
+          updatedAt: normalizeTimestamp(data?.updatedAt),
+        };
+      });
+
+      return {
+        items,
+        pagination: {
+          page,
+          limit,
+          totalCount,
+          hasNextPage: offset + items.length < totalCount,
+        },
+      };
+    },
   },
 
   MarketplaceProduct: {
