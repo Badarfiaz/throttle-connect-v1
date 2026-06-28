@@ -11,7 +11,9 @@ import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 import ProfileRequiredBanner from "@/components/networking/ProfileRequiredBanner";
 import UpcomingEventsSection from "@/components/networking/UpcomingEventsSection";
-import { Compass, Wrench, Trophy, ShieldCheck, Users, CalendarDays, Image as ImageIcon } from "lucide-react";
+import { Compass, Wrench, Trophy, ShieldCheck, Users, CalendarDays, Image as ImageIcon, Sparkles, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 import NetworkingCategoryGrid from "@/components/networking/NetworkingCategoryGrid";
 
@@ -85,6 +87,28 @@ function Home() {
       />
 
       <ProfileRequiredBanner />
+
+      {/* Global Discussion Channel Banner */}
+      <div className="max-w-5xl mx-auto px-6 mt-8">
+        <div className="bg-gradient-to-r from-[#0B2447] via-[#19376D] to-[#0F4C75] rounded-3xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3 blur-2xl pointer-events-none" />
+          <div className="relative z-10 space-y-2 text-center md:text-left">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-amber-305 text-amber-300 text-xs font-bold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
+              New Feature
+            </span>
+            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight">Global Discussion Channel</h3>
+            <p className="text-sm text-blue-105 text-blue-100 max-w-xl leading-relaxed">
+              Ask questions about parts, recommend services, share photos of your car or bike, and connect instantly with the entire community.
+            </p>
+          </div>
+          <Link href="/networking/discussion" className="relative z-10 w-full md:w-auto shrink-0">
+            <Button className="w-full md:w-auto bg-white hover:bg-blue-50 text-[#0B2447] h-12 px-6 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-md">
+              Join Discussion <ArrowRight className="w-4 h-4" />
+            </Button>
+          </Link>
+        </div>
+      </div>
 
  
 

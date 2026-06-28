@@ -20,25 +20,25 @@ export default function VehicleImageGallery({
 }: VehicleImageGalleryProps) {
   return (
     <div className="space-y-2">
-      <label className="text-xs font-semibold text-slate-500 font-mono uppercase tracking-wider text-[#19376D]">
+      <label className="text-xs font-bold font-mono uppercase tracking-wider text-primary">
         Vehicle Photos (Multiple)
       </label>
       <div className="space-y-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2.5">
           {images.map((imgUrl, idx) => (
             <div
               key={idx}
-              className="relative h-16 w-16 rounded-xl border border-slate-200 bg-slate-50 overflow-hidden shrink-0 group"
+              className="relative h-16 w-16 rounded-xl border border-border bg-muted/40 overflow-hidden shrink-0 group"
             >
               <img
                 src={imgUrl}
                 alt={`Vehicle Preview ${idx + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
               <button
                 type="button"
                 onClick={() => onRemove(idx)}
-                className="absolute top-0.5 right-0.5 h-4.5 w-4.5 bg-black/70 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
+                className="absolute top-1 right-1 h-5 w-5 bg-background/80 hover:bg-destructive text-foreground hover:text-white rounded-full flex items-center justify-center shadow-xs transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -48,14 +48,14 @@ export default function VehicleImageGallery({
             type="button"
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
-            className="h-16 w-16 rounded-xl border-2 border-dashed border-slate-200 hover:border-primary/40 hover:bg-slate-50 flex flex-col items-center justify-center gap-1 text-slate-400 transition"
+            className="h-16 w-16 rounded-xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-muted/40 flex flex-col items-center justify-center gap-1 text-muted-foreground transition cursor-pointer"
           >
             {uploading ? (
-              <Loader2 className="h-4 w-4 animate-spin text-[#19376D]" />
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
             ) : (
               <>
-                <Plus className="h-4 w-4 text-slate-500" />
-                <span className="text-[10px] font-semibold text-slate-500">
+                <Plus className="h-5 w-5 text-muted-foreground" />
+                <span className="text-[10px] font-semibold">
                   Add
                 </span>
               </>
