@@ -1,6 +1,6 @@
 "use client";
 
-import { Crown, MessageCircle, Calendar, Sparkles, ArrowRight, Users } from "lucide-react";
+import { Crown, MessageCircle, Calendar, Sparkles, ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/app/redux/hooks";
 import { useEffect, useState } from "react";
@@ -10,8 +10,50 @@ import Link from "next/link";
 
 const WHATSAPP_NUMBER = "923344444503";
 const WHATSAPP_MESSAGE = encodeURIComponent(
-  "Hi! I need assistance with my Throttle Connect Gold Plan subscription.",
+  "Hi! I need assistance with my Throttle Connect subscription.",
 );
+
+const PLAN_STYLES = {
+  silver: {
+    title: "Silver Membership",
+    bg: "from-slate-500/10 via-slate-550/5 to-slate-500/0",
+    border: "border-slate-500/20",
+    text: "text-slate-900",
+    textMuted: "text-slate-800",
+    progressBg: "bg-slate-200/50",
+    progressBar: "from-slate-500 to-slate-400",
+    badge: "bg-slate-500 text-white border-slate-600",
+    iconBg: "bg-slate-500",
+    iconColor: "text-slate-400",
+    icon: ShieldCheck,
+  },
+  gold: {
+    title: "Gold Membership",
+    bg: "from-amber-500/10 via-yellow-500/5 to-amber-500/0",
+    border: "border-amber-500/20",
+    text: "text-amber-900",
+    textMuted: "text-amber-800",
+    progressBg: "bg-amber-200/50",
+    progressBar: "from-amber-500 to-yellow-500",
+    badge: "bg-emerald-500 text-white border-emerald-600",
+    iconBg: "bg-amber-500",
+    iconColor: "text-amber-300",
+    icon: Crown,
+  },
+  platinum: {
+    title: "Platinum Membership",
+    bg: "from-purple-500/10 via-indigo-500/5 to-purple-500/0",
+    border: "border-purple-500/20",
+    text: "text-purple-900",
+    textMuted: "text-purple-800",
+    progressBg: "bg-purple-200/50",
+    progressBar: "from-purple-500 to-indigo-500",
+    badge: "bg-purple-600 text-white border-purple-700",
+    iconBg: "bg-purple-500",
+    iconColor: "text-purple-300",
+    icon: Sparkles,
+  },
+};
 
 function getDaysRemaining(subscriptionEnd: string | null | undefined): number | null {
   if (!subscriptionEnd) return null;
@@ -36,11 +78,11 @@ export default function GoldUserBanner() {
   const [recentPayment, setRecentPayment] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
-  // Check if subscription plan is gold and status is active
-  const isGoldActive =
-    user?.subscriptionPlan === "gold"  
-    console.log('user?.subscriptionPlan', user?.subscriptionPlan)
-console.log('isGoldActive => ',isGoldActive);
+  // Check if subscription plan is active
+  const isSubscriptionActive =
+    user?.subscriptionPlan === "gold" ||
+     user?.subscriptionPlan === "silver" ||
+     user?.subscriptionPlan === "platinum"  ;
 
   useEffect(() => {
     if (!user?.userId) return;
@@ -58,7 +100,11 @@ console.log('isGoldActive => ',isGoldActive);
     }
   };
 
-  if (!isGoldActive) return null;
+  if (!isSubscriptionActive) return null;
+
+  const currentPlan = user?.subscriptionPlan as "silver" | "gold" | "platinum";
+  const styles = PLAN_STYLES[currentPlan] || PLAN_STYLES.gold;
+  const PlanIcon = styles.icon;
 
   const daysLeft = getDaysRemaining(user?.subscriptionEnd);
   const progress = getProgressPercent(user?.subscriptionStart, user?.subscriptionEnd);
@@ -67,54 +113,54 @@ console.log('isGoldActive => ',isGoldActive);
 
   return (
     <div className="space-y-4 mb-6">
-      {/* Gold status card */}
-      <div className="rounded-2xl bg-gradient-to-r from-amber-500/10 via-yellow-500/5 to-amber-500/0 border border-amber-500/20 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-md relative overflow-hidden">
+      {/* Dynamic status card */}
+      <div className={`rounded-2xl bg-gradient-to-r ${styles.bg} border ${styles.border} p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-md relative overflow-hidden`}>
         {/* Background glow */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+        <div className={`absolute top-0 right-0 w-32 h-32 ${currentPlan === 'silver' ? 'bg-slate-400/10' : currentPlan === 'platinum' ? 'bg-purple-400/10' : 'bg-amber-400/10'} rounded-full blur-2xl pointer-events-none`} />
         
         <div className="flex items-start sm:items-center gap-4 relative z-10">
-          <div className="p-3 bg-amber-500 text-white rounded-2xl shrink-0 shadow-lg shadow-amber-500/25">
-            <Crown className="w-6 h-6 animate-bounce" style={{ animationDuration: '3s' }} />
+          <div className={`p-3 ${styles.iconBg} text-white rounded-2xl shrink-0 shadow-lg shadow-black/10`}>
+            <PlanIcon className="w-6 h-6 animate-bounce" style={{ animationDuration: '3s' }} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-amber-900 text-base flex items-center gap-1">
-                Gold Membership
+              <span className={`font-extrabold ${styles.text} text-base flex items-center gap-1`}>
+                {styles.title}
               </span>
-              <span className="text-[10px] font-extrabold bg-emerald-500 text-white px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm animate-pulse">
+              <span className={`text-[10px] font-extrabold ${styles.badge} px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm animate-pulse`}>
                 Active
               </span>
             </div>
             {daysLeft !== null ? (
               <div className="mt-2">
-                <div className="flex items-center gap-2 text-xs text-amber-800 font-medium">
+                <div className={`flex items-center gap-2 text-xs ${styles.textMuted} font-medium`}>
                   <Calendar className="w-3.5 h-3.5" />
                   <span>
                     <strong>{daysLeft} days</strong> remaining in your cycle (4 months total)
                   </span>
                 </div>
-                <div className="mt-2 w-full sm:w-64 h-2 bg-amber-200/50 rounded-full overflow-hidden border border-amber-300/30">
+                <div className={`mt-2 w-full sm:w-64 h-2 ${styles.progressBg} rounded-full overflow-hidden border border-black/5`}>
                   <div
-                    className="h-full bg-gradient-to-r from-amber-500 to-yellow-550 to-yellow-500 rounded-full transition-all"
+                    className={`h-full bg-gradient-to-r ${styles.progressBar} rounded-full transition-all`}
                     style={{ width: `${100 - progress}%` }}
                   />
                 </div>
               </div>
             ) : (
-              <p className="text-xs text-amber-800 font-medium mt-1">
-                Your premium Gold plan is active. Enjoy exclusive leads and high visibility!
+              <p className={`text-xs ${styles.textMuted} font-medium mt-1`}>
+                Your premium {styles.title} is active. Enjoy exclusive leads and high visibility!
               </p>
             )}
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0 relative z-10 w-full sm:w-auto justify-end">
-          <Link href="/checkout/success">
+          <Link href={`/checkout/success?plan=${currentPlan}`}>
             <Button
               size="sm"
-              className="bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold gap-1.5 cursor-pointer shadow-md shadow-amber-600/10"
+              className={`bg-slate-900 hover:bg-slate-805 hover:bg-slate-800 text-white rounded-xl text-xs font-bold gap-1.5 cursor-pointer shadow-md`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-305 text-amber-300" />
               Success Benefits
             </Button>
           </Link>
@@ -122,7 +168,7 @@ console.log('isGoldActive => ',isGoldActive);
             onClick={openWhatsApp}
             size="sm"
             variant="outline"
-            className="bg-white hover:bg-slate-50 border-slate-200 text-slate-750 text-slate-700 rounded-xl text-xs font-semibold gap-1.5 cursor-pointer shadow-sm"
+            className="bg-white hover:bg-slate-50 border-slate-200 text-slate-700 rounded-xl text-xs font-semibold gap-1.5 cursor-pointer shadow-sm"
           >
             <MessageCircle className="w-3.5 h-3.5 text-[#25D366] fill-[#25D366]" />
             Support

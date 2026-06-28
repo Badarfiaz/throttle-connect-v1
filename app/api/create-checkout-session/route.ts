@@ -5,23 +5,34 @@ const stripe = new Stripe(process.env.NEXT_PUBLIC_FIREBASE_SECRET_KEY!, {
   apiVersion: "2026-06-24.dahlia",
 });
 
-const GOLD_PRODUCT_ID = "prod_UmujeU8znJd5Kh";
+const PRODUCT_IDS: Record<string, string | undefined> = {
+  gold: process.env.NEXT_PUBLIC_STRIPE_GOLD_PRICE_ID,
+  silver: process.env.NEXT_PUBLIC_STRIPE_SILVER_PRICE_ID,
+  platinum: process.env.NEXT_PUBLIC_STRIPE_PLATINUM_PRICE_ID,
+};
 
 export async function POST(req: NextRequest) {
   try {
-    const { uid, successUrl, cancelUrl } = await req.json();
+    const { uid, plan, successUrl, cancelUrl } = await req.json();
 
     if (!uid) {
       return NextResponse.json({ error: "Missing user ID" }, { status: 400 });
     }
 
+    const targetPlan = plan || "gold";
+    const productId = PRODUCT_IDS[targetPlan];
+
+    if (!productId) {
+      return NextResponse.json({ error: `Invalid plan: ${targetPlan}` }, { status: 400 });
+    }
+
     // Fetch the product's default price from Stripe
-    const product = await stripe.products.retrieve(GOLD_PRODUCT_ID);
+    const product = await stripe.products.retrieve(productId);
     const priceId = product.default_price as string | null;
 
     if (!priceId) {
       return NextResponse.json(
-        { error: "No default price found for Gold product. Please configure a price in Stripe." },
+        { error: `No default price found for ${targetPlan} product. Please configure a price in Stripe.` },
         { status: 400 },
       );
     }
@@ -30,9 +41,9 @@ export async function POST(req: NextRequest) {
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl || `${req.nextUrl.origin}/checkout/success`,
-      cancel_url: cancelUrl || `${req.nextUrl.origin}/checkout?plan=gold&cancelled=true`,
+      cancel_url: cancelUrl || `${req.nextUrl.origin}/checkout?plan=${targetPlan}&cancelled=true`,
       metadata: {
-        plan: "gold",
+        plan: targetPlan,
         uid,
       },
     });

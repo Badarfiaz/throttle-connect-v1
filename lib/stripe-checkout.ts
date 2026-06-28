@@ -1,4 +1,4 @@
-export type CheckoutPlan = "gold";
+export type CheckoutPlan = "gold" | "silver" | "platinum";
 
 export async function createStripeCheckoutSession(
   uid: string,

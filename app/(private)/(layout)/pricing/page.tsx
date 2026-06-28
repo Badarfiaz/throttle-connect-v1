@@ -19,6 +19,7 @@ const plans = [
     icon: Zap,
     iconColor: "text-blue-500 bg-blue-50",
     popular: false,
+    href: "/list-your-business",
     features: [
       "Standard marketplace presence in Throttle Connect",
       "Post up to 20 listings to showcase products or services",
@@ -38,6 +39,7 @@ const plans = [
     icon: ShieldCheck,
     iconColor: "text-slate-500 bg-slate-50",
     popular: false,
+    href: "/checkout?plan=silver",
     features: [
       "16 Featured Listings for stronger category visibility",
       "24 professionally designed social media creatives",
@@ -58,6 +60,7 @@ const plans = [
     icon: Sparkles,
     iconColor: "text-amber-500 bg-amber-50",
     popular: true,
+    href: "/checkout?plan=gold",
     features: [
       "32 Featured Listings for high-priority placement",
       "75+ brand banner Ads placements on key sections",
@@ -80,6 +83,7 @@ const plans = [
     icon: Crown,
     iconColor: "text-purple-500 bg-purple-55 text-purple-500 bg-purple-50",
     popular: false,
+    href: "/checkout?plan=platinum",
     features: [
       "80 Featured Listings for dominant category visibility",
       "185+ brand banner Ads placements for premium exposure",
@@ -271,7 +275,7 @@ export default function PricingPage() {
                       : "bg-white hover:bg-gray-50 text-[#0B2447] border border-gray-200 cursor-pointer"
                   }`}
                 >
-                  <Link href={plan.popular ? "/checkout?plan=gold" : "/list-your-business"}>
+                  <Link href={plan.href}>
                     {plan.buttonText}
                   </Link>
                 </Button>

@@ -21,20 +21,82 @@ import { useAppSelector } from "@/app/redux/hooks";
 import { createStripeCheckoutSession } from "@/lib/stripe-checkout";
 import Link from "next/link";
 
+const SILVER_FEATURES = [
+  "16 Featured Listings for stronger category visibility",
+  "24 professionally designed social media creatives",
+  "8 engaging reels / short videos by our creative team",
+  "44–66 Quality Leads per 4 months",
+  "Organic + paid visibility mix in the ecosystem",
+  "Limited slots per category - secure your position",
+];
+
 const GOLD_FEATURES = [
   "32 Featured Listings for high-priority placement",
-  "75+ brand banner Ads on key sections",
-  "48 premium social media posts",
-  "16 high-quality reels / videos",
+  "75+ brand banner Ads placements on key sections",
+  "48 premium social media posts designed for your brand",
+  "16 high-quality reels / videos for maximum engagement",
   "65–95 Quality Leads per 4 months",
-  "Strong organic + paid amplification",
+  "Strong organic visibility + paid amplification",
   "Priority growth support & performance optimization",
 ];
 
-const TERMS = [
+const PLATINUM_FEATURES = [
+  "80 Featured Listings for dominant category visibility",
+  "185+ brand banner Ads placements for premium exposure",
+  "80 professionally crafted social media creatives",
+  "24 powerful reels / videos to maximize recall",
+  "130–145 Quality Leads per 4 months",
+  "Maximum organic exposure + aggressive paid amplification",
+  "Top-tier positioning to capture high-intent buyers",
+  "Exclusive category dominance - limited vendors per city",
+];
+
+const PLAN_DETAILS = {
+  silver: {
+    name: "Silver Plan",
+    price: "Rs. 46,000",
+    originalPrice: "Rs. 56,000",
+    monthly: "Rs. 11,500/month",
+    discount: "Rs. 10,000",
+    features: SILVER_FEATURES,
+    gradient: "from-slate-700 to-slate-500",
+    accentBg: "bg-slate-50 border-slate-200 text-slate-700",
+    badgeColor: "bg-slate-50 text-slate-700 border-slate-200",
+    icon: ShieldCheck,
+    iconColor: "text-slate-400",
+  },
+  gold: {
+    name: "Gold Plan",
+    price: "Rs. 83,000",
+    originalPrice: "Rs. 104,000",
+    monthly: "Rs. 20,750/month",
+    discount: "Rs. 21,000",
+    features: GOLD_FEATURES,
+    gradient: "from-[#0B2447] to-[#19376D]",
+    accentBg: "bg-amber-50 border-amber-200 text-amber-700",
+    badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+    icon: Crown,
+    iconColor: "text-amber-300",
+  },
+  platinum: {
+    name: "Platinum Plan",
+    price: "Rs. 112,000",
+    originalPrice: "Rs. 140,000",
+    monthly: "Rs. 28,000/month",
+    discount: "Rs. 28,000",
+    features: PLATINUM_FEATURES,
+    gradient: "from-purple-950 to-indigo-900",
+    accentBg: "bg-purple-50 border-purple-200 text-purple-700",
+    badgeColor: "bg-purple-50 text-purple-750 text-purple-700 border-purple-200",
+    icon: Sparkles,
+    iconColor: "text-purple-300",
+  },
+};
+
+const getTerms = (planName: string) => [
   {
     title: "Subscription Duration",
-    body: "The Gold Plan is a 4-month (120-day) subscription starting from the date of successful payment. The plan does not auto-renew unless you explicitly choose to renew.",
+    body: `The ${planName} is a 4-month (120-day) subscription starting from the date of successful payment. The plan does not auto-renew unless you explicitly choose to renew.`,
   },
   {
     title: "Refund Policy",
@@ -63,7 +125,12 @@ function CheckoutContent() {
   const router = useRouter();
   const user = useAppSelector((s) => s.auth.user);
 
-  const plan = searchParams.get("plan") ?? "gold";
+  const planParam = searchParams.get("plan") ?? "gold";
+  const plan = (planParam.toLowerCase() === "silver" || planParam.toLowerCase() === "platinum" ? planParam.toLowerCase() : "gold") as "silver" | "gold" | "platinum";
+  
+  const details = PLAN_DETAILS[plan];
+  const TERMS = getTerms(details.name);
+
   const cancelled = searchParams.get("cancelled") === "true";
 
   const [agreed, setAgreed] = useState(false);
@@ -91,13 +158,15 @@ function CheckoutContent() {
     setError(null);
 
     try {
-      const url = await createStripeCheckoutSession(user.userId, "gold");
+      const url = await createStripeCheckoutSession(user.userId, plan);
       window.location.assign(url);
     } catch (err: any) {
       setError(err.message ?? "Failed to initiate payment. Please try again.");
       setLoading(false);
     }
   };
+
+  const PlanIcon = details.icon;
 
   return (
     <div className="min-h-screen bg-[#f8fafc] py-12 px-4">
@@ -108,9 +177,9 @@ function CheckoutContent() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 text-amber-700 text-sm font-semibold mb-4 border border-amber-200">
-            <Crown className="w-4 h-4" />
-            Gold Plan Checkout
+          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-4 border ${details.badgeColor}`}>
+            <PlanIcon className="w-4 h-4" />
+            {details.name} Checkout
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-[#0B2447]">
             Complete Your Order
@@ -140,7 +209,7 @@ function CheckoutContent() {
               <div className="flex items-center gap-2 mb-5">
                 <FileText className="w-5 h-5 text-[#19376D]" />
                 <h2 className="text-lg font-bold text-[#0B2447]">
-                  Terms & Conditions
+                  Terms &amp; Conditions
                 </h2>
               </div>
 
@@ -188,7 +257,7 @@ function CheckoutContent() {
                 </div>
                 <span className="text-sm text-slate-600 leading-relaxed">
                   I have read and agree to the{" "}
-                  <strong className="text-[#0B2447]">Terms & Conditions</strong>{" "}
+                  <strong className="text-[#0B2447]">Terms &amp; Conditions</strong>{" "}
                   above. I understand the subscription duration, refund policy,
                   and deliverables timeline.
                 </span>
@@ -211,48 +280,50 @@ function CheckoutContent() {
             className="lg:col-span-2 space-y-4"
           >
             {/* Plan card */}
-            <div className="bg-gradient-to-br from-[#0B2447] to-[#19376D] rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+            <div className={`bg-gradient-to-br ${details.gradient} rounded-3xl p-6 text-white shadow-xl relative overflow-hidden`}>
               <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full" />
               <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/5 rounded-full" />
 
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 bg-amber-400/20 rounded-xl">
-                    <Sparkles className="w-5 h-5 text-amber-300" />
+                  <div className="p-2 bg-white/10 rounded-xl">
+                    <PlanIcon className={`w-5 h-5 ${details.iconColor}`} />
                   </div>
-                  <span className="font-bold text-lg">Gold Plan</span>
+                  <span className="font-bold text-lg">{details.name}</span>
                 </div>
 
                 <div className="mb-4">
-                  <div className="text-blue-200/70 text-xs line-through mb-0.5">
-                    Rs. 104,000
-                  </div>
-                  <div className="text-4xl font-extrabold">Rs. 83,000</div>
-                  <div className="text-blue-200 text-sm mt-1 flex items-center gap-1">
+                  {details.originalPrice && (
+                    <div className="text-blue-100/60 text-xs line-through mb-0.5">
+                      {details.originalPrice}
+                    </div>
+                  )}
+                  <div className="text-4xl font-extrabold">{details.price}</div>
+                  <div className="text-blue-100 text-sm mt-1 flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5" />
-                    4-month plan · Rs. 20,750/month
+                    4-month plan · {details.monthly}
                   </div>
                 </div>
 
                 <div className="bg-white/10 rounded-2xl p-4 mb-4">
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-blue-200">Subtotal</span>
-                    <span className="font-semibold">Rs. 83,000</span>
+                    <span className="text-blue-100">Subtotal</span>
+                    <span className="font-semibold">{details.price}</span>
                   </div>
                   <div className="flex justify-between text-sm mb-3">
-                    <span className="text-blue-200">Discount (20%)</span>
-                    <span className="font-semibold text-emerald-300">
-                      – Rs. 21,000
+                    <span className="text-blue-100">Discount Included</span>
+                    <span className="font-semibold text-emerald-355 text-emerald-300">
+                      – {details.discount}
                     </span>
                   </div>
                   <div className="border-t border-white/20 pt-2 flex justify-between font-bold">
                     <span>Total Due</span>
-                    <span>Rs. 83,000</span>
+                    <span>{details.price}</span>
                   </div>
                 </div>
 
                 <ul className="space-y-2">
-                  {GOLD_FEATURES.slice(0, 4).map((f) => (
+                  {details.features.slice(0, 4).map((f) => (
                     <li
                       key={f}
                       className="flex items-start gap-2 text-xs text-blue-100"
@@ -261,10 +332,12 @@ function CheckoutContent() {
                       {f}
                     </li>
                   ))}
-                  <li className="flex items-center gap-2 text-xs text-blue-200/60">
-                    <Zap className="w-3.5 h-3.5 shrink-0" />
-                    +{GOLD_FEATURES.length - 4} more benefits included
-                  </li>
+                  {details.features.length > 4 && (
+                    <li className="flex items-center gap-2 text-xs text-blue-250 text-blue-200/70">
+                      <Zap className="w-3.5 h-3.5 shrink-0" />
+                      +{details.features.length - 4} more benefits included
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
