@@ -17,8 +17,7 @@ export default function CategorySection({
   items,
   pageType,
 }: CategorySectionProps) {
-  console.log("items ", items);
-  const link =
+   const link =
     pageType === "marketplace"
       ? `/marketplace/storeProfile/${items?.slugUrl}`
       : `/networking/Club-list/${items?.slugUrl}`;

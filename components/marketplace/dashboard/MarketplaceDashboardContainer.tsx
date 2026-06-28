@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DashboardContainer } from "@/components/shared/DashboardContainer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,14 @@ import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
 import ProfileSection from "@/components/marketplace/dashboard/sections/ProfileSection";
 import ProductsSection from "@/components/marketplace/dashboard/sections/ProductsSection";
 import AddProductSection from "@/components/marketplace/dashboard/sections/AddProductSection";
+import ServicesSection from "@/components/marketplace/dashboard/sections/ServicesSection";
+import AddServiceSection from "@/components/marketplace/dashboard/sections/AddServiceSection";
+import { useMarketplaceServices } from "@/hooks/useMarketplaceServices";
 import {
   Package,
   Layers,
   Eye,
   DollarSign,
-  TrendingUp,
   Plus,
   Sparkles,
   Info,
@@ -23,11 +25,12 @@ import {
   ArrowRight,
   Edit2,
   Store,
-  X,
+  Wrench,
 } from "lucide-react";
 import { toast } from "sonner";
+import { MarketplaceService } from "@/types/marketplace";
 
-type LocalDashboardTab = "overview" | "profile" | "products" | "add-product";
+type LocalDashboardTab = "overview" | "profile" | "products" | "add-product" | "services" | "add-service";
 
 type MarketplaceProduct = {
   id: string;
@@ -46,6 +49,7 @@ type MarketplaceProduct = {
 const MarketplaceDashboardContainer = () => {
   const [activeTab, setActiveTab] = useState<LocalDashboardTab>("overview");
   const [editingProduct, setEditingProduct] = useState<MarketplaceProduct | null>(null);
+  const [editingService, setEditingService] = useState<MarketplaceService | null>(null);
 
   const {
     user,
@@ -66,6 +70,19 @@ const MarketplaceDashboardContainer = () => {
 
   const { deleteProduct, deleting } = useMarketplaceProducts();
 
+  const {
+    services,
+    loading: servicesLoading,
+    error: servicesError,
+    deleting: deletingService,
+    fetchMyServices,
+    deleteService,
+  } = useMarketplaceServices();
+
+  useEffect(() => {
+    fetchMyServices().catch(() => undefined);
+  }, [fetchMyServices]);
+
   const handleEditProduct = (product: MarketplaceProduct) => {
     setEditingProduct(product);
     setActiveTab("add-product");
@@ -79,6 +96,20 @@ const MarketplaceDashboardContainer = () => {
     setEditingProduct(null);
     setActiveTab("products");
     fetchProducts().catch(() => undefined);
+  };
+
+  const handleEditService = (service: MarketplaceService) => {
+    setEditingService(service);
+    setActiveTab("add-service");
+  };
+
+  const handleDeleteService = async (storeId: string, serviceId: string) => {
+    await deleteService(storeId, serviceId);
+  };
+
+  const handleBackToServices = () => {
+    setEditingService(null);
+    setActiveTab("services");
   };
 
   const outOfStockProducts = products.filter((p) => p.stock === 0);
@@ -104,6 +135,17 @@ const MarketplaceDashboardContainer = () => {
       id: "add-product",
       label: "Add Product",
       description: "Create a new listing",
+    },
+    {
+      id: "services",
+      label: "Services",
+      description: "Mechanic, electrician & more",
+      badge: services.length > 0 ? String(services.length) : undefined,
+    },
+    {
+      id: "add-service",
+      label: "Add Service",
+      description: "List a new service",
     },
   ];
 
@@ -250,6 +292,14 @@ const MarketplaceDashboardContainer = () => {
                     <Store className="h-4.5 w-4.5 text-purple-650" />
                     <span className="text-xs font-bold">Preview Page</span>
                   </Button>
+                  <Button variant="outline" onClick={() => { setEditingService(null); setActiveTab("add-service"); }} className="h-16 flex flex-col items-center justify-center gap-1 border dark:border-slate-800 hover:border-primary rounded-xl cursor-pointer">
+                    <Wrench className="h-4.5 w-4.5 text-orange-500" />
+                    <span className="text-xs font-bold">Add Service</span>
+                  </Button>
+                  <Button variant="outline" onClick={() => setActiveTab("services")} className="h-16 flex flex-col items-center justify-center gap-1 border dark:border-slate-800 hover:border-primary rounded-xl cursor-pointer">
+                    <Wrench className="h-4.5 w-4.5 text-teal-600" />
+                    <span className="text-xs font-bold">My Services</span>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -366,6 +416,28 @@ const MarketplaceDashboardContainer = () => {
         <AddProductSection
           onBack={handleBackToProducts}
           editProduct={editingProduct}
+        />
+      )}
+
+      {activeTab === "services" && (
+        <ServicesSection
+          services={services}
+          loading={servicesLoading}
+          error={servicesError}
+          onAddService={() => {
+            setEditingService(null);
+            setActiveTab("add-service");
+          }}
+          onEditService={handleEditService}
+          onDeleteService={handleDeleteService}
+          deleting={deletingService}
+        />
+      )}
+
+      {activeTab === "add-service" && (
+        <AddServiceSection
+          onBack={handleBackToServices}
+          editService={editingService}
         />
       )}
     </DashboardContainer>

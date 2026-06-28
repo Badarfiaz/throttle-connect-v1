@@ -8,6 +8,7 @@ import MarketplaceCategoryGrid from "@/components/marketplace/MarketplaceCategor
 import MarketplaceSearch from "@/components/marketplace/MarketplaceSearch";
 import CategorySection from "@/components/shared/CategorySection";
 import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
+import FeaturedServicesSection from "@/components/marketplace/FeaturedServicesSection";
 
 import { cardDataMarketplace } from "@/dummydata/networking";
 import { MARKETPLACE_ALL_STORES_QUERY } from "@/app/graphql/marketplace";
@@ -158,6 +159,9 @@ function Page() {
           </p>
         )}
       </SectionWrapper>
+
+      {/* Vehicle Services */}
+      <FeaturedServicesSection />
 
       {/* Categories */}
       <div className={SECTION_CONTAINER}>
