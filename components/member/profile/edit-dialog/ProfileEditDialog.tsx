@@ -52,12 +52,12 @@ export default function ProfileEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white p-6 md:p-8 scrollbar-none">
-        <DialogHeader className="pb-4 border-b border-slate-100">
-          <DialogTitle className="text-xl font-bold text-slate-900">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl bg-card border border-border p-6 md:p-8 shadow-2xl scrollbar-none">
+        <DialogHeader className="pb-4 border-b border-border/60">
+          <DialogTitle className="text-xl font-bold text-foreground">
             {isEditingExisting ? "Edit Rider Profile" : "Complete Rider Profile"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-muted-foreground text-xs">
             Provide details about yourself, your primary ride, and emergency contacts.
           </DialogDescription>
         </DialogHeader>
@@ -79,7 +79,7 @@ export default function ProfileEditDialog({
             />
           </div>
 
-          <div className="border-t border-slate-100 pt-6 grid gap-6 md:grid-cols-2">
+          <div className="border-t border-border/60 pt-6 grid gap-6 md:grid-cols-2">
             <SafetyDocumentFields
               form={form}
               licenseFileRef={imageUploads.licenseFileRef}
@@ -91,18 +91,19 @@ export default function ProfileEditDialog({
             <EmergencyContactFields form={form} />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 mt-6">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-border/60 mt-6">
             <Button
               type="button"
               variant="ghost"
               onClick={() => onOpenChange(false)}
               disabled={saving}
+              className="rounded-xl text-muted-foreground hover:bg-muted"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="bg-[#19376D] hover:bg-[#0B2447] text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl px-5 py-2"
               disabled={saving}
             >
               {saving ? "Saving Details..." : "Save Profile Details"}

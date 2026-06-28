@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ImageUploadCardProps {
@@ -33,16 +33,16 @@ export default function ImageUploadCard({
 }: ImageUploadCardProps) {
   return (
     <div className="space-y-2">
-      <label className="text-xs font-semibold text-slate-500 font-mono uppercase tracking-wider text-[#19376D]">
+      <label className="text-xs font-bold font-mono uppercase tracking-wider text-primary">
         {label}
       </label>
       <div
-        className={`flex p-3 border border-slate-200 bg-slate-50 rounded-xl ${
+        className={`flex p-4 border border-border bg-muted/20 rounded-2xl ${
           layout === "row" ? "items-center gap-4" : "flex-col gap-3"
         }`}
       >
         <div
-          className={`relative rounded-xl border bg-white shrink-0 overflow-hidden flex items-center justify-center ${previewClassName}`}
+          className={`relative rounded-xl border border-border bg-card shrink-0 overflow-hidden flex items-center justify-center ${previewClassName}`}
         >
           {value ? (
             <img
@@ -51,13 +51,16 @@ export default function ImageUploadCard({
               className={`h-full w-full ${imageFit === "cover" ? "object-cover" : "object-contain"}`}
             />
           ) : (
-            <span className="text-xs font-semibold text-slate-400 text-center px-2">
-              {emptyLabel}
-            </span>
+            <div className="flex flex-col items-center justify-center text-center p-2">
+              <UploadCloud className="h-5 w-5 text-muted-foreground/40 mb-1" />
+              <span className="text-[10px] font-medium text-muted-foreground/70 leading-tight">
+                {emptyLabel}
+              </span>
+            </div>
           )}
           {uploading && (
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <Loader2 className="h-5 w-5 animate-spin text-white" />
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-xs flex items-center justify-center">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
             </div>
           )}
         </div>
@@ -65,7 +68,7 @@ export default function ImageUploadCard({
           className={
             layout === "row"
               ? "space-y-1.5 flex-1"
-              : "flex items-center justify-between"
+              : "flex items-center justify-between gap-2 w-full"
           }
         >
           <Button
@@ -74,11 +77,11 @@ export default function ImageUploadCard({
             variant="outline"
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
-            className="h-8 text-xs font-semibold rounded-lg bg-white border-slate-200 hover:bg-slate-50 text-slate-700"
+            className="h-8 text-xs font-semibold rounded-xl bg-card border-border hover:bg-muted text-foreground"
           >
             {uploading ? "Uploading..." : buttonLabel}
           </Button>
-          <p className="text-[10px] text-slate-400">{helperText}</p>
+          <p className="text-[10px] text-muted-foreground">{helperText}</p>
         </div>
         <input
           ref={inputRef}

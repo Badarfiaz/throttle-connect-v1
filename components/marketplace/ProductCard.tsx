@@ -10,7 +10,7 @@ import { MapPin, User, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PriceLabel from "./PriceLabel";
 import CategoryLabel from "./CategoryLabel";
-import HeartButton from "./HeartButton";
+import FavoriteButton from "../shared/FavoriteButton";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
@@ -21,6 +21,7 @@ type ProductCardSkeletonProps = {
   isLandingPage?: boolean;
   className?: string;
 };
+// ... [rest of skeleton omitted for brevity, let's target the exact lines] ...
 
 export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({
   size = "md",
@@ -149,7 +150,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandi
 
             {/* Heart / Favourite */}
             <div className="absolute top-2.5 right-2.5 z-10">
-              <HeartButton />
+              <FavoriteButton
+                itemId={product.id}
+                itemType="product"
+                itemData={{
+                  title: product.productName,
+                  image: product.imageurl?.url,
+                  details: `PKR ${product.price?.toLocaleString()}`,
+                  link: `/marketplace/product/${product.id}`,
+                }}
+              />
             </div>
 
             {/* Condition Badge overlay on image */}

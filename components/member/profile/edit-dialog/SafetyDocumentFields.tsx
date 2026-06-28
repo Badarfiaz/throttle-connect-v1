@@ -33,7 +33,7 @@ export default function SafetyDocumentFields({
 }: SafetyDocumentFieldsProps) {
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-bold uppercase tracking-wider text-[#19376D] flex items-center gap-1.5">
+      <h3 className="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-1.5 border-b border-border/40 pb-2">
         <Activity className="h-4 w-4" /> Safety & Documents
       </h3>
       <div className="space-y-3">
@@ -51,12 +51,12 @@ export default function SafetyDocumentFields({
           onUpload={onUploadLicenseImage}
         />
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-500">Riding Experience</label>
+          <label className="text-xs font-semibold text-muted-foreground">Riding Experience</label>
           <Select
             value={form.watch("experienceYears")}
             onValueChange={(val) => form.setValue("experienceYears", val)}
           >
-            <SelectTrigger className="w-full border-slate-200">
+            <SelectTrigger className="w-full border-border rounded-xl bg-transparent text-foreground">
               <SelectValue placeholder="Select experience" />
             </SelectTrigger>
             <SelectContent>
@@ -69,7 +69,7 @@ export default function SafetyDocumentFields({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-500">Riding Interests</label>
+          <label className="text-xs font-semibold text-muted-foreground">Riding Interests</label>
           <div className="flex flex-wrap gap-2 pt-1">
             {INTEREST_OPTIONS.map((interest) => {
               const isSelected = selectedInterests.includes(interest.value);
@@ -78,10 +78,10 @@ export default function SafetyDocumentFields({
                   key={interest.value}
                   type="button"
                   onClick={() => onToggleInterest(interest.value)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-200 ${
                     isSelected
-                      ? "bg-[#19376D] text-white border-[#19376D] shadow-xs"
-                      : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                      ? "bg-primary text-primary-foreground border-primary shadow-xs scale-[0.98]"
+                      : "bg-muted/60 text-muted-foreground border-border hover:bg-muted"
                   }`}
                 >
                   {interest.label}

@@ -12,6 +12,7 @@ import AnimateMotion from "../shared/AnimateMotion";
 import Link from "next/link";
 import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
 import { useTrackClick } from "@/hooks/analytics/useTrackClick";
+import FavoriteButton from "../shared/FavoriteButton";
 
 interface ClubCardProps {
   club: Club;
@@ -71,6 +72,20 @@ const ClubCard = ({ club, isLandingPage }: ClubCardProps) => {
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border backdrop-blur-sm ${badgeStyle}`}>
               {club.categoryType.replace("-", " ")}
             </span>
+          </div>
+
+          {/* Heart / Favourite */}
+          <div className="absolute top-4 right-4 z-10">
+            <FavoriteButton
+              itemId={club.id}
+              itemType="club"
+              itemData={{
+                title: club.name,
+                image: club.image,
+                details: `${club.memberCount} Members · ${club.location}`,
+                link: `/networking/Club-Profile/${club.id}`,
+              }}
+            />
           </div>
         </div>
 

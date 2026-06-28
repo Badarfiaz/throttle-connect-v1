@@ -41,7 +41,7 @@ const mockMemberProfile: MemberProfile = {
 
 export default function ProfilePage() {
   return (
-    <div className="min-h-screen bg-background text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-6xl space-y-8 px-4 pb-16 pt-12 md:px-8">
         <ProfileHero />
       </div>

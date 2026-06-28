@@ -21,34 +21,34 @@ interface EmergencyContactFieldsProps {
 export default function EmergencyContactFields({ form }: EmergencyContactFieldsProps) {
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-bold uppercase tracking-wider text-red-600 flex items-center gap-1.5">
+      <h3 className="text-sm font-bold uppercase tracking-wider text-rose-500 flex items-center gap-1.5 border-b border-border/40 pb-2">
         <HeartHandshake className="h-4 w-4" /> Emergency Contact
       </h3>
       <div className="space-y-3">
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-500">Contact Name *</label>
+          <label className="text-xs font-semibold text-muted-foreground">Contact Name *</label>
           <Input
             placeholder="Emergency contact full name"
             {...form.register("emergencyContactName", { required: "Required for safety" })}
-            className="border-slate-200 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+            className="border-border rounded-xl focus-visible:ring-1 focus-visible:ring-primary bg-transparent text-foreground placeholder:text-muted-foreground/60"
           />
         </div>
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-500">Contact Phone *</label>
+          <label className="text-xs font-semibold text-muted-foreground">Contact Phone *</label>
           <Input
             type="tel"
             placeholder="Emergency phone number"
             {...form.register("emergencyContactPhone", { required: "Required for safety" })}
-            className="border-slate-200 focus-visible:ring-1 focus-visible:ring-[#19376D]"
+            className="border-border rounded-xl focus-visible:ring-1 focus-visible:ring-primary bg-transparent text-foreground placeholder:text-muted-foreground/60"
           />
         </div>
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-500">Blood Group</label>
+          <label className="text-xs font-semibold text-muted-foreground">Blood Group</label>
           <Select
             value={form.watch("bloodGroup")}
             onValueChange={(val) => form.setValue("bloodGroup", val)}
           >
-            <SelectTrigger className="w-full border-slate-200">
+            <SelectTrigger className="w-full border-border rounded-xl bg-transparent text-foreground">
               <SelectValue placeholder="Select blood group" />
             </SelectTrigger>
             <SelectContent>

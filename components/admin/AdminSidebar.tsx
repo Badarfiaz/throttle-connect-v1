@@ -15,6 +15,7 @@ import {
   X,
   Shield,
   Users,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -27,6 +28,7 @@ const navItems = [
   { href: "/admin/clubs", label: "Clubs", icon: Users2 },
   { href: "/admin/events", label: "Events", icon: Calendar },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/lobby-messages", label: "Lobby Messages", icon: MessageSquare },
   { href: "/admin/notes", label: "Notes", icon: StickyNote },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/settings", label: "Settings", icon: Settings },
