@@ -14,7 +14,9 @@ import {
   Calendar,
   MessageSquare,
   Sparkles,
+  Settings,
 } from "lucide-react";
+import Link from "next/link";
 import { MemberProfile } from "@/types/member";
 import { getStatBlocks, INTEREST_OPTIONS } from "./profileForm.constants";
 import SafetyContactPanel from "./SafetyContactPanel";
@@ -94,8 +96,18 @@ export default function ProfileSummaryCard({
               )}
             </div>
 
-            {/* Action Button */}
-            <div className="self-start sm:self-end mt-4 sm:mt-0">
+            {/* Action Buttons */}
+            <div className="self-start sm:self-end mt-4 sm:mt-0 flex items-center gap-2.5">
+              <Link href="/settings">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 rounded-xl shadow-md border-border hover:bg-muted"
+                >
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Button>
+              </Link>
               <Button
                 onClick={onEdit}
                 size="sm"

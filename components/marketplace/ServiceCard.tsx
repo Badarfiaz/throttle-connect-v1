@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { MarketplaceService, SERVICE_TYPES } from "@/types/marketplace";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
+import FavoriteButton from "../shared/FavoriteButton";
 
 type ServiceCardSkeletonProps = {
   size?: "sm" | "md" | "lg";
@@ -207,9 +208,23 @@ export default function ServiceCard({
               </Badge>
             </div>
 
+            {/* Heart / Favourite */}
+            <div className="absolute top-3 right-3 z-10">
+              <FavoriteButton
+                itemId={service.id}
+                itemType="service"
+                itemData={{
+                  title: service.title,
+                  image: service.imageUrl ?? undefined,
+                  details: service.price ? `PKR ${service.price.toLocaleString()}` : "Price on quote",
+                  link: `/marketplace/service/${service.id}`,
+                }}
+              />
+            </div>
+
             {/* Available / Unavailable pill */}
             {!service.isAvailable && (
-              <div className="absolute top-3 right-3 z-10">
+              <div className="absolute top-14 right-3 z-10">
                 <Badge className="bg-rose-600/90 text-white border-0 text-[9px] font-bold px-2 py-0.5 rounded-md">
                   Unavailable
                 </Badge>

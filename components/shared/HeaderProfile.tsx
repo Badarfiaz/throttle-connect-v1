@@ -38,7 +38,7 @@ function HeaderProfile({ email, avatar, logout, isSuperAdmin }: headerProfilePro
             <Link href="/profile">Profile</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/bookings">Bookings</Link>
+            <Link href="/favorites">Favorites</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/settings">Settings</Link>
