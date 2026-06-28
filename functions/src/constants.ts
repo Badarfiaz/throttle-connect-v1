@@ -3,4 +3,5 @@ export const COLLECTIONS = {
   MARKETPLACE_PRODUCTS: "marketplaceProducts",
   MARKETPLACE_STORES: "marketplaceStores",
   NETWORKING_CLUBS: "networkingStores",
+  CUSTOMERS: "customers",
 };

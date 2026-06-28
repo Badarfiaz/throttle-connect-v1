@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { MarketplaceService } from "@/types/marketplace";
+import GoldUserBanner from "@/components/shared/GoldUserBanner";
 
 type LocalDashboardTab = "overview" | "profile" | "products" | "add-product" | "services" | "add-service" | "leads" | "analytics";
 
@@ -193,10 +194,13 @@ const MarketplaceDashboardContainer = () => {
         </div>
       ) : null}
 
+      {/* ── Gold User Banner (shown on all tabs) ── */}
+      <GoldUserBanner />
+
       {/* ── Landing Overview Tab ── */}
       {activeTab === "overview" && (
         <div className="space-y-6">
-          
+
           {/* Welcome Banner */}
           <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>

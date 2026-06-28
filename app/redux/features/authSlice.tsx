@@ -116,6 +116,20 @@ const authSlice = createSlice({
       state.isAuthenticated = !!action.payload;
       state.isLoading = false;
     },
+    updateUserRole: (state, action: PayloadAction<{ role: string; subscriptionPlan?: string; subscriptionEnd?: string; subscriptionStart?: string }>) => {
+      if (state.user) {
+        state.user.role = action.payload.role as any;
+        if (action.payload.subscriptionPlan !== undefined) {
+          state.user.subscriptionPlan = action.payload.subscriptionPlan as any;
+        }
+        if (action.payload.subscriptionEnd !== undefined) {
+          state.user.subscriptionEnd = action.payload.subscriptionEnd;
+        }
+        if (action.payload.subscriptionStart !== undefined) {
+          state.user.subscriptionStart = action.payload.subscriptionStart;
+        }
+      }
+    },
     updateUserOnboarding: (
       state,
       action: PayloadAction<{
@@ -162,7 +176,7 @@ const authSlice = createSlice({
 });
 
 // ================== Exports ==================
-export const { logout, clearError, setUser, updateUserOnboarding, setNetworkingStore } =
+export const { logout, clearError, setUser, updateUserOnboarding, setNetworkingStore, updateUserRole } =
 
   authSlice.actions;
 
