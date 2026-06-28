@@ -28,6 +28,7 @@ export type NetworkingStore = {
   upcomingEventsCount?: number | null;
   latestEventId?: string | null;
   gallery?: string[] | null;
+  featured?: boolean;
 };
 
 export type NetworkingEventType =
@@ -69,6 +70,7 @@ export type NetworkingEvent = {
   maxParticipants?: number | null;
   participantCount: number;
   visibility: "public" | "private";
+  featured?: boolean;
   createdAt: string;
   updatedAt: string;
 };

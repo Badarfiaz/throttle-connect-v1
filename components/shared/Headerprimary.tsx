@@ -112,6 +112,7 @@ const HeaderPrimary: FC = () => {
               avatar={avatarLetter}
               email={user.email}
               logout={handleLogout}
+              isSuperAdmin={user.role === "superAdmin"}
             />
           </div>
         ) : (

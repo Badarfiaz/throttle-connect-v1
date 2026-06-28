@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
+import { useLeads } from "@/hooks/useLeads";
+import { useAppSelector } from "@/app/redux/hooks";
 import { MarketplaceProduct } from "@/types/marketplace";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -25,6 +27,8 @@ const ProductDetailContainer = () => {
   const productId = params?.id as string;
 
   const { fetchProductById, loading } = useMarketplaceProducts();
+  const { recordLead } = useLeads();
+  const { user } = useAppSelector((s) => s.auth);
 
   const [product, setProduct] = useState<MarketplaceProduct | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -213,6 +217,16 @@ const ProductDetailContainer = () => {
               itemName={product.productName}
               itemType="product"
               showMetadata={false}
+              onContact={() => {
+                if (product && user) {
+                  recordLead({
+                    productId: product.id,
+                    productName: product.productName,
+                    productImage: product.imageurl?.url,
+                    storeOwnerUid: product.ownerUid,
+                  });
+                }
+              }}
             >
               <Button 
                 onClick={() => {

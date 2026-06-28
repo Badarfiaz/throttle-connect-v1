@@ -29,6 +29,7 @@ export type Club = {
   logoUrl?: string;
   description: string;
   createdBy: string;
+  featured?: boolean;
 };
 
 export interface EventItem {

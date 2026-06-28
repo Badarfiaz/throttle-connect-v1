@@ -52,11 +52,22 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               }
             : null;
 
+          const role = userData.role ?? "user";
+
+          // Set cookie so middleware can verify superAdmin role server-side
+          if (role === "superAdmin") {
+            document.cookie = "tc_role=superAdmin; path=/; max-age=86400; SameSite=Strict";
+          } else {
+            document.cookie = "tc_role=user; path=/; max-age=86400; SameSite=Strict";
+          }
+
           dispatch(
             setUser({
               userId: user.uid,
               email: user.email ?? "",
-              name: user.displayName || user.email?.split("@")[0] || "",
+              name: userData.name || user.displayName || user.email?.split("@")[0] || "",
+              phone: userData.phone || "",
+              role,
               marketplace: normalizeFirestoreStore(userData.marketplace),
               networking: normalizeFirestoreStore(userData.networking),
               profileData: mergedProfile ? normalizeFirestoreStore(mergedProfile) : null,
@@ -66,6 +77,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.error("Error fetching in auth provider user data:", error);
         }
       } else {
+        document.cookie = "tc_role=; path=/; max-age=0";
         dispatch(setUser(null));
       }
     });

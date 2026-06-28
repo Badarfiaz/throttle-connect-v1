@@ -10,6 +10,7 @@ import { MapPin, Users2, ChevronRight, User } from "lucide-react";
 import { Club, CategoryType } from "@/types/main";
 import AnimateMotion from "../shared/AnimateMotion";
 import Link from "next/link";
+import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
 
 interface ClubCardProps {
   club: Club;
@@ -92,9 +93,12 @@ const ClubCard = ({ club, isLandingPage }: ClubCardProps) => {
 
             {/* Club Identity */}
             <div className="space-y-2">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors line-clamp-1 leading-snug">
-                {club.name}
-              </h3>
+              <div className="flex items-start gap-2">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors line-clamp-1 leading-snug flex-1">
+                  {club.name}
+                </h3>
+                {club.featured && <FeaturedBadge featured={true} />}
+              </div>
               <p className="text-sm text-slate-550 dark:text-slate-400 line-clamp-2 leading-relaxed">
                 {club.description}
               </p>

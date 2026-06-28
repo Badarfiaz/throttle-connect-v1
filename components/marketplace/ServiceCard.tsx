@@ -17,6 +17,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { MarketplaceService, SERVICE_TYPES } from "@/types/marketplace";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
 
 type ServiceCardSkeletonProps = {
   size?: "sm" | "md" | "lg";
@@ -220,9 +221,12 @@ export default function ServiceCard({
           <div className="px-4 py-3.5 flex flex-col flex-1 justify-between">
             <div className="space-y-1.5">
               {/* Service title */}
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-1 group-hover:text-primary transition-colors">
-                {service.title}
-              </h3>
+              <div className="flex items-start justify-between gap-1">
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white leading-snug line-clamp-1 group-hover:text-primary transition-colors flex-1">
+                  {service.title}
+                </h3>
+                {service.featured && <FeaturedBadge featured={true} />}
+              </div>
 
               {/* Rating */}
               <div className="flex items-center gap-1.5">

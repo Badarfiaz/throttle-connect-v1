@@ -24,6 +24,8 @@ type SellerProfileCardProps = {
   showStoreLink?: boolean;
   className?: string;
   children?: React.ReactNode;
+  /** Called when the buyer taps any contact button — used to record leads */
+  onContact?: () => void;
 };
 
 export default function SellerProfileCard({
@@ -34,6 +36,7 @@ export default function SellerProfileCard({
   showStoreLink = true,
   className,
   children,
+  onContact,
 }: SellerProfileCardProps) {
   if (!store) return null;
 
@@ -127,6 +130,7 @@ export default function SellerProfileCard({
             preferredMethod="phone"
             menuIcon={true}
             detailPage={true}
+            onContactClick={onContact}
           />
 
           {/* Instant Inquiry Button (WhatsApp Icon) */}
@@ -136,6 +140,7 @@ export default function SellerProfileCard({
               target="_blank"
               rel="noopener noreferrer"
               className="shrink-0"
+              onClick={() => onContact?.()}
             >
               <Button
                 className="h-11 w-11 bg-emerald-600 hover:bg-emerald-550 text-white rounded-xl flex items-center justify-center shadow-sm cursor-pointer border-0"

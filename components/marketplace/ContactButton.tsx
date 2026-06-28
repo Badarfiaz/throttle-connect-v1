@@ -21,6 +21,8 @@ type ContactButtonProps = {
   menuIcon?: boolean;
   /** When true, renders the larger "detail page" style used on product detail pages */
   detailPage?: boolean;
+  /** Fires when the user taps the primary contact button (for lead recording) */
+  onContactClick?: () => void;
 };
 
 function ContactButton({
@@ -29,6 +31,7 @@ function ContactButton({
   preferredMethod = "whatsapp",
   menuIcon = false,
   detailPage = false,
+  onContactClick,
 }: ContactButtonProps) {
   const contactMethod = getContactMethod({
     phone,
@@ -78,7 +81,10 @@ function ContactButton({
               ? "noopener noreferrer"
               : undefined
           }
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onContactClick?.();
+          }}
         >
           <ContactIcon size={detailPage ? 18 : 16} />
           {contactMethod.label}

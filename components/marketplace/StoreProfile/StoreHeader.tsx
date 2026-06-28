@@ -19,8 +19,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { MarketplaceStore } from "@/types/marketplace";
-import { get } from "http";
 import { getMarketplaceCategoryName } from "@/ulity/getMarketplaceCategoryName";
+import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
 
 type StoreWithExtras = MarketplaceStore & {
   category?: string;
@@ -60,6 +60,7 @@ export default function StoreHeader({ store }: { store: StoreWithExtras }) {
                 <ShieldCheck className="h-3 w-3" /> Verified
               </Badge>
             )}
+            {store.featured && <FeaturedBadge featured={true} />}
           </div>
 
           {store.location && (

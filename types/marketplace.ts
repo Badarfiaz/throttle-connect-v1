@@ -18,6 +18,7 @@ export type MarketplaceStore = {
   slugUrl?: string | null;
   pageType?: string | null;
   phone?: string | null;
+  featured?: boolean;
 };
 
 export type MarketplaceStoreCard = {
@@ -43,6 +44,7 @@ export type MarketplaceProduct = {
   };
   stock: number;
   price: number;
+  featured?: boolean;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -74,6 +76,7 @@ export type MarketplaceService = {
   priceUnit?: string | null;
   imageUrl?: string | null;
   isAvailable: boolean;
+  featured?: boolean;
   reviews?: ServiceReview[];
   averageRating?: number | null;
   reviewCount?: number | null;

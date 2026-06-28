@@ -13,6 +13,7 @@ import CategoryLabel from "./CategoryLabel";
 import HeartButton from "./HeartButton";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
 
 type ProductCardSkeletonProps = {
   size?: "sm" | "md" | "lg";
@@ -162,6 +163,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandi
               <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-1 flex-1">
                 {product.productName || "Product Title"}
               </h3>
+              {product.featured && <FeaturedBadge featured={true} />}
             </div>
 
             {/* Price */}

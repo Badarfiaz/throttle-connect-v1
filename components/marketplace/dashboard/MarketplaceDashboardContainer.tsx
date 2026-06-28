@@ -12,6 +12,7 @@ import ProductsSection from "@/components/marketplace/dashboard/sections/Product
 import AddProductSection from "@/components/marketplace/dashboard/sections/AddProductSection";
 import ServicesSection from "@/components/marketplace/dashboard/sections/ServicesSection";
 import AddServiceSection from "@/components/marketplace/dashboard/sections/AddServiceSection";
+import LeadsSection from "@/components/marketplace/dashboard/sections/LeadsSection";
 import { useMarketplaceServices } from "@/hooks/useMarketplaceServices";
 import {
   Package,
@@ -26,11 +27,12 @@ import {
   Edit2,
   Store,
   Wrench,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MarketplaceService } from "@/types/marketplace";
 
-type LocalDashboardTab = "overview" | "profile" | "products" | "add-product" | "services" | "add-service";
+type LocalDashboardTab = "overview" | "profile" | "products" | "add-product" | "services" | "add-service" | "leads";
 
 type MarketplaceProduct = {
   id: string;
@@ -146,6 +148,11 @@ const MarketplaceDashboardContainer = () => {
       id: "add-service",
       label: "Add Service",
       description: "List a new service",
+    },
+    {
+      id: "leads",
+      label: "Leads",
+      description: "Buyers who contacted you",
     },
   ];
 
@@ -440,6 +447,8 @@ const MarketplaceDashboardContainer = () => {
           editService={editingService}
         />
       )}
+
+      {activeTab === "leads" && <LeadsSection />}
     </DashboardContainer>
   );
 };

@@ -47,10 +47,14 @@ export type OnBoardType = {
   tiktok: string;
 };
 
+export type UserRole = "user" | "superAdmin";
+
 export type User = {
   userId: string;
   email: string;
   name: string;
+  phone?: string;
+  role?: UserRole;
   completed?: boolean;
   marketplace?: MarketplaceStore | null;
   networking?: NetworkingStore | null;
