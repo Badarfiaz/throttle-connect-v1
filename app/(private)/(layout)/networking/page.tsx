@@ -1,18 +1,81 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { db } from "@/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import { Club } from "@/types/main";
 import ClubCard from "@/components/networking/ClubsCard";
-import CategorySection from "@/components/shared/CategorySection";
-import FeaturedSection from "@/components/shared/FeaturedSection";
 import HeroSection from "@/components/shared/HeroSection";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
+import ProfileRequiredBanner from "@/components/networking/ProfileRequiredBanner";
+import UpcomingEventsSection from "@/components/networking/UpcomingEventsSection";
+import { Compass, Wrench, Trophy, ShieldCheck, Users, CalendarDays, Image as ImageIcon } from "lucide-react";
 
-import {
-  cardDataNetworking,
-  clubs,
-  vehicleCategories,
-} from "@/dummydata/networking";
+import NetworkingCategoryGrid from "@/components/networking/NetworkingCategoryGrid";
 
-function home() {
+
+function Home() {
+  const [dbClubs, setDbClubs] = useState<Club[]>([]);
+  const [loading, setLoading] = useState(true);
+
+
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "networkingStores"));
+        const fetchedClubs: Club[] = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.completed) {
+            fetchedClubs.push({
+              id: doc.id,
+              name: data.clubName || "Unnamed Club",
+              categoryType: (data.clubType === "car" ? "sedans" : data.clubType === "bike" ? "bikes" : "offroad") as any,
+              image: data.bannerUrl || "/images/category/offroad.webp",
+              location: data.city || "Unknown Location",
+              memberCount: 1,
+              description: data.description || "No description provided.",
+              createdBy: data.email || "Owner",
+              logoUrl: data.logoUrl || "/images/category/offroad.webp",
+            });
+          }
+        });
+        setDbClubs(fetchedClubs);
+      } catch (err) {
+        console.error("Error fetching clubs:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClubs();
+  }, []);
+
+  const customClubStartData = [
+    {
+      icon: Users,
+      title: "Roster Control",
+      description: "Review and approve membership requests to build a verified circle of riders.",
+    },
+    {
+      icon: CalendarDays,
+      title: "Plan Events",
+      description: "Host track days, cafe meets, long-distance breakfast runs, and invite peers.",
+    },
+    {
+      icon: Trophy,
+      title: "Show Awards",
+      description: "Add awards, milestones, and credentials to showcase on your profile page.",
+    },
+    {
+      icon: ImageIcon,
+      title: "Run Moments",
+      description: "Share snapshot galleries of your club moments with a 10-image gallery limit.",
+    },
+  ];
+
   return (
     <div>
       <HeroSection
@@ -21,64 +84,114 @@ function home() {
         ctaText="Get Started"
       />
 
-      <div className="max-w-5xl mt-20 mx-auto px-6">
-        {/* Section Heading */}
-        <Title
-          title="Explore Categories"
-          description="Discover your next ride — from elegant sedans to powerful superbikes"
-        />
+      <ProfileRequiredBanner />
+
+ 
+
+      <div className="max-w-5xl mt-12 mx-auto px-6">
+        <NetworkingCategoryGrid />
       </div>
 
-      <div className="px-4 sm:px-6 md:px-12 lg:px-20 pt-0 pb-0">
-        <PrimaryCarousel
-          items={vehicleCategories}
-          responsive={{
-            mobile: 2,
-            tablet: 3,
-            desktop: 4,
-          }}
-          className="w-full"
-          renderItem={(category) => (
-            <div className="w-full h-full">
-              {/* <CategorySection key={category.id} items={category} /> */}
+      {/* Redesigned Club Benefits Section */}
+      <section className="bg-slate-50/50 text-slate-900 py-16 px-6 relative overflow-hidden border-y border-slate-100">
+        <div className="max-w-5xl mx-auto animate-in fade-in duration-300">
+          <div className="text-center mb-12 max-w-3xl mx-auto space-y-4">
+            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Why Join an Automotive Club?</h2>
+            <p className="text-sm text-slate-500 leading-relaxed max-w-xl mx-auto font-medium">
+              Unlock the full automotive experience. Connect with local communities that match your driving passion and style.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition duration-300">
+              <div className="shrink-0 w-11 h-11 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center">
+                <Compass className="w-5.5 h-5.5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-slate-900">Weekly Breakfast Runs</h3>
+                <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                  Enjoy planned morning runs, scenic weekend trips, multi-day tours, and coffee meetups with fellow riders.
+                </p>
+              </div>
             </div>
-          )}
-        />
-      </div>
 
-      <FeaturedSection />
+            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition duration-300">
+              <div className="shrink-0 w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+                <Wrench className="w-5.5 h-5.5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-slate-900">Collective Tech Knowledge</h3>
+                <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                  Get first-hand vehicle maintenance reviews, help with parts sourcing, tuning discussions, and DIY assistance.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition duration-300">
+              <div className="shrink-0 w-11 h-11 rounded-xl bg-purple-500/10 text-purple-650 flex items-center justify-center">
+                <Trophy className="w-5.5 h-5.5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-slate-900">Awards & Trophy Wall</h3>
+                <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                  Win recognition, post club achievements, list certificates, and celebrate custom community milestones.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition duration-300">
+              <div className="shrink-0 w-11 h-11 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
+                <ShieldCheck className="w-5.5 h-5.5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-slate-900">Disciplined Safe Riding</h3>
+                <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                  Participate in verified automotive circles that practice strict safety measures, road discipline, and organization.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    
 
       <div className="bg-background text-text py-12 xs:py-16 px-4 xs:px-6">
         <div className="max-w-6xl mx-auto text-center space-y-6 xs:space-y-8">
           <Title
             title="Discover Clubs"
-            description="Explore our thriving network of automotive clubs — from off-roaders
-            to superbikes."
+            description="Explore our thriving network of automotive clubs — from off-roaders to superbikes."
           />
 
-          {/* 🚗 Shadcn Carousel */}
-          <PrimaryCarousel
-            items={clubs}
-            responsive={{
-              mobile: 1,
-              tablet: 2,
-              desktop: 3,
-            }}
-            renderItem={(club) => <ClubCard club={club} />}
-          />
+          {loading ? (
+            <div className="flex justify-center items-center py-10">
+              <p className="text-muted-foreground animate-pulse font-medium">Loading clubs...</p>
+            </div>
+          ) : dbClubs.length > 0 ? (
+            <PrimaryCarousel
+              items={dbClubs}
+              responsive={{
+                mobile: 1,
+                tablet: 2,
+                desktop: 3,
+              }}
+              renderItem={(club) => <ClubCard club={club} />}
+            />
+          ) : (
+            <p className="text-muted-foreground text-sm py-10">No clubs registered yet.</p>
+          )}
         </div>
       </div>
       <RegistureClubBanner
-        title="Join the Throttle Connect Club Network"
-        description="Whether you’re looking to register your own club or discover new
-            ones, we’ve got you covered. Connect with auto enthusiasts, explore
-            meetups, and grow your community."
-        ctaButton1="Register Club"
-        ctaButton2="Find a Club"
-        cardData={cardDataNetworking}
+        title="Start Your Own Automotive Chapter"
+        description="Have a crew or want to lead the pack? Register your club, schedule weekend runs, moderate membership requests, and share milestones with a polished gallery moments view."
+        ctaButton1="Register Your Club"
+        cardData={customClubStartData}
       />
+   <UpcomingEventsSection />
+
+
     </div>
   );
 }
 
-export default home;
+export default Home;

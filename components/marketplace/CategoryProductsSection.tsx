@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProductCard from "@/components/marketplace/ProductCard";
+import ProductCard, { ProductCardSkeleton } from "@/components/marketplace/ProductCard";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import Title from "@/components/shared/Title";
 import { getProductsByCategory } from "@/ulity/marketplaceProducts";
@@ -59,8 +59,22 @@ export default function CategoryProductsSection({
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="text-gray-500">Loading products...</div>
+      <div className="mt-16">
+        <Title
+          title={categoryTitle || `${category} Products`}
+          align="left"
+        />
+        <PrimaryCarousel
+          items={Array.from({ length: 4 })}
+          responsive={{
+            mobile: 1.5,
+            tablet: 2,
+            desktop: 4,
+          }}
+          renderItem={(_, i) => (
+            <ProductCardSkeleton key={i} />
+          )}
+        />
       </div>
     );
   }

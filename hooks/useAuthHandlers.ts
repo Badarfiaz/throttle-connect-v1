@@ -6,10 +6,17 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { auth } from "@/firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { auth, db } from "@/firebase";
 import { saveUserToFirestore } from "./saveUserToFirestore";
 
 type AuthMode = "login" | "signup";
+
+export type PendingGoogleUser = {
+  uid: string;
+  email: string;
+  name: string;
+};
 
 interface UseAuthHandlersProps {
   mode: AuthMode;
@@ -18,74 +25,59 @@ interface UseAuthHandlersProps {
 
 export const useAuthHandlers = ({ mode, closeModal }: UseAuthHandlersProps) => {
   const [submitting, setSubmitting] = useState(false);
+  const [pendingGoogleUser, setPendingGoogleUser] = useState<PendingGoogleUser | null>(null);
 
-  // 🔹 Email/password auth
+  // Email/password auth
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setSubmitting(true);
 
       const formData = new FormData(e.currentTarget);
-      const formDataObj = Object.fromEntries(formData.entries());
-      console.log("Form Data:", formDataObj); // Debug log
       const email = String(formData.get("email"));
       const password = String(formData.get("password"));
       const name = String(formData.get("name") || "");
+      const phone = String(formData.get("phone") || "");
 
       try {
-        let userCred;
-
         if (mode === "login") {
-          // LOGIN
-          userCred = await signInWithEmailAndPassword(auth, email, password);
+          await signInWithEmailAndPassword(auth, email, password);
         } else {
-          // SIGNUP
-          userCred = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password,
-          );
-
+          const userCred = await createUserWithEmailAndPassword(auth, email, password);
           await saveUserToFirestore({
             uid: userCred.user.uid,
             displayName: name,
             email,
+            phone,
           });
         }
 
-        toast.success(
-          mode === "login" ? "Login successful" : "Signup successful",
-          {
-            description:
-              mode === "login"
-                ? "Welcome back to Throttle Connect!"
-                : "Account created successfully!",
-          },
-        );
+        toast.success(mode === "login" ? "Login successful" : "Signup successful", {
+          description:
+            mode === "login"
+              ? "Welcome back to Throttle Connect!"
+              : "Account created successfully!",
+        });
 
         closeModal();
-      } catch (err: any) {
-        console.error("Auth error:", err);
+      } catch (err: unknown) {
+        const firebaseErr = err as { code?: string; message?: string };
+        let errorMessage = firebaseErr.message ?? "Unknown error";
 
-        // Handle specific Firebase error codes
-        let errorMessage = err.message;
-
-        if (err.code === "auth/user-not-found") {
-          errorMessage =
-            "No account found with this email. Please sign up first.";
-        } else if (err.code === "auth/wrong-password") {
+        if (firebaseErr.code === "auth/user-not-found") {
+          errorMessage = "No account found with this email. Please sign up first.";
+        } else if (firebaseErr.code === "auth/wrong-password") {
           errorMessage = "Incorrect password. Please try again.";
-        } else if (err.code === "auth/invalid-email") {
+        } else if (firebaseErr.code === "auth/invalid-email") {
           errorMessage = "Invalid email address format.";
-        } else if (err.code === "auth/user-disabled") {
+        } else if (firebaseErr.code === "auth/user-disabled") {
           errorMessage = "This account has been disabled.";
-        } else if (err.code === "auth/email-already-in-use") {
+        } else if (firebaseErr.code === "auth/email-already-in-use") {
           errorMessage = "Email already in use. Please login instead.";
-        } else if (err.code === "auth/weak-password") {
+        } else if (firebaseErr.code === "auth/weak-password") {
           errorMessage = "Password should be at least 6 characters.";
-        } else if (err.code === "auth/invalid-credential") {
-          errorMessage =
-            "Invalid email or password. Please check your credentials.";
+        } else if (firebaseErr.code === "auth/invalid-credential") {
+          errorMessage = "Invalid email or password. Please check your credentials.";
         }
 
         toast.error("Authentication error", { description: errorMessage });
@@ -96,32 +88,66 @@ export const useAuthHandlers = ({ mode, closeModal }: UseAuthHandlersProps) => {
     [mode, closeModal],
   );
 
-  // 🔹 Google login
+  // Google sign-in
   const handleGoogle = useCallback(async () => {
     setSubmitting(true);
     try {
       const res = await signInWithPopup(auth, new GoogleAuthProvider());
+      const uid = res.user.uid;
+      const email = res.user.email ?? "";
+      const name = res.user.displayName ?? "";
 
-      await saveUserToFirestore({
-        uid: res.user.uid,
-        displayName: res.user.displayName,
-        email: res.user.email,
-      });
+      // Save basic profile (won't overwrite createdAt or phone if already set)
+      await saveUserToFirestore({ uid, displayName: name, email });
 
-      toast.success("Google login successful", {
-        description: "Welcome back to Throttle Connect!",
-      });
-      closeModal();
-    } catch (err: any) {
-      toast.error("Google login failed", { description: err.message });
+      // Check if user already has a phone number
+      const userDoc = await getDoc(doc(db, "users", uid));
+      const existingPhone = (userDoc.data()?.phone as string | undefined) ?? "";
+
+      if (!existingPhone) {
+        // New user (or existing without phone) → collect phone before closing
+        setPendingGoogleUser({ uid, email, name });
+      } else {
+        toast.success("Google login successful", {
+          description: "Welcome back to Throttle Connect!",
+        });
+        closeModal();
+      }
+    } catch (err: unknown) {
+      const firebaseErr = err as { message?: string };
+      toast.error("Google login failed", { description: firebaseErr.message });
     } finally {
       setSubmitting(false);
     }
   }, [closeModal]);
 
+  // Save phone for Google users and complete sign-in
+  const submitGooglePhone = useCallback(
+    async (phone: string) => {
+      if (!pendingGoogleUser) return;
+      setSubmitting(true);
+      try {
+        await updateDoc(doc(db, "users", pendingGoogleUser.uid), { phone });
+        setPendingGoogleUser(null);
+        toast.success("Welcome to Throttle Connect!", {
+          description: "Your account has been set up.",
+        });
+        closeModal();
+      } catch (err: unknown) {
+        const firebaseErr = err as { message?: string };
+        toast.error("Failed to save phone number", { description: firebaseErr.message });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [pendingGoogleUser, closeModal],
+  );
+
   return {
     handleSubmit,
     handleGoogle,
+    submitGooglePhone,
     submitting,
+    pendingGoogleUser,
   };
 };

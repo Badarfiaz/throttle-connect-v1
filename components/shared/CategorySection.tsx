@@ -7,18 +7,68 @@ import { cn } from "@/lib/utils";
 import { MarketplaceStoreCard } from "@/types/marketplace";
 import { allowedPageType } from "@/types/CommonType";
 import { slugToTitle } from "@/ulity/slugToTitle";
+import { Skeleton } from "@/components/ui/skeleton";
+
+type CategorySectionSkeletonProps = {
+  className?: string;
+};
+
+export const CategorySectionSkeleton: React.FC<CategorySectionSkeletonProps> = ({
+  className,
+}) => {
+  return (
+    <Card
+      className={cn(
+        "w-[185px] h-[234px] p-3 flex flex-col items-start justify-start gap-3",
+        "bg-[#F5F9FB] border border-[#0C679233] rounded-[6px]",
+        "shadow-[0_2px_6px_rgba(0,0,0,0.08)]",
+        className,
+      )}
+    >
+      {/* Logo skeleton */}
+      <Skeleton className="w-20 h-20 rounded-xl shrink-0" />
+
+      {/* Content skeleton */}
+      <div className="flex flex-col justify-between flex-1 w-full min-h-0">
+        <div className="flex flex-col gap-2 w-full">
+          {/* Store name */}
+          <Skeleton className="h-4 w-3/4 rounded" />
+
+          {/* Badge */}
+          <Skeleton className="h-5 w-16 rounded" />
+
+          {/* Categories */}
+          <div className="space-y-1 mt-1">
+            <Skeleton className="h-3 w-full rounded" />
+            <Skeleton className="h-3 w-5/6 rounded" />
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-1 w-full">
+          <Skeleton className="h-3 w-3 rounded-full shrink-0" />
+          <Skeleton className="h-3 w-1/2 rounded" />
+        </div>
+      </div>
+    </Card>
+  );
+};
 
 type CategorySectionProps = {
-  items: MarketplaceStoreCard;
+  items?: MarketplaceStoreCard;
   pageType?: allowedPageType;
+  loading?: boolean;
 };
 
 export default function CategorySection({
   items,
   pageType,
+  loading = false,
 }: CategorySectionProps) {
-  console.log("items ", items);
-  const link =
+  if (loading || !items) {
+    return <CategorySectionSkeleton />;
+  }
+   const link =
     pageType === "marketplace"
       ? `/marketplace/storeProfile/${items?.slugUrl}`
       : `/networking/Club-list/${items?.slugUrl}`;

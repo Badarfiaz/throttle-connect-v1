@@ -1,5 +1,5 @@
 import { db } from "@/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { MarketplaceStore } from "@/types/marketplace";
 import { NetworkingStore } from "@/types/networking";
 import {
@@ -66,9 +66,37 @@ export const fetchNetworkingForUser = createAsyncThunk(
 export const fetchUserProfileData = createAsyncThunk(
   "auth/fetchUserProfileData",
   async (userId: string) => {
-    return await getStoreData<MemberProfile>("members", userId);
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      if (userData) {
+        const mergedProfile = {
+          completed: userData.profileData?.completed,
+          createdAt: userData.profileData?.createdAt,
+          experienceYears: userData.profileData?.experienceYears,
+          interests: userData.profileData?.interests,
+          drivingLicenseImage: userData.profileData?.drivingLicenseImage || "",
+          memberName: userData.name || "",
+          name: userData.name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          whatsapp: userData.whatsapp || "",
+          profileImage: userData.profileImage || "",
+          emergencyContact: userData.emergencyContact || null,
+          location: userData.location || null,
+          vehicle: userData.vehicle || null,
+          userId: userData.userId || userId,
+          clubId: userData.clubId || null,
+          membershipStatus: userData.membershipStatus || "none",
+        };
+        return normalizeFirestoreStore(mergedProfile) as MemberProfile;
+      }
+    }
+    return null;
   },
 );
+
 
 const authSlice = createSlice({
   name: "auth",
@@ -105,6 +133,11 @@ const authSlice = createSlice({
         };
       }
     },
+    setNetworkingStore: (state, action: PayloadAction<NetworkingStore | null>) => {
+      if (state.user) {
+        state.user.networking = action.payload || undefined;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchMarketplaceForUser.fulfilled, (state, action) => {
@@ -129,7 +162,8 @@ const authSlice = createSlice({
 });
 
 // ================== Exports ==================
-export const { logout, clearError, setUser, updateUserOnboarding } =
+export const { logout, clearError, setUser, updateUserOnboarding, setNetworkingStore } =
+
   authSlice.actions;
 
 // Listener middleware: when `setUser` is dispatched with a user, fetch both stores.

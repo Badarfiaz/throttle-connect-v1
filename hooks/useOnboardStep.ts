@@ -1,8 +1,11 @@
+"use client";
+
 import { useCallback, useState } from "react";
-import { ONBOARD_URL } from "@/lib/config";
-import getFirebaseToken from "@/ulity/getFirebaseToken";
 import { useAppDispatch, useAppSelector } from "@/app/redux/hooks";
 import { updateUserOnboarding } from "@/app/redux/features/authSlice";
+import { db } from "@/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { makeSlugUrl } from "@/ulity/genrateSlugUrl";
 
 type OnboardPageType = "marketplace" | "networking";
 
@@ -30,6 +33,7 @@ const formatDateWithOffset = (date: Date) => {
 };
 
 export const allowedTypes: OnboardPageType[] = ["marketplace", "networking"];
+
 export const useOnboardStep = ({ pageType }: UseOnboardStepOptions) => {
   if (!allowedTypes.includes(pageType)) {
     throw new Error("Invalid onBoardType");
@@ -46,69 +50,38 @@ export const useOnboardStep = ({ pageType }: UseOnboardStepOptions) => {
       setError(null);
 
       try {
-        const { token } = await getFirebaseToken();
-
-        if (!token) {
-          throw new Error("Missing authentication token.");
+        if (!user?.userId) {
+          throw new Error("Missing user session.");
         }
 
-        const payload = {
+        const COLLECTION_NAME =
+          pageType === "marketplace" ? "marketplaceStores" : "networkingStores";
+
+        const titleOrName = (data.clubName || data.title || `${pageType}-${user.userId}`) as string;
+
+        const payload: Record<string, unknown> = {
           ...data,
           completed: options.completed,
           pageType,
           onBoardType: pageType,
+          ownerUid: user.userId,
+          createdAt: formatDateWithOffset(new Date()),
+          slugUrl: makeSlugUrl(titleOrName),
         };
-        console.log("payload", payload);
 
-        const res = await fetch(ONBOARD_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        });
+        const docRef = doc(db, COLLECTION_NAME, user.userId);
+        await setDoc(docRef, payload, { merge: true });
 
-        const result = await res.json();
+        // Update user onboarding state in Redux
+        dispatch(
+          updateUserOnboarding({
+            pageType,
+            data: payload,
+            completed: options.completed,
+          }),
+        );
 
-        if (!res.ok) {
-          throw new Error(
-            typeof result?.message === "string"
-              ? result.message
-              : "Onboarding request failed.",
-          );
-        }
-
-        if (options.completed) {
-          const marketplaceData: Record<string, unknown> =
-            pageType === "marketplace"
-              ? {
-                  ...data,
-                  pageType,
-                  onBoardType: pageType,
-                }
-              : { ...data };
-
-          if (pageType === "marketplace") {
-            if (!("ownerUid" in marketplaceData) && user?.userId) {
-              marketplaceData.ownerUid = user.userId;
-            }
-            if (!("createdAt" in marketplaceData)) {
-              marketplaceData.createdAt = formatDateWithOffset(new Date());
-            }
-          }
-
-          // Update user onboarding state only after a successful final step
-          dispatch(
-            updateUserOnboarding({
-              pageType,
-              data: marketplaceData,
-              completed: options.completed,
-            }),
-          );
-        }
-
-        return result;
+        return { success: true, message: "Onboarded successfully." };
       } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error";
         setError(message);

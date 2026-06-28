@@ -2,6 +2,7 @@
 
 import { FC, useCallback, useMemo, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { shallowEqual, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -26,6 +27,7 @@ const HeaderPrimary: FC = () => {
   const isAuthed = !!user?.userId;
 
   const hasMarketplaceCompleted = user?.marketplace?.completed;
+  const hasNetworkingCompleted = user?.networking?.completed;
 
   const avatarLetter = useMemo(
     () => (isAuthed ? user!.email.trim().charAt(0).toUpperCase() : "?"),
@@ -67,9 +69,19 @@ const HeaderPrimary: FC = () => {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-xl font-semibold text-[#0B2447]"
+          className="flex items-center gap-2.5 text-xl font-semibold text-[#0B2447]"
         >
-          Throttle<span className="text-[#19376D]">Connect</span>
+          <Image
+            src="/images/logos/header-logo.png"
+            alt="ThrottleConnect Logo"
+            width={38}
+            height={38}
+            className="object-contain"
+            priority
+          />
+          <span>
+            Throttle<span className="text-[#19376D]">Connect</span>
+          </span>
         </Link>
 
         {/* Nav */}
@@ -88,7 +100,16 @@ const HeaderPrimary: FC = () => {
             <Button
               type="button"
               onClick={() => router.push("/marketplace/dashboard")}
-              className="rounded-md bg-[#19376D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B2447] transition-colors"
+              className="rounded-md bg-[#19376D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B3A5B] transition-colors"
+            >
+              Dashboard
+            </Button>
+          )}
+          {pathname === "/networking" && hasNetworkingCompleted && (
+            <Button
+              type="button"
+              onClick={() => router.push("/networking/dashboard")}
+              className="rounded-md bg-[#19376D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0B3A5B] transition-colors"
             >
               Dashboard
             </Button>
@@ -102,6 +123,7 @@ const HeaderPrimary: FC = () => {
               avatar={avatarLetter}
               email={user.email}
               logout={handleLogout}
+              isSuperAdmin={user.role === "superAdmin"}
             />
           </div>
         ) : (

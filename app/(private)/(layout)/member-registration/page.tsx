@@ -1,6 +1,5 @@
-import RegistrationContainer from "@/components/shared/RegistrationContainer";
-import React from "react";
+import { redirect } from "next/navigation";
 
-export default function Profile() {
-  return <RegistrationContainer type="member" />;
+export default function MemberRegistrationRedirectPage() {
+  redirect("/profile");
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProductCard from "../marketplace/ProductCard";
+import ProductCard, { ProductCardSkeleton } from "../marketplace/ProductCard";
 import PrimaryCarousel from "./PrimaryCarousel";
 import Title from "./Title";
 import { MarketplaceProduct, MarketplaceStore } from "@/types/marketplace";
@@ -60,8 +60,19 @@ function StoreProductsSection({ store }: StoreProductsSectionProps) {
 
   if (loading) {
     return (
-      <div className="mt-6 flex justify-center py-10 text-sm text-muted-foreground">
-        Loading products...
+      <div className="mt-8">
+        <Title title={`Products by ${store?.title ?? "Store"}`} align="left" />
+        <PrimaryCarousel
+          items={Array.from({ length: 4 })}
+          responsive={{
+            mobile: 2,
+            tablet: 2,
+            desktop: 4,
+          }}
+          renderItem={(_, i) => (
+            <ProductCardSkeleton key={i} />
+          )}
+        />
       </div>
     );
   }

@@ -6,7 +6,18 @@ export type CategoryType =
   | "bikes"
   | "electric-bikes"
   | "superbikes"
-  | "cruisers";
+  | "cruisers"
+  | "vespa-scooter"
+  | "sports-car"
+  | "diy-tools"
+  | "wrench"
+  | "racing-flag"
+  | "jeep"
+  | "electric-car"
+  | "vintage-car"
+  | "electric-bike"
+  | "cafe-racer"
+  | "modified-bike";
 
 export type Club = {
   id: string;
@@ -15,8 +26,10 @@ export type Club = {
   image: string;
   location: string;
   memberCount: number;
+  logoUrl?: string;
   description: string;
   createdBy: string;
+  featured?: boolean;
 };
 
 export interface EventItem {

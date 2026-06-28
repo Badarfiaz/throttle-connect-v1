@@ -106,3 +106,61 @@ export const marketplaceCategories: Category[] = [
     imageUrl: "/images/categories/Used Parts.jpeg",
   },
 ];
+
+export const networkingCategories: Category[] = [
+  {
+    name: "Bike Clubs",
+    slug: "bike",
+    imageUrl: "/images/category/cafe_racer.png",
+  },
+  {
+    name: "Car Clubs",
+    slug: "car",
+    imageUrl: "/images/category/sports_car.png",
+  },
+  {
+    name: "Jeep & Off-road",
+    slug: "other",
+    imageUrl: "/images/category/jeep.png",
+  },
+  {
+    name: "Vespa & Scooters",
+    slug: "bike",
+    imageUrl: "/images/category/vespa_scooter.png",
+  },
+  {
+    name: "Café Racers",
+    slug: "bike",
+    imageUrl: "/images/category/cafe_racer.png",
+  },
+  {
+    name: "Electric Bikes",
+    slug: "bike",
+    imageUrl: "/images/category/electric_bike.png",
+  },
+  {
+    name: "Electric Cars",
+    slug: "car",
+    imageUrl: "/images/category/electric_car.png",
+  },
+  {
+    name: "Vintage Cars",
+    slug: "car",
+    imageUrl: "/images/category/vintage_car.png",
+  },
+  {
+    name: "Modified Bikes",
+    slug: "bike",
+    imageUrl: "/images/category/modified_bike.png",
+  },
+  {
+    name: "Sports Cars",
+    slug: "car",
+    imageUrl: "/images/category/sports_car.png",
+  },
+  {
+    name: "Other Clubs",
+    slug: "other",
+    imageUrl: "/images/category/racing_flag.png",
+  },
+];

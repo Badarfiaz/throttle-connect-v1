@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import ProductCard from "@/components/marketplace/ProductCard";
+import ProductCard, { ProductCardSkeleton } from "@/components/marketplace/ProductCard";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import MarketplaceCategoryGrid from "@/components/marketplace/MarketplaceCategoryGrid";
 import MarketplaceSearch from "@/components/marketplace/MarketplaceSearch";
-import CategorySection from "@/components/shared/CategorySection";
+import CategorySection, { CategorySectionSkeleton } from "@/components/shared/CategorySection";
 import CategoryProductsSection from "@/components/marketplace/CategoryProductsSection";
+import FeaturedServicesSection from "@/components/marketplace/FeaturedServicesSection";
 
 import { cardDataMarketplace } from "@/dummydata/networking";
 import { MARKETPLACE_ALL_STORES_QUERY } from "@/app/graphql/marketplace";
@@ -94,7 +95,18 @@ function Page() {
       >
         <div className="pt-4">
           {loading ? (
-            <p className={CENTER_TEXT}>Loading stores...</p>
+            <PrimaryCarousel
+              items={Array.from({ length: 5 })}
+              responsive={{
+                mobile: mobileResponsiveCount,
+                tablet: 3,
+                desktop: 5,
+              }}
+              className="w-full"
+              renderItem={(_, i) => (
+                <CategorySectionSkeleton key={i} />
+              )}
+            />
           ) : error ? (
             <p className={CENTER_TEXT}>Failed to load stores.</p>
           ) : storeCards.length > 0 ? (
@@ -136,7 +148,18 @@ function Page() {
         description="Discover our handpicked selection..."
       >
         {featuredLoading ? (
-          <p className={CENTER_TEXT}>Loading featured products...</p>
+          <PrimaryCarousel
+            items={Array.from({ length: 4 })}
+            className="w-full"
+            responsive={{
+              mobile: mobileResponsiveCount,
+              tablet: 2,
+              desktop: 4,
+            }}
+            renderItem={(_, i) => (
+              <ProductCardSkeleton key={i} />
+            )}
+          />
         ) : featuredError ? (
           <p className={CENTER_TEXT}>Failed to load featured products.</p>
         ) : featuredProducts.length > 0 ? (
@@ -159,6 +182,7 @@ function Page() {
         )}
       </SectionWrapper>
 
+
       {/* Categories */}
       <div className={SECTION_CONTAINER}>
         <CategoryProductsSection
@@ -167,6 +191,8 @@ function Page() {
           categoryDescription="Find quality automotive accessories for your vehicle."
         />
       </div>
+      {/* Vehicle Services */}
+      <FeaturedServicesSection />
 
       <div className={SECTION_CONTAINER}>
         <CategoryProductsSection
