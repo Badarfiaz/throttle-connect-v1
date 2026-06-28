@@ -2,6 +2,7 @@
 
 import { FC, useCallback, useMemo, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { shallowEqual, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -68,9 +69,19 @@ const HeaderPrimary: FC = () => {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 text-xl font-semibold text-[#0B2447]"
+          className="flex items-center gap-2.5 text-xl font-semibold text-[#0B2447]"
         >
-          Throttle<span className="text-[#19376D]">Connect</span>
+          <Image
+            src="/images/logos/header-logo.png"
+            alt="ThrottleConnect Logo"
+            width={38}
+            height={38}
+            className="object-contain"
+            priority
+          />
+          <span>
+            Throttle<span className="text-[#19376D]">Connect</span>
+          </span>
         </Link>
 
         {/* Nav */}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   Facebook,
   Instagram,
@@ -63,7 +64,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand Column */}
           <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-3">
+              <Image
+            src="/images/logos/header-logo.png"
+                alt="ThrottleConnect Logo"
+                width={44}
+                height={44}
+                className="object-contain rounded-lg"
+              />
               <span className="text-2xl font-bold text-white">
                 ThrottleConnect
               </span>
