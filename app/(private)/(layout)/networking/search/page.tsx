@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import SearchPage from "@/components/search/SearchPage";
 
@@ -9,9 +9,17 @@ import SearchPage from "@/components/search/SearchPage";
  *
  * Reads the `category` query param and delegates to the shared SearchPage.
  */
-export default function NetworkingSearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const category = searchParams.get("category");
 
   return <SearchPage type="networking" category={category} />;
+}
+
+export default function NetworkingSearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center dark:bg-slate-955 text-slate-500">Loading search...</div>}>
+      <SearchPageContent />
+    </Suspense>
+  );
 }

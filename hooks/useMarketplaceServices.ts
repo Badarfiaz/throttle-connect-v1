@@ -13,6 +13,7 @@ import {
   UPDATE_MARKETPLACE_SERVICE_MUTATION,
   DELETE_MARKETPLACE_SERVICE_MUTATION,
   ADD_SERVICE_REVIEW_MUTATION,
+  GET_SERVICE_BY_ID_QUERY,
 } from "@/app/graphql/marketplace";
 import {
   executeMarketplaceProductRequest,
@@ -81,6 +82,24 @@ export const useMarketplaceServices = () => {
       }>(FEATURED_SERVICES_QUERY, { limit });
       const data = result?.data?.featuredServices ?? [];
       setServices(data);
+      return data;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setError(message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchServiceById = useCallback(async (id: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await executeMarketplaceProductRequestPublic<{
+        marketplaceServiceById: MarketplaceService;
+      }>(GET_SERVICE_BY_ID_QUERY, { id });
+      const data = result?.data?.marketplaceServiceById;
       return data;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
@@ -252,6 +271,7 @@ export const useMarketplaceServices = () => {
     fetchMyServices,
     fetchStoreServices,
     fetchFeaturedServices,
+    fetchServiceById,
     createService,
     updateService,
     deleteService,

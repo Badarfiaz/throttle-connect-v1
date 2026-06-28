@@ -3,7 +3,7 @@ import type { MarketplaceStore } from "@/types/marketplace";
 import StoreBanner from "./StoreProfile/StoreBanner";
 import StoreHeader from "./StoreProfile/StoreHeader";
 import OverviewCard from "./StoreProfile/OverviewCard";
-import ContactCard from "./StoreProfile/ContactCard";
+import SellerProfileCard from "./SellerProfileCard";
 import StoreProductsSection from "../shared/StoreProductsSection";
 
 type Props = {
@@ -41,7 +41,11 @@ export default function StoreProfilePage({
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="flex flex-col gap-4 md:col-span-1">
-            <ContactCard store={store} />
+            <SellerProfileCard
+              store={store}
+              showMetadata={true}
+              showStoreLink={false}
+            />
           </div>
 
           <div className="md:col-span-2">

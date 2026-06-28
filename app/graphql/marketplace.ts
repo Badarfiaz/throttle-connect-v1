@@ -349,6 +349,15 @@ export const GET_MARKETPLACE_SERVICE_QUERY = `
   }
 `;
 
+export const GET_SERVICE_BY_ID_QUERY = `
+  query GetServiceById($id: ID!) {
+    marketplaceServiceById(id: $id) {
+      ${SERVICE_FIELDS}
+      reviews { ${REVIEW_FIELDS} }
+    }
+  }
+`;
+
 export const CREATE_MARKETPLACE_SERVICE_MUTATION = `
   mutation CreateMarketplaceService($input: CreateMarketplaceServiceInput!) {
     createMarketplaceService(input: $input) {

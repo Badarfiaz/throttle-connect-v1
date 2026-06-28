@@ -112,6 +112,7 @@ const marketplaceStoreTypeDefs = /* GraphQL */ `
     storeServices(storeId: ID!): [MarketplaceService!]!
     featuredServices(limit: Int): [MarketplaceService!]!
     marketplaceService(storeId: ID!, serviceId: ID!): MarketplaceService
+    marketplaceServiceById(id: ID!): MarketplaceService
   }
 
   type Mutation {

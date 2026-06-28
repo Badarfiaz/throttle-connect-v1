@@ -165,6 +165,17 @@ const marketplaceStoreResolvers = {
       return buildServiceDoc(doc, storeId);
     },
 
+    marketplaceServiceById: async (_: any, args: { id: string }) => {
+      const { id } = args;
+      const snap = await db
+        .collectionGroup(SERVICES_SUBCOLLECTION)
+        .get();
+      const doc = snap.docs.find((d) => d.id === id);
+      if (!doc) return null;
+      const storeId = doc.ref.parent.parent?.id ?? "";
+      return buildServiceDoc(doc, storeId);
+    },
+
     marketplaceStores: async (_: any, __: any, context: { uid: string }) => {
       const { uid } = context;
 

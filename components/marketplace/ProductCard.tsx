@@ -12,14 +12,91 @@ import PriceLabel from "./PriceLabel";
 import CategoryLabel from "./CategoryLabel";
 import HeartButton from "./HeartButton";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
-type ProductCardProps = {
-  product: MarketplaceProduct;
+type ProductCardSkeletonProps = {
   size?: "sm" | "md" | "lg";
   isLandingPage?: boolean;
+  className?: string;
 };
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandingPage = false }) => {
+export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({
+  size = "md",
+  isLandingPage = false,
+  className,
+}) => {
+  const sizeStyles = {
+    sm: "w-[200px]",
+    md: "w-[252px]",
+    lg: "w-[320px]",
+  };
+
+  const imageHeightStyles = {
+    sm: "h-[130px]",
+    md: "h-[160px]",
+    lg: "h-[200px]",
+  };
+
+  return (
+    <Card
+      className={cn(
+        "relative overflow-hidden mb-2.5",
+        "bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-xl",
+        "shadow-sm",
+        isLandingPage ? "w-full" : sizeStyles[size],
+        className,
+      )}
+    >
+      {/* Image skeleton */}
+      <Skeleton className={cn("w-full rounded-t-xl", imageHeightStyles[size])} />
+
+      {/* Content skeleton */}
+      <div className="px-3.5 py-3 flex flex-col gap-2">
+        {/* Title */}
+        <Skeleton className="h-4 w-3/4 rounded" />
+
+        {/* Price & Stock */}
+        <div className="flex items-center justify-between mt-1">
+          <Skeleton className="h-5 w-20 rounded" />
+          <Skeleton className="h-3 w-12 rounded" />
+        </div>
+
+        {/* Category */}
+        <div className="flex items-center mt-1">
+          <Skeleton className="h-5 w-24 rounded-full" />
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-1 mt-1">
+          <Skeleton className="h-3 w-3 rounded-full shrink-0" />
+          <Skeleton className="h-3 w-2/3 rounded" />
+        </div>
+
+        {/* Seller Info Footer */}
+        <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
+            <Skeleton className="w-5 h-5 rounded-full shrink-0" />
+            <Skeleton className="h-3 w-20 rounded" />
+          </div>
+          <Skeleton className="h-3.5 w-14 rounded shrink-0" />
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+type ProductCardProps = {
+  product?: MarketplaceProduct;
+  size?: "sm" | "md" | "lg";
+  isLandingPage?: boolean;
+  loading?: boolean;
+};
+
+const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandingPage = false, loading = false }) => {
+  if (loading || !product) {
+    return <ProductCardSkeleton size={size} isLandingPage={isLandingPage} />;
+  }
+
   const sizeStyles = {
     sm: "w-[200px]",
     md: "w-[252px]",

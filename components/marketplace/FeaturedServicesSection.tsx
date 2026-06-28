@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { MarketplaceService } from "@/types/marketplace";
 import { useMarketplaceServices } from "@/hooks/useMarketplaceServices";
-import ServiceCard from "./ServiceCard";
+import ServiceCard, { ServiceCardSkeleton } from "./ServiceCard";
 import PrimaryCarousel from "@/components/shared/PrimaryCarousel";
 import { SectionWrapper } from "@/components/shared/SectionWrapper";
 import { CENTER_TEXT } from "@/types/main";
@@ -39,14 +39,18 @@ console.log('services', services)
     >
       <div className="pt-4">
         {loading ? (
-          <div className="flex gap-4 overflow-hidden">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 h-[340px] w-[252px] shrink-0 animate-pulse"
-              />
-            ))}
-          </div>
+          <PrimaryCarousel
+            items={Array.from({ length: 4 })}
+            responsive={{
+              mobile: mobileResponsiveCount,
+              tablet: 2,
+              desktop: 4,
+            }}
+            className="w-full"
+            renderItem={(_, i) => (
+              <ServiceCardSkeleton key={i} />
+            )}
+          />
         ) : (
           <PrimaryCarousel
             items={services}

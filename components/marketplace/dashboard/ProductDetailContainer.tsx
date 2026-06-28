@@ -16,6 +16,7 @@ import Link from "next/link";
 
 import { Package, Tag, MapPin, Clock, Store, Layers, ChevronLeft, ShieldCheck, Mail, Phone, ShoppingCart, Heart } from "lucide-react";
 import ContactButton from "../ContactButton";
+import SellerProfileCard from "../SellerProfileCard";
 
 const ProductDetailContainer = () => {
   const params = useParams();
@@ -207,72 +208,21 @@ const ProductDetailContainer = () => {
 
           {/* ── RIGHT COLUMN (seller + contact + extra info) ── */}
           <div className="space-y-6">
-
-            {/* Seller Card */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200/60 dark:border-slate-800/80 p-6">
-              <Link
-                href={
-                  product.owner?.slugUrl
-                    ? `/marketplace/storeProfile/${product.owner.slugUrl}`
-                    : "#"
-                }
-                className="flex items-center gap-3.5 group mb-6"
+            <SellerProfileCard
+              store={product.owner}
+              itemName={product.productName}
+              itemType="product"
+              showMetadata={false}
+            >
+              <Button 
+                onClick={() => {
+                  toast.success("Added to Cart!");
+                }}
+                className="w-full h-11 bg-emerald-600 hover:bg-emerald-550 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
-                <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gradient-to-tr from-[#19376D] to-[#0B2447] flex items-center justify-center shrink-0 shadow">
-                  {product.owner?.logoUrl ? (
-                    <img
-                      src={product.owner.logoUrl}
-                      alt={product.owner?.title || "Store"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Store size={26} className="text-white" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Seller Profile</p>
-                  <p className="text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-primary transition-colors truncate flex items-center gap-1">
-                    {product.owner?.title || "Unknown Store"}
-                    {product.owner?.completed && <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />}
-                  </p>
-                </div>
-
-                <ChevronLeft size={18} className="text-slate-400 rotate-180 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-
-              <Separator className="mb-6 dark:bg-slate-800" />
-
-              <div className="flex flex-col gap-3">
-                <ContactButton
-                  phone={product.owner?.phone}
-                  email={product.owner?.email}
-                  preferredMethod="phone"
-                  menuIcon={true}
-                  detailPage={true}
-                />
-
-                <Button 
-                  onClick={() => {
-                    toast.success("Added to Cart!");
-                  }}
-                  className="w-full h-11 bg-emerald-600 hover:bg-emerald-550 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-                >
-                  <ShoppingCart className="h-4 w-4" /> Add to Cart
-                </Button>
-
-                <Link
-                  href={
-                    product.owner?.slugUrl
-                      ? `/marketplace/storeProfile/${product.owner.slugUrl}`
-                      : "#"
-                  }
-                  className="flex items-center justify-center gap-1.5 w-full h-10 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition"
-                >
-                  <Store size={14} />
-                  View Store Profile
-                </Link>
-              </div>
-            </div>
+                <ShoppingCart className="h-4 w-4" /> Add to Cart
+              </Button>
+            </SellerProfileCard>
 
             {/* Category + Stock Cards */}
             <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200/60 dark:border-slate-800/80 p-6 space-y-4">
