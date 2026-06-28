@@ -11,6 +11,7 @@ import { Club, CategoryType } from "@/types/main";
 import AnimateMotion from "../shared/AnimateMotion";
 import Link from "next/link";
 import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
+import { useTrackClick } from "@/hooks/analytics/useTrackClick";
 
 interface ClubCardProps {
   club: Club;
@@ -18,6 +19,8 @@ interface ClubCardProps {
 }
 
 const ClubCard = ({ club, isLandingPage }: ClubCardProps) => {
+  const { trackClick } = useTrackClick("clubAnalytics", club.id);
+
   // Map category to styles
   const categoryStyles: Record<CategoryType, string> = {
     sedans: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
@@ -127,7 +130,7 @@ const ClubCard = ({ club, isLandingPage }: ClubCardProps) => {
             </p>
           </div>
           
-          <Link href={`/networking/Club-Profile/${club.id}`} className="shrink-0">
+          <Link href={`/networking/Club-Profile/${club.id}`} className="shrink-0" onClick={() => trackClick()}>
             <Button size="sm" variant="default" className="rounded-xl bg-[#0B2447] hover:bg-[#19376D] text-white font-semibold transition-all shadow-xs hover:shadow-md flex items-center gap-1 cursor-pointer">
               View Club <ChevronRight className="h-4 w-4" />
             </Button>

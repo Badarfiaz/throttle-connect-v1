@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import SharedButton from "@/components/shared/SharedButton";
 import { useAppSelector, useAppDispatch } from "@/app/redux/hooks";
+import { useTrackView } from "@/hooks/analytics/useTrackView";
 import { fetchUserProfileData } from "@/app/redux/features/authSlice";
 import { toast } from "sonner";
 import {
@@ -51,6 +52,7 @@ export default function ClubProfile() {
 
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
+  const { trackView } = useTrackView("clubAnalytics", id as string);
   const [submitting, setSubmitting] = useState(false);
   const [myRequest, setMyRequest] = useState<any>(null);
   const [loadingRequest, setLoadingRequest] = useState(false);
@@ -74,9 +76,9 @@ export default function ClubProfile() {
       try {
         const docRef = doc(db, "networkingStores", id as string);
         const docSnap = await getDoc(docRef);
-        console.log("Fetched club data:", docSnap.data());
         if (docSnap.exists()) {
           setDbClub(docSnap.data());
+          trackView(user?.userId);
         }
       } catch (err) {
         console.error("Error fetching club profile:", err);

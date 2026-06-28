@@ -34,14 +34,6 @@
       ]
     },
     {
-      "collectionGroup": "leads",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "storeOwnerUid", "order": "ASCENDING" },
-        { "fieldPath": "clickedAt", "order": "DESCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "marketplaceStores",
       "queryScope": "COLLECTION",
       "fields": [

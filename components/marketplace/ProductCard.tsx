@@ -14,6 +14,7 @@ import HeartButton from "./HeartButton";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
+import { useTrackClick } from "@/hooks/analytics/useTrackClick";
 
 type ProductCardSkeletonProps = {
   size?: "sm" | "md" | "lg";
@@ -94,6 +95,8 @@ type ProductCardProps = {
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandingPage = false, loading = false }) => {
+  const { trackClick } = useTrackClick("productAnalytics", product?.id ?? "");
+
   if (loading || !product) {
     return <ProductCardSkeleton size={size} isLandingPage={isLandingPage} />;
   }
@@ -121,6 +124,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandi
     <CardLinkWrapper link={`/marketplace/product/${product.id}`}>
       <TooltipProvider>
         <Card
+          onClick={() => trackClick()}
           className={cn(
             "relative overflow-hidden cursor-pointer mb-2.5",
             "bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-xl",

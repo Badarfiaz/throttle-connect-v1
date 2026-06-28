@@ -13,6 +13,7 @@ import AddProductSection from "@/components/marketplace/dashboard/sections/AddPr
 import ServicesSection from "@/components/marketplace/dashboard/sections/ServicesSection";
 import AddServiceSection from "@/components/marketplace/dashboard/sections/AddServiceSection";
 import LeadsSection from "@/components/marketplace/dashboard/sections/LeadsSection";
+import AnalyticsSection from "@/components/marketplace/dashboard/sections/AnalyticsSection";
 import { useMarketplaceServices } from "@/hooks/useMarketplaceServices";
 import {
   Package,
@@ -32,7 +33,7 @@ import {
 import { toast } from "sonner";
 import { MarketplaceService } from "@/types/marketplace";
 
-type LocalDashboardTab = "overview" | "profile" | "products" | "add-product" | "services" | "add-service" | "leads";
+type LocalDashboardTab = "overview" | "profile" | "products" | "add-product" | "services" | "add-service" | "leads" | "analytics";
 
 type MarketplaceProduct = {
   id: string;
@@ -153,6 +154,11 @@ const MarketplaceDashboardContainer = () => {
       id: "leads",
       label: "Leads",
       description: "Buyers who contacted you",
+    },
+    {
+      id: "analytics",
+      label: "Analytics",
+      description: "Views & clicks per listing",
     },
   ];
 
@@ -448,7 +454,12 @@ const MarketplaceDashboardContainer = () => {
         />
       )}
 
-      {activeTab === "leads" && <LeadsSection />}
+      {activeTab === "leads" && (
+        <LeadsSection products={products.map((p) => ({ id: p.id, productName: p.productName }))} />
+      )}
+      {activeTab === "analytics" && (
+        <AnalyticsSection products={products.map((p) => ({ id: p.id, productName: p.productName }))} />
+      )}
     </DashboardContainer>
   );
 };

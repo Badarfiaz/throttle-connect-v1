@@ -22,8 +22,9 @@ import MembersTab from "./MembersTab";
 import EventsTab from "./EventsTab";
 import AchievementsTab from "./AchievementsTab";
 import GalleryTab from "./GalleryTab";
+import AnalyticsTab from "./AnalyticsTab";
 
-type DashboardTab = "overview" | "profile" | "members" | "events" | "achievements" | "gallery";
+type DashboardTab = "overview" | "profile" | "members" | "events" | "achievements" | "gallery" | "analytics";
 
 export default function NetworkingDashboardContainer() {
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
@@ -158,6 +159,11 @@ export default function NetworkingDashboardContainer() {
         label: "Club Gallery",
         description: "Post club moments (max 10)",
         badge: club?.gallery?.length ? `${club.gallery.length}/10` : undefined,
+      },
+      {
+        id: "analytics",
+        label: "Analytics",
+        description: "Profile views & listing clicks",
       },
     ];
   }, [pendingRequests.length, eventsList, club?.gallery]);
@@ -474,6 +480,7 @@ export default function NetworkingDashboardContainer() {
           handleDelete={handleGalleryDelete}
         />
       )}
+      {activeTab === "analytics" && <AnalyticsTab clubId={club?.id} />}
     </DashboardContainer>
   );
 }

@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useMarketplaceProducts } from "@/hooks/useMarketplaceProducts";
 import { useLeads } from "@/hooks/useLeads";
+import { useTrackView } from "@/hooks/analytics/useTrackView";
+import { useTrackClick } from "@/hooks/analytics/useTrackClick";
 import { useAppSelector } from "@/app/redux/hooks";
 import { MarketplaceProduct } from "@/types/marketplace";
 import { useParams, useRouter } from "next/navigation";
@@ -29,6 +31,8 @@ const ProductDetailContainer = () => {
   const { fetchProductById, loading } = useMarketplaceProducts();
   const { recordLead } = useLeads();
   const { user } = useAppSelector((s) => s.auth);
+  const { trackView } = useTrackView("productAnalytics", productId);
+  const { trackClick } = useTrackClick("productAnalytics", productId);
 
   const [product, setProduct] = useState<MarketplaceProduct | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +46,18 @@ const ProductDetailContainer = () => {
     (async () => {
       try {
         const res = await fetchProductById(productId);
-        if (mounted) setProduct(res);
+        if (mounted) {
+          setProduct(res);
+          if (res) {
+            trackView(user?.userId);
+            // Record this user as a lead for the store owner
+            recordLead({
+              productId: res.id,
+              productTitle: res.productName,
+              storeOwnerUid: res.ownerUid,
+            });
+          }
+        }
       } catch (err) {
         if (mounted) {
           setError(
@@ -55,7 +70,7 @@ const ProductDetailContainer = () => {
     return () => {
       mounted = false;
     };
-  }, [productId, fetchProductById]);
+  }, [productId, fetchProductById]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (error) {
     return (
@@ -218,14 +233,7 @@ const ProductDetailContainer = () => {
               itemType="product"
               showMetadata={false}
               onContact={() => {
-                if (product && user) {
-                  recordLead({
-                    productId: product.id,
-                    productName: product.productName,
-                    productImage: product.imageurl?.url,
-                    storeOwnerUid: product.ownerUid,
-                  });
-                }
+                trackClick();
               }}
             >
               <Button 
