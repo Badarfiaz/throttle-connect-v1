@@ -1,4 +1,5 @@
 import { onRequest } from "firebase-functions/v2/https";
+import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import { withCors } from "../utils/withcors";
 import marketplaceStoreResolvers from "./graphql/marketplaceStore/resolvers";
 import { admin, verifyToken } from "../lib/firebase";
@@ -112,4 +113,45 @@ export const onboard = onRequest(
         .json({ success: false, message: "Internal Server Error" });
     }
   }),
+);
+
+// Triggered by Firebase Stripe Extension when a payment session is completed.
+// Updates the user's role to goldUser and sets subscription period.
+export const onStripePaymentCompleted = onDocumentWritten(
+  "customers/{uid}/payments/{paymentId}",
+  async (event) => {
+    const after = event.data?.after?.data();
+    if (!after) return;
+
+    // Only process succeeded payments
+    if (after.status !== "succeeded") return;
+
+    const uid = event.params.uid;
+    const metadata = after.metadata ?? {};
+    const plan = metadata.plan ?? "gold";
+
+    if (plan !== "gold") return;
+
+    const subscriptionStart = new Date();
+    const subscriptionEnd = new Date(subscriptionStart);
+    subscriptionEnd.setDate(subscriptionEnd.getDate() + 120); // 4 months = 120 days
+
+    try {
+      const subscriptionStart = new Date();
+      const subscriptionEnd = new Date(subscriptionStart);
+      subscriptionEnd.setDate(subscriptionEnd.getDate() + 120); // 4 months = 120 days
+
+      await db.collection(COLLECTIONS.USERS).doc(uid).update({
+        isGoldUser: true,
+        subscriptionPlan: "gold",
+        subscriptionStatus: "active",
+        subscriptionStart: subscriptionStart.toISOString(),
+        subscriptionEnd: subscriptionEnd.toISOString(),
+        recentPayment: true,
+      });
+      console.log(`Updated user ${uid} subscription to gold.`);
+    } catch (err) {
+      console.error(`Failed to update user ${uid} subscription:`, err);
+    }
+  },
 );

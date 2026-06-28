@@ -49,6 +49,7 @@ const HeaderPrimary: FC = () => {
   const navLinks = useMemo(
     () => [
       { href: "/", label: "Home" },
+      { href: "/pricing", label: "Pricing" },
       { href: "/blogs", label: "News" },
       { href: "/contact", label: "Contact Us" },
       { href: "/list-your-business", label: "Registration" }, // FIXED lowercase route

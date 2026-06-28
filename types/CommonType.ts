@@ -47,7 +47,9 @@ export type OnBoardType = {
   tiktok: string;
 };
 
-export type UserRole = "user" | "superAdmin";
+export type UserRole = "user" | "superAdmin" | "goldUser" | "silverUser" | "platinumUser";
+
+export type SubscriptionPlan = "gold" | "silver" | "platinum" | null;
 
 export type User = {
   userId: string;
@@ -59,4 +61,9 @@ export type User = {
   marketplace?: MarketplaceStore | null;
   networking?: NetworkingStore | null;
   profileData?: MemberProfile | null;
+  subscriptionPlan?: SubscriptionPlan;
+  subscriptionStatus?: "active" | "inactive" | null;
+  subscriptionEnd?: string | null;
+  subscriptionStart?: string | null;
+  isGoldUser?: boolean;
 };

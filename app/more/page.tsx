@@ -14,6 +14,7 @@ import {
   LayoutTemplate,
   LogOut,
   Settings,
+  CreditCard,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -62,6 +63,11 @@ const MorePage = () => {
           label: "New Feed",
           icon: MessageCircle,
           href: "/blogs",
+        },
+        {
+          label: "Pricing & Plans",
+          icon: CreditCard,
+          href: "/pricing",
         },
         {
           label: "Help & Support",
