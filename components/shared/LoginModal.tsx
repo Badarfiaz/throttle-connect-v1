@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import type { PendingGoogleUser } from "@/hooks/useAuthHandlers";
+import type { OtpStep, PendingGoogleUser } from "@/hooks/useAuthHandlers";
 
 type AuthMode = "login" | "signup";
 
@@ -26,6 +26,10 @@ interface LoginModalProps {
   openModal: () => void;
   pendingGoogleUser?: PendingGoogleUser | null;
   submitGooglePhone?: (phone: string) => Promise<void>;
+  otpStep?: OtpStep;
+  verifyOtpEmailSignup?: (otp: string) => Promise<void>;
+  verifyOtpGooglePhone?: (otp: string) => Promise<void>;
+  cancelOtp?: () => void;
 }
 
 const LoginModal: FC<LoginModalProps> = ({
@@ -39,128 +43,197 @@ const LoginModal: FC<LoginModalProps> = ({
   openModal,
   pendingGoogleUser,
   submitGooglePhone,
+  otpStep,
+  verifyOtpEmailSignup,
+  verifyOtpGooglePhone,
+  cancelOtp,
 }) => {
   const [googlePhone, setGooglePhone] = useState("");
+  const [otp, setOtp] = useState("");
+
+  const handleOtpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (otpStep === "email-signup") {
+      await verifyOtpEmailSignup?.(otp);
+    } else if (otpStep === "google-phone") {
+      await verifyOtpGooglePhone?.(otp);
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          className="bg-[#0B2447] hover:bg-[#19376D] text-white rounded-md px-5"
-          onClick={openModal}
-        >
-          Login
-        </Button>
-      </DialogTrigger>
+    <>
+      {/* Invisible reCAPTCHA container — required by Firebase Phone Auth */}
+      <div id="recaptcha-container" />
 
-      <DialogContent className="max-w-md rounded-2xl">
-        {/* Phone collection step after Google sign-in */}
-        {pendingGoogleUser ? (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-semibold text-center mb-1">
-                One last step
-              </DialogTitle>
-              <DialogDescription className="text-center">
-                Hi {pendingGoogleUser.name || pendingGoogleUser.email}! Please add your phone number to complete sign-up.
-              </DialogDescription>
-            </DialogHeader>
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                await submitGooglePhone?.(googlePhone);
-              }}
-              className="space-y-4 mt-4"
-            >
-              <div className="flex flex-col space-y-2">
-                <Label htmlFor="google-phone">Phone Number</Label>
-                <Input
-                  id="google-phone"
-                  name="google-phone"
-                  type="tel"
-                  placeholder="e.g. 03001234567"
-                  value={googlePhone}
-                  onChange={(e) => setGooglePhone(e.target.value)}
-                  required
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full bg-[#0B2447] hover:bg-[#19376D] text-white"
-                disabled={submitting}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button
+            className="bg-[#0B2447] hover:bg-[#19376D] text-white rounded-md px-5"
+            onClick={openModal}
+          >
+            Login
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent className="max-w-md rounded-2xl">
+
+          {/* OTP verification step */}
+          {otpStep ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-semibold text-center mb-1">
+                  Verify your phone
+                </DialogTitle>
+                <DialogDescription className="text-center">
+                  Enter the 6-digit code sent to your phone number.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleOtpSubmit} className="space-y-4 mt-4">
+                <div className="flex flex-col space-y-2">
+                  <Label htmlFor="otp">Verification Code</Label>
+                  <Input
+                    id="otp"
+                    name="otp"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="123456"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                    required
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full bg-[#0B2447] hover:bg-[#19376D] text-white"
+                  disabled={submitting || otp.length < 6}
+                >
+                  {submitting ? "Verifying..." : "Verify OTP"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => {
+                    setOtp("");
+                    cancelOtp?.();
+                  }}
+                  disabled={submitting}
+                >
+                  Back
+                </Button>
+              </form>
+            </>
+          ) : pendingGoogleUser ? (
+            /* Phone collection step after Google sign-in */
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-semibold text-center mb-1">
+                  One last step
+                </DialogTitle>
+                <DialogDescription className="text-center">
+                  Hi {pendingGoogleUser.name || pendingGoogleUser.email}! Please add your phone
+                  number to complete sign-up.
+                </DialogDescription>
+              </DialogHeader>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  await submitGooglePhone?.(googlePhone);
+                }}
+                className="space-y-4 mt-4"
               >
-                {submitting ? "Saving..." : "Complete Sign-up"}
-              </Button>
-            </form>
-          </>
-        ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-semibold text-center mb-2">
-                {mode === "login" ? "Log in" : "Sign up"}
-              </DialogTitle>
-              <DialogDescription className="text-center">
-                Login or create an account to continue.
-              </DialogDescription>
-            </DialogHeader>
+                <div className="flex flex-col space-y-2">
+                  <Label htmlFor="google-phone">Phone Number</Label>
+                  <Input
+                    id="google-phone"
+                    name="google-phone"
+                    type="tel"
+                    placeholder="e.g. 03001234567"
+                    value={googlePhone}
+                    onChange={(e) => setGooglePhone(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full bg-[#0B2447] hover:bg-[#19376D] text-white"
+                  disabled={submitting}
+                >
+                  {submitting ? "Sending OTP..." : "Send OTP"}
+                </Button>
+              </form>
+            </>
+          ) : (
+            /* Normal login / signup form */
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-semibold text-center mb-2">
+                  {mode === "login" ? "Log in" : "Sign up"}
+                </DialogTitle>
+                <DialogDescription className="text-center">
+                  Login or create an account to continue.
+                </DialogDescription>
+              </DialogHeader>
 
-            <Tabs
-              value={mode}
-              onValueChange={(val) => setMode(val as AuthMode)}
-              className="w-full mt-4"
-            >
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              </TabsList>
+              <Tabs
+                value={mode}
+                onValueChange={(val) => setMode(val as AuthMode)}
+                className="w-full mt-4"
+              >
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="login">Login</TabsTrigger>
+                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                </TabsList>
 
-              <TabsContent value={mode}>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {mode === "signup" && (
-                    <InputGroup label="Full Name" id="name" type="text" required />
-                  )}
-                  <InputGroup label="Email" id="email" type="email" required />
-                  <InputGroup label="Password" id="password" type="password" required />
-                  {mode === "signup" && (
-                    <InputGroup
-                      label="Phone Number"
-                      id="phone"
-                      type="tel"
-                      placeholder="e.g. 03001234567"
-                      required
-                    />
-                  )}
+                <TabsContent value={mode}>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {mode === "signup" && (
+                      <InputGroup label="Full Name" id="name" type="text" required />
+                    )}
+                    <InputGroup label="Email" id="email" type="email" required />
+                    <InputGroup label="Password" id="password" type="password" required />
+                    {mode === "signup" && (
+                      <InputGroup
+                        label="Phone Number"
+                        id="phone"
+                        type="tel"
+                        placeholder="e.g. 03001234567"
+                        required
+                      />
+                    )}
 
-                  <Button
-                    type="submit"
-                    className="w-full bg-[#0B2447] hover:bg-[#19376D] text-white"
-                    disabled={submitting}
-                  >
-                    {submitting
-                      ? mode === "login"
-                        ? "Logging in..."
-                        : "Creating..."
-                      : mode === "login"
-                      ? "Log in"
-                      : "Create Account"}
-                  </Button>
+                    <Button
+                      type="submit"
+                      className="w-full bg-[#0B2447] hover:bg-[#19376D] text-white"
+                      disabled={submitting}
+                    >
+                      {submitting
+                        ? mode === "login"
+                          ? "Logging in..."
+                          : "Sending OTP..."
+                        : mode === "login"
+                        ? "Log in"
+                        : "Create Account"}
+                    </Button>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full flex items-center justify-center gap-2"
-                    onClick={handleGoogle}
-                    disabled={submitting}
-                  >
-                    Continue with Google
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full flex items-center justify-center gap-2"
+                      onClick={handleGoogle}
+                      disabled={submitting}
+                    >
+                      Continue with Google
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
