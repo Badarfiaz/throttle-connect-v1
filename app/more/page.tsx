@@ -42,7 +42,7 @@ const MorePage = () => {
   const openModal = useCallback(() => setOpen(true), []);
 
   // Use auth handlers hook
-  const { handleSubmit, handleGoogle, submitGooglePhone, verifyOtpEmailSignup, verifyOtpGooglePhone, cancelOtp, submitting, pendingGoogleUser, otpStep } = useAuthHandlers({
+  const { handleSubmit, handleGoogle, submitGooglePhone, submitting, pendingGoogleUser } = useAuthHandlers({
     mode,
     closeModal,
   });
@@ -203,10 +203,6 @@ const MorePage = () => {
               openModal={openModal}
               pendingGoogleUser={pendingGoogleUser}
               submitGooglePhone={submitGooglePhone}
-              otpStep={otpStep}
-              verifyOtpEmailSignup={verifyOtpEmailSignup}
-              verifyOtpGooglePhone={verifyOtpGooglePhone}
-              cancelOtp={cancelOtp}
             />
           </div>
         )}

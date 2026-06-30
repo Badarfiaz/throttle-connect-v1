@@ -1,14 +1,10 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import {
-  ConfirmationResult,
+  createUserWithEmailAndPassword,
   EmailAuthProvider,
   GoogleAuthProvider,
-  linkWithCredential,
-  linkWithPhoneNumber,
-  RecaptchaVerifier,
   signInWithEmailAndPassword,
-  signInWithPhoneNumber,
   signInWithPopup,
 } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -23,66 +19,14 @@ export type PendingGoogleUser = {
   name: string;
 };
 
-type PendingEmailSignup = {
-  email: string;
-  password: string;
-  name: string;
-  phone: string;
-};
-
-export type OtpStep = "email-signup" | "google-phone" | null;
-
 interface UseAuthHandlersProps {
   mode: AuthMode;
   closeModal: () => void;
 }
 
-// Convert local phone (e.g. 03001234567) to E.164 (+923001234567)
-function toE164(phone: string): string {
-  const cleaned = phone.replace(/[\s\-()]/g, "");
-  if (cleaned.startsWith("+")) return cleaned;
-  if (cleaned.startsWith("0")) return "+92" + cleaned.slice(1);
-  return "+" + cleaned;
-}
-
 export const useAuthHandlers = ({ mode, closeModal }: UseAuthHandlersProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [pendingGoogleUser, setPendingGoogleUser] = useState<PendingGoogleUser | null>(null);
-  const [pendingEmailSignup, setPendingEmailSignup] = useState<PendingEmailSignup | null>(null);
-  const [otpStep, setOtpStep] = useState<OtpStep>(null);
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-
-  const pendingGooglePhoneRef = useRef<string>("");
-  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
-
-  const getOrCreateRecaptcha = useCallback(async () => {
-    console.log("[OTP] Creating fresh RecaptchaVerifier...");
-    recaptchaVerifierRef.current?.clear();
-    recaptchaVerifierRef.current = null;
-
-    const container = document.getElementById("recaptcha-container");
-    console.log("[OTP] recaptcha-container found in DOM:", !!container);
-    if (container) container.innerHTML = ""; // wipe leftover widget HTML
-
-    const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-      size: "invisible",
-      callback: () => console.log("[OTP] reCAPTCHA solved successfully"),
-      "expired-callback": () => console.warn("[OTP] reCAPTCHA token expired"),
-    });
-
-    console.log("[OTP] Calling verifier.render()...");
-    const widgetId = await verifier.render();
-    console.log("[OTP] reCAPTCHA rendered, widgetId:", widgetId);
-
-    recaptchaVerifierRef.current = verifier;
-    return verifier;
-  }, []);
-
-  const clearRecaptcha = useCallback(() => {
-    console.log("[OTP] Clearing RecaptchaVerifier");
-    recaptchaVerifierRef.current?.clear();
-    recaptchaVerifierRef.current = null;
-  }, []);
 
   // Email/password auth
   const handleSubmit = useCallback(
@@ -104,25 +48,25 @@ export const useAuthHandlers = ({ mode, closeModal }: UseAuthHandlersProps) => {
           toast.success("Login successful", { description: "Welcome back to Throttle Connect!" });
           closeModal();
         } else {
-          const formattedPhone = toE164(phone);
-          console.log("[OTP] Starting email signup OTP flow");
-          console.log("[OTP] Raw phone:", phone, "→ E.164:", formattedPhone);
+          console.log("[AUTH] Starting direct email signup");
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+          console.log("[AUTH] User created, uid:", user.uid);
 
-          const verifier = await getOrCreateRecaptcha();
-          console.log("[OTP] Calling signInWithPhoneNumber...");
+          await saveUserToFirestore({
+            uid: user.uid,
+            displayName: name,
+            email: email,
+            phone: phone,
+          });
+          console.log("[AUTH] User saved to Firestore");
 
-          const result = await signInWithPhoneNumber(auth, formattedPhone, verifier);
-          console.log("[OTP] signInWithPhoneNumber success, confirmationResult:", result);
-
-          setConfirmationResult(result);
-          setPendingEmailSignup({ email, password, name, phone });
-          setOtpStep("email-signup");
-          toast.info("OTP sent", { description: `Verification code sent to ${formattedPhone}` });
+          toast.success("Signup successful", { description: "Account created successfully!" });
+          closeModal();
         }
       } catch (err: unknown) {
-        clearRecaptcha();
         const firebaseErr = err as { code?: string; message?: string };
-        console.error("[OTP] Error during signup/OTP send:", firebaseErr.code, firebaseErr.message, err);
+        console.error("[AUTH] Error during login/signup:", firebaseErr.code, firebaseErr.message, err);
 
         let errorMessage = firebaseErr.message ?? "Unknown error";
         if (firebaseErr.code === "auth/user-not-found") {
@@ -150,57 +94,7 @@ export const useAuthHandlers = ({ mode, closeModal }: UseAuthHandlersProps) => {
         setSubmitting(false);
       }
     },
-    [mode, closeModal, getOrCreateRecaptcha, clearRecaptcha],
-  );
-
-  // Verify OTP for email signup → create account + link email credential
-  const verifyOtpEmailSignup = useCallback(
-    async (otp: string) => {
-      if (!confirmationResult || !pendingEmailSignup) return;
-      console.log("[OTP] Verifying OTP for email signup, code:", otp);
-      setSubmitting(true);
-      try {
-        const phoneCredResult = await confirmationResult.confirm(otp);
-        const phoneUser = phoneCredResult.user;
-        console.log("[OTP] Phone OTP confirmed, uid:", phoneUser.uid);
-
-        const emailCred = EmailAuthProvider.credential(
-          pendingEmailSignup.email,
-          pendingEmailSignup.password,
-        );
-        console.log("[OTP] Linking email credential to phone user...");
-        await linkWithCredential(phoneUser, emailCred);
-        console.log("[OTP] Email credential linked successfully");
-
-        await saveUserToFirestore({
-          uid: phoneUser.uid,
-          displayName: pendingEmailSignup.name,
-          email: pendingEmailSignup.email,
-          phone: pendingEmailSignup.phone,
-        });
-        console.log("[OTP] User saved to Firestore");
-
-        toast.success("Signup successful", { description: "Account created successfully!" });
-        setOtpStep(null);
-        setConfirmationResult(null);
-        setPendingEmailSignup(null);
-        clearRecaptcha();
-        closeModal();
-      } catch (err: unknown) {
-        const firebaseErr = err as { code?: string; message?: string };
-        console.error("[OTP] OTP verification error:", firebaseErr.code, firebaseErr.message, err);
-        let errorMessage = firebaseErr.message ?? "Unknown error";
-        if (firebaseErr.code === "auth/invalid-verification-code") {
-          errorMessage = "Incorrect OTP. Please check and try again.";
-        } else if (firebaseErr.code === "auth/code-expired") {
-          errorMessage = "OTP expired. Please request a new one.";
-        }
-        toast.error("OTP verification failed", { description: errorMessage });
-      } finally {
-        setSubmitting(false);
-      }
-    },
-    [confirmationResult, pendingEmailSignup, closeModal, clearRecaptcha],
+    [mode, closeModal],
   );
 
   // Google sign-in
@@ -238,107 +132,35 @@ export const useAuthHandlers = ({ mode, closeModal }: UseAuthHandlersProps) => {
     }
   }, [closeModal]);
 
-  // Send OTP after collecting phone for Google user
+  // Save phone directly for Google user without OTP
   const submitGooglePhone = useCallback(
     async (phone: string) => {
       if (!pendingGoogleUser) return;
       setSubmitting(true);
       try {
-        const formattedPhone = toE164(phone);
-        pendingGooglePhoneRef.current = phone;
-        console.log("[OTP] Google phone OTP flow — raw:", phone, "→ E.164:", formattedPhone);
-
-        const currentUser = auth.currentUser;
-        console.log("[OTP] auth.currentUser uid:", currentUser?.uid ?? "(null)");
-        if (!currentUser) throw new Error("No authenticated user found.");
-
-        const verifier = await getOrCreateRecaptcha();
-        console.log("[OTP] Calling linkWithPhoneNumber...");
-        const result = await linkWithPhoneNumber(currentUser, formattedPhone, verifier);
-        console.log("[OTP] linkWithPhoneNumber success, confirmationResult:", result);
-
-        setConfirmationResult(result);
-        setOtpStep("google-phone");
-        toast.info("OTP sent", { description: `Verification code sent to ${formattedPhone}` });
-      } catch (err: unknown) {
-        clearRecaptcha();
-        const firebaseErr = err as { code?: string; message?: string };
-        console.error("[OTP] Google phone OTP send error:", firebaseErr.code, firebaseErr.message, err);
-
-        let errorMessage = firebaseErr.message ?? "Unknown error";
-        if (firebaseErr.code === "auth/invalid-phone-number") {
-          errorMessage = "Invalid phone number. Please use format: 03001234567";
-        } else if (firebaseErr.code === "auth/provider-already-linked") {
-          await updateDoc(doc(db, "users", pendingGoogleUser.uid), { phone });
-          setPendingGoogleUser(null);
-          toast.success("Welcome to Throttle Connect!", { description: "Your account has been set up." });
-          closeModal();
-          return;
-        }
-        toast.error("Failed to send OTP", { description: errorMessage });
-      } finally {
-        setSubmitting(false);
-      }
-    },
-    [pendingGoogleUser, closeModal, getOrCreateRecaptcha, clearRecaptcha],
-  );
-
-  // Verify OTP for Google phone link flow
-  const verifyOtpGooglePhone = useCallback(
-    async (otp: string) => {
-      if (!confirmationResult || !pendingGoogleUser) return;
-      console.log("[OTP] Verifying OTP for Google phone link, code:", otp);
-      setSubmitting(true);
-      try {
-        await confirmationResult.confirm(otp);
-        console.log("[OTP] Google phone OTP confirmed successfully");
-
-        await updateDoc(doc(db, "users", pendingGoogleUser.uid), {
-          phone: pendingGooglePhoneRef.current,
-        });
-        console.log("[OTP] Phone saved to Firestore:", pendingGooglePhoneRef.current);
+        console.log("[AUTH] Saving Google user phone directly — phone:", phone);
+        await updateDoc(doc(db, "users", pendingGoogleUser.uid), { phone });
+        console.log("[AUTH] Phone saved to Firestore");
 
         toast.success("Welcome to Throttle Connect!", { description: "Your account has been set up." });
-        setOtpStep(null);
-        setConfirmationResult(null);
         setPendingGoogleUser(null);
-        pendingGooglePhoneRef.current = "";
-        clearRecaptcha();
         closeModal();
       } catch (err: unknown) {
         const firebaseErr = err as { code?: string; message?: string };
-        console.error("[OTP] Google OTP verify error:", firebaseErr.code, firebaseErr.message, err);
-        let errorMessage = firebaseErr.message ?? "Unknown error";
-        if (firebaseErr.code === "auth/invalid-verification-code") {
-          errorMessage = "Incorrect OTP. Please check and try again.";
-        } else if (firebaseErr.code === "auth/code-expired") {
-          errorMessage = "OTP expired. Please request a new one.";
-        }
-        toast.error("OTP verification failed", { description: errorMessage });
+        console.error("[AUTH] Google phone save error:", firebaseErr.code, firebaseErr.message, err);
+        toast.error("Failed to save phone number", { description: firebaseErr.message ?? "Unknown error" });
       } finally {
         setSubmitting(false);
       }
     },
-    [confirmationResult, pendingGoogleUser, closeModal, clearRecaptcha],
+    [pendingGoogleUser, closeModal],
   );
-
-  const cancelOtp = useCallback(() => {
-    console.log("[OTP] User cancelled OTP step");
-    setOtpStep(null);
-    setConfirmationResult(null);
-    setPendingEmailSignup(null);
-    clearRecaptcha();
-  }, [clearRecaptcha]);
 
   return {
     handleSubmit,
     handleGoogle,
     submitGooglePhone,
-    verifyOtpEmailSignup,
-    verifyOtpGooglePhone,
-    cancelOtp,
     submitting,
     pendingGoogleUser,
-    otpStep,
   };
 };
