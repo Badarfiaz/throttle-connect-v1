@@ -120,6 +120,10 @@ const MarketplaceDashboardContainer = () => {
 
   const outOfStockProducts = products.filter((p) => p.stock === 0);
 
+  const estSalesVolume = products.reduce((acc, product) => {
+    return acc + (Number(product.price) || 0) * (Number(product.stock) || 0);
+  }, 0);
+
   const localNavItems = [
     {
       id: "overview",
@@ -271,7 +275,7 @@ const MarketplaceDashboardContainer = () => {
               <CardContent className="p-5 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Est. Sales Volume</span>
-                  <h3 className="text-2xl font-black mt-1 text-slate-900 dark:text-white">PKR 45,800</h3>
+                  <h3 className="text-2xl font-black mt-1 text-slate-900 dark:text-white">PKR {estSalesVolume.toLocaleString()}</h3>
                 </div>
                 <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"><DollarSign className="h-5 w-5" /></div>
               </CardContent>
