@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Calendar, Clock, MapPin, Users, Loader2, ShieldCheck, ChevronRight } from "lucide-react";
 import Title from "@/components/shared/Title";
+import { FeaturedBadge } from "@/components/admin/FeaturedBadge";
 import {
   Dialog,
   DialogContent,
@@ -18,12 +19,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export default function UpcomingEventsSection({ displayLimit = 20 }: { displayLimit?: number } = {}) {
+export default function UpcomingEventsSection({ displayLimit = 6 }: { displayLimit?: number } = {}) {
   const router = useRouter();
   const user = useAppSelector((state) => state.auth.user);
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
-  
+
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -34,11 +35,12 @@ export default function UpcomingEventsSection({ displayLimit = 20 }: { displayLi
     const q = query(
       collection(db, "events"),
       where("status", "==", "upcoming"),
-      limit(40)
+      limit(20)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-      list.sort((a, b) => a.startDateTime.localeCompare(b.startDateTime));
+      // Most recently created first, so the "top" events are the freshest listings
+      list.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
       setUpcomingEvents(list.slice(0, displayLimit));
       setLoadingEvents(false);
     }, (error) => {
@@ -180,7 +182,7 @@ export default function UpcomingEventsSection({ displayLimit = 20 }: { displayLi
             <span className="text-muted-foreground ml-2 animate-pulse font-medium">Loading events...</span>
           </div>
         ) : upcomingEvents.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
             {upcomingEvents.map((event) => {
               const eventDate = new Date(event.startDateTime);
               const day = eventDate.getDate();
@@ -236,9 +238,12 @@ export default function UpcomingEventsSection({ displayLimit = 20 }: { displayLi
                             <span className="truncate max-w-[120px]">{event.city}</span>
                           </span>
                         </div>
-                        <h4 className="font-bold text-slate-900 text-lg group-hover:text-primary transition-colors duration-250 line-clamp-1 leading-snug">
-                          {event.title}
-                        </h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-slate-900 text-lg group-hover:text-primary transition-colors duration-250 line-clamp-1 leading-snug flex-1">
+                            {event.title}
+                          </h4>
+                          {event.featured && <FeaturedBadge featured={true} />}
+                        </div>
                         <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
                           {event.description}
                         </p>

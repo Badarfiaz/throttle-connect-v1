@@ -12,6 +12,7 @@ import Title from "@/components/shared/Title";
 import ProfileRequiredBanner from "@/components/networking/ProfileRequiredBanner";
 import UpcomingEventsSection from "@/components/networking/UpcomingEventsSection";
 import FeaturedClubsSection from "@/components/networking/FeaturedClubsSection";
+import FeaturedEventsSection from "@/components/networking/FeaturedEventsSection";
 import { Compass, Wrench, Trophy, ShieldCheck, Users, CalendarDays, Image as ImageIcon, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -217,7 +218,8 @@ function Home() {
         ctaButton1="Register Your Club"
         cardData={customClubStartData}
       /> */}
-   <UpcomingEventsSection />
+   <FeaturedEventsSection />
+   <UpcomingEventsSection displayLimit={6} />
 
 
     </div>

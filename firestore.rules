@@ -19,6 +19,11 @@ service cloud.firestore {
       return isAuthenticated() && getClubOwner(clubId) == request.auth.uid;
     }
 
+    function isAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superAdmin';
+    }
+
     // 1. Users Collection
     match /users/{userId} {
       allow read: if isAuthenticated();
@@ -36,9 +41,10 @@ service cloud.firestore {
       allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
       allow update: if isAuthenticated() && (
         resource.data.ownerUid == request.auth.uid ||
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberCount', 'pendingRequestsCount', 'upcomingEventsCount'])
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberCount', 'pendingRequestsCount', 'upcomingEventsCount']) ||
+        isAdmin()
       );
-      allow delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+      allow delete: if isAuthenticated() && (resource.data.ownerUid == request.auth.uid || isAdmin());
 
       // Achievements subcollection
       match /achievements/{achievementId} {
@@ -71,10 +77,11 @@ service cloud.firestore {
     match /events/{eventId} {
       allow read: if true;
       allow create: if isAuthenticated() && isClubOwner(request.resource.data.clubId);
-      allow delete: if isAuthenticated() && isClubOwner(resource.data.clubId);
+      allow delete: if isAuthenticated() && (isClubOwner(resource.data.clubId) || isAdmin());
       allow update: if isAuthenticated() && (
         isClubOwner(resource.data.clubId) ||
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['participantCount'])
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['participantCount']) ||
+        isAdmin()
       );
     }
 
@@ -93,8 +100,15 @@ service cloud.firestore {
       allow write: if isAuthenticated() && (
         storeId == request.auth.uid ||
         (resource != null && resource.data.ownerUid == request.auth.uid) ||
-        (request.resource != null && request.resource.data.ownerUid == request.auth.uid)
+        (request.resource != null && request.resource.data.ownerUid == request.auth.uid) ||
+        isAdmin()
       );
+
+      // Services subcollection
+      match /services/{serviceId} {
+        allow read: if true;
+        allow write: if isAuthenticated() && (storeId == request.auth.uid || isAdmin());
+      }
     }
 
     // 7. Marketplace Products Collection
@@ -102,7 +116,8 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAuthenticated() && (
         (resource != null && resource.data.ownerUid == request.auth.uid) ||
-        (request.resource != null && request.resource.data.ownerUid == request.auth.uid)
+        (request.resource != null && request.resource.data.ownerUid == request.auth.uid) ||
+        isAdmin()
       );
 
       // Leads subcollection — visitors record themselves as leads; only the product owner can read them
