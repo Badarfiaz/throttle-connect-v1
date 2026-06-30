@@ -59,8 +59,8 @@ function PrimaryCarousel<T>({
         ))}
       </CarouselContent>
 
-      <CarouselPrevious className="hidden sm:flex" />
-      <CarouselNext className="hidden sm:flex" />
+      <CarouselPrevious className="hidden md:flex" />
+      <CarouselNext className="hidden md:flex" />
     </Carousel>
   );
 }
