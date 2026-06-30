@@ -24,27 +24,25 @@ const plans = [
       "Standard marketplace presence in Throttle Connect",
       "Post up to 20 listings to showcase products or services",
       "Appear in search and category pages for buyer discovery",
-      "Direct customer visibility through public business profile",
-      "Upgrade anytime as your business grows",
+      "Only 1 product lead visible — upgrade to unlock more",
+      "No featured ads, products, clubs, or events",
     ],
   },
   {
     name: "Silver",
     tagline: "For small businesses ready to build visibility and start attracting quality inquiries.",
-    price: "Rs. 46,000",
-    originalPrice: "Rs. 56,000",
-    period: "per 4 months",
-    monthlyEquivalent: "Rs. 11,500 / month",
+    price: "Rs. 7,999",
+    originalPrice: "Rs. 11,500",
+    period: "per month",
+    monthlyEquivalent: "Billed monthly",
     buttonText: "Get Started",
     icon: ShieldCheck,
     iconColor: "text-slate-500 bg-slate-50",
     popular: false,
     href: "/checkout?plan=silver",
     features: [
-      "16 Featured Listings for stronger category visibility",
-      "24 professionally designed social media creatives",
-      "8 engaging reels / short videos by our creative team",
-      "44-66 Quality Leads for high-impact reach",
+      "4 Featured Listings for stronger category visibility",
+       "3-10 Quality Leads for high-impact reach",
       "Organic + paid visibility mix in the ecosystem",
       "Limited slots per category - secure your position",
     ],
@@ -52,21 +50,18 @@ const plans = [
   {
     name: "Gold",
     tagline: "For growing brands that want stronger positioning, better reach, and consistent lead flow.",
-    price: "Rs. 83,000",
-    originalPrice: "Rs. 104,000",
-    period: "per 4 months",
-    monthlyEquivalent: "Rs. 20,750 / month",
+    price: "Rs. 14,999",
+    originalPrice: "Rs. 20,750",
+    period: "per month",
+    monthlyEquivalent: "Billed monthly",
     buttonText: "Get Started",
     icon: Sparkles,
     iconColor: "text-amber-500 bg-amber-50",
     popular: true,
     href: "/checkout?plan=gold",
     features: [
-      "32 Featured Listings for high-priority placement",
-      "75+ brand banner Ads placements on key sections",
-      "48 premium social media posts designed for your brand",
-      "16 high-quality reels / videos for maximum engagement",
-      "65-95 Quality Leads for high-impact reach",
+      "8 Featured Listings for high-priority placement",
+       "5-10 Quality Leads for high-impact reach",
       "Strong organic visibility + paid amplification",
       "Priority growth support & performance optimization",
       "Limited premium slots per category",
@@ -75,21 +70,19 @@ const plans = [
   {
     name: "Platinum",
     tagline: "For serious brands that want category dominance, premium visibility, and maximum market impact.",
-    price: "Rs. 112,000",
-    originalPrice: "Rs. 140,000",
-    period: "per 4 months",
-    monthlyEquivalent: "Rs. 28,000 / month",
+    price: "Rs. 21,999",
+    originalPrice: "Rs. 28,000",
+    period: "per month",
+    monthlyEquivalent: "Billed monthly",
     buttonText: "Get Started",
     icon: Crown,
     iconColor: "text-purple-500 bg-purple-55 text-purple-500 bg-purple-50",
     popular: false,
     href: "/checkout?plan=platinum",
     features: [
-      "80 Featured Listings for dominant category visibility",
-      "185+ brand banner Ads placements for premium exposure",
-      "80 professionally crafted social media creatives",
-      "24 powerful reels / videos to maximize recall",
-      "130-145 Quality Leads for maximum lead generation",
+      "20 Featured Listings for dominant category visibility",
+      "45+ brand banner Ads placements for premium exposure",
+       "10-20 Quality Leads for maximum lead generation",
       "Maximum organic exposure + aggressive paid amplification",
       "Top-tier positioning to capture high-intent buyers",
       "Exclusive category dominance - limited vendors per city",
@@ -101,7 +94,7 @@ const plans = [
 const faqs = [
   {
     question: "What is the duration of the premium plans?",
-    answer: "Our premium plans (Silver, Gold, and Platinum) are billed as 4-month packages. This duration is designed to allow our creative team to produce high-quality media, run consistent advertising campaigns, and deliver a reliable flow of verified leads to your business.",
+    answer: "Our premium plans (Silver, Gold, and Platinum) are billed monthly. This gives our creative team a steady cadence to produce high-quality media, run consistent advertising campaigns, and deliver a reliable flow of verified leads to your business — without locking you into a long-term commitment.",
   },
   {
     question: "How are the quality leads generated and delivered?",
@@ -117,7 +110,7 @@ const faqs = [
   },
   {
     question: "Can I upgrade, downgrade, or cancel my plan?",
-    answer: "Yes, you can upgrade your plan at any point during your cycle to immediately unlock higher limits and features. Downgrades or cancellations can be requested at any time and will take effect at the end of the current 4-month billing period.",
+    answer: "Yes, you can upgrade your plan at any point during your cycle to immediately unlock higher limits and features. Downgrades or cancellations can be requested at any time and will take effect at the end of the current monthly billing period.",
   },
   {
     question: "Are there any commissions or hidden fees on sales?",
@@ -178,10 +171,10 @@ export default function PricingPage() {
             className="mt-8 inline-flex items-center justify-center p-1 bg-white border border-gray-200 rounded-2xl shadow-sm"
           >
             <span className="px-6 py-2.5 bg-[#0B2447] text-white text-sm font-semibold rounded-xl shadow-sm">
-              Four Month Plans
+              Monthly Plans
             </span>
             <span className="px-6 py-2.5 text-gray-500 text-sm font-medium">
-              Save up to 20%
+              Cancel anytime, no long-term lock-in
             </span>
           </motion.div>
         </div>
