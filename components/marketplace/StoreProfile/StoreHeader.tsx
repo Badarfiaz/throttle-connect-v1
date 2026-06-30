@@ -8,7 +8,6 @@ import {
   MoreVertical,
   ShieldCheck,
 } from "lucide-react";
-import ContactButton from "@/components/marketplace/ContactButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -91,33 +90,25 @@ export default function StoreHeader({ store }: { store: StoreWithExtras }) {
           </div>
 
           <div className="mt-4">
-            <div className="flex items-center gap-0 rounded-lg overflow-hidden w-65">
-              <ContactButton
-                phone={store.phone}
-                email={store.email}
-                preferredMethod={store.contactMethod as any}
-                menuIcon
-              />
-            </div>
+            <Button
+              variant="outline"
+              className="w-fit gap-2 rounded-lg border-blue-200 bg-blue-50/60 font-medium text-blue-700 shadow-sm hover:bg-blue-100"
+              onClick={() =>
+                window.open(
+                  "https://maps.app.goo.gl/jyFmPnnywrVbV2bH8",
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
+            >
+              <Navigation className="h-4 w-4" />
+              Get Directions
+            </Button>
           </div>
+
         </div>
 
         <div className="space-y-3 self-start">
-<Button
-  variant="outline"
-  className="w-full gap-2 rounded-lg border-blue-200 bg-blue-50/60 font-medium text-blue-700 shadow-sm hover:bg-blue-100"
-  onClick={() =>
-    window.open(
-      "https://maps.app.goo.gl/jyFmPnnywrVbV2bH8",
-      "_blank",
-      "noopener,noreferrer"
-    )
-  }
->
-  <Navigation className="h-4 w-4" />
-  Get Directions
-</Button>
-
           <Card className="overflow-hidden border-slate-200 shadow-sm">
             <div className="border-b border-slate-200 bg-slate-100/80 px-4 py-2.5 text-center">
               <div className="flex items-center justify-center gap-2 text-sm font-semibold text-blue-600">

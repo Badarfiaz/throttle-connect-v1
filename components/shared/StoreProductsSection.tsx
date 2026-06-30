@@ -60,7 +60,7 @@ function StoreProductsSection({ store }: StoreProductsSectionProps) {
 
   if (loading) {
     return (
-      <div className="mt-8">
+      <div className="mt-8 flex flex-col gap-4">
         <Title title={`Products by ${store?.title ?? "Store"}`} align="left" />
         <PrimaryCarousel
           items={Array.from({ length: 4 })}
@@ -87,7 +87,7 @@ function StoreProductsSection({ store }: StoreProductsSectionProps) {
 
   if (!products.length) {
     return (
-      <div className="mt-8">
+      <div className="mt-8 flex flex-col gap-4">
         <Title title={`Products by ${store?.title ?? "Store"}`} align="left" />
         <p className="text-sm text-muted-foreground">
           No products available for this store yet.
@@ -97,7 +97,7 @@ function StoreProductsSection({ store }: StoreProductsSectionProps) {
   }
 
   return (
-    <div className="mt-8">
+    <div className="mt-8 flex flex-col gap-4">
       <Title title={`Products by ${store?.title ?? "Store"}`} align="left" />
       <PrimaryCarousel
         items={products}

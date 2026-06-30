@@ -32,26 +32,31 @@ export default function StoreProfilePage({
     return <div className="min-h-screen">Store Not Found</div>;
 
   return (
-    <div className="min-h-screen bg-slate-50/70 font-sans">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-3 py-6 md:px-4">
-        <Card className="overflow-hidden border-slate-200 p-0 shadow-sm">
+    <div className="min-h-screen bg-slate-50/50 font-sans">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 py-6 md:py-8 lg:px-8">
+        <div className="overflow-hidden rounded-3xl border border-slate-200/60 bg-white shadow-sm">
           <StoreBanner store={store} />
           <StoreHeader store={store} />
-        </Card>
+        </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="flex flex-col gap-4 md:col-span-1">
-            <SellerProfileCard
-              store={store}
-              showMetadata={true}
-              showStoreLink={false}
-            />
-          </div>
-
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+          {/* Main Content Area */}
+          <div className="flex flex-col gap-6 lg:col-span-8 order-2 lg:order-1">
             <OverviewCard store={store} />
           </div>
+
+          {/* Sidebar Area */}
+          <div className="flex flex-col gap-6 lg:col-span-4 order-1 lg:order-2">
+            <div className="sticky top-24">
+              <SellerProfileCard
+                store={store}
+                showMetadata={true}
+                showStoreLink={false}
+              />
+            </div>
+          </div>
         </div>
+        
         <StoreProductsSection store={store} />
       </div>
     </div>
