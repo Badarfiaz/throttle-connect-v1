@@ -1,15 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { marketplaceCategories, networkingCategories } from "@/data/category";
-import {
-  GET_PRODUCTS_PAGINATED_QUERY,
-} from "@/app/graphql/marketplace";
-import {
-  GET_CLUBS_PAGINATED_QUERY,
-} from "@/app/graphql/networking";
-import { useSearchPagination } from "@/hooks/useSearchPagination";
 import { MarketplaceProduct } from "@/types/marketplace";
 import SearchResults, { SearchResultItem } from "./SearchResults";
 import SearchSkeleton from "./SearchSkeleton";
@@ -40,129 +33,124 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 export type SearchPageType = "marketplace" | "networking";
 
 type SearchPageProps = {
   type: SearchPageType;
-  /** The active category slug (from the URL query param or segment) */
   category?: string | null;
 };
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-const PAGE_LIMIT = 10;
+const PAGE_SIZE = 20;
 
 function slugToLabel(slug: string) {
   return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+function mapAlgoliaHit(hit: any): MarketplaceProduct {
+  return {
+    id: hit.objectID,
+    productName: hit.productName ?? "",
+    price: hit.price ?? 0,
+    category: hit.category ?? "",
+    description: hit.description ?? "",
+    imageurl: { url: hit["imageurl.url"] ?? "" },
+    owner: hit.owner ?? null,
+  } as unknown as MarketplaceProduct;
+}
 
 export default function SearchPage({ type, category }: SearchPageProps) {
   const router = useRouter();
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get("query") ?? "";
 
   const isMarketplace = type === "marketplace";
   const categories = isMarketplace ? marketplaceCategories : networkingCategories;
-  const categoryLabel =
-    category
-      ? categories.find((c) => c.slug === category)?.name ?? slugToLabel(category)
-      : `All ${isMarketplace ? "Products" : "Clubs"}`;
+  const categoryLabel = category
+    ? categories.find((c) => c.slug === category)?.name ?? slugToLabel(category)
+    : `All ${isMarketplace ? "Products" : "Clubs"}`;
 
-  // ------------------------------------------------------------------
-  // Paginated data via shared hook
-  // ------------------------------------------------------------------
-console.log('search page')
-  const {
-    items: rawItems,
-    pagination,
-    loading,
-    loadingMore,
-    error,
-    search,
-    loadMore,
-  } = useSearchPagination<any>(
-    isMarketplace ? "products" : "clubs",
-    isMarketplace ? GET_PRODUCTS_PAGINATED_QUERY : GET_CLUBS_PAGINATED_QUERY,
-    {
-      where: category ? { category } : {},
+  const [textQuery, setTextQuery] = useState(urlQuery);
+  const [sortBy, setSortBy] = useState<string>("newest");
+  const [items, setItems] = useState<any[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync textQuery from URL on mount
+  useEffect(() => {
+    if (urlQuery) setTextQuery(urlQuery);
+  }, [urlQuery]);
+
+  const fetchResults = useCallback(
+    async (query: string, cat: string | null | undefined, pg: number, append = false) => {
+      if (append) setLoadingMore(true);
+      else { setLoading(true); setError(null); }
+
+      try {
+        const params = new URLSearchParams({
+          query,
+          hitsPerPage: String(PAGE_SIZE),
+          page: String(pg),
+        });
+        if (cat) params.set("category", cat);
+
+        const res = await fetch(`/api/algolia/search?${params.toString()}`);
+        if (!res.ok) throw new Error("Search failed");
+        const data = await res.json();
+
+        const newItems = data.hits ?? [];
+        setItems((prev) => (append ? [...prev, ...newItems] : newItems));
+        setTotalCount(data.nbHits ?? 0);
+        setPage(pg);
+        setHasNextPage((pg + 1) * PAGE_SIZE < (data.nbHits ?? 0));
+      } catch (e: any) {
+        setError(e.message ?? "Failed to fetch results");
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     },
-    PAGE_LIMIT,
+    [],
   );
 
-  // ------------------------------------------------------------------
-  // Client-side text search on top of server results
-  // ------------------------------------------------------------------
-  const [textQuery, setTextQuery] = useState("");
-  const [sortBy, setSortBy] = useState<string>("newest");
-
-  // Kick off initial fetch when category changes
+  // Fetch on category or initial load
   useEffect(() => {
-    search({ where: category ? { category } : {} });
+    setItems([]);
+    fetchResults(textQuery, category, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
-  // Map raw items to SearchResultItem union
-  const searchResultItems: SearchResultItem[] = rawItems
-    .filter((item: any) => {
-      if (!textQuery.trim()) return true;
-      const q = textQuery.toLowerCase();
-      if (isMarketplace) {
-        return (
-          item.productName?.toLowerCase().includes(q) ||
-          item.description?.toLowerCase().includes(q)
-        );
-      }
-      return (
-        item.clubName?.toLowerCase().includes(q) ||
-        item.description?.toLowerCase().includes(q)
-      );
-    })
-    .sort((a: any, b: any) => {
-      if (isMarketplace) {
-        if (sortBy === "price-low") return (a.price ?? 0) - (b.price ?? 0);
-        if (sortBy === "price-high") return (b.price ?? 0) - (a.price ?? 0);
-        if (sortBy === "name")
-          return (a.productName ?? "").localeCompare(b.productName ?? "");
-      }
-      return 0; // default: server order (newest)
-    })
-    .map((item: any): SearchResultItem =>
-      isMarketplace
-        ? { kind: "marketplace", data: item as MarketplaceProduct }
-        : { kind: "networking", data: item },
-    );
+  // Debounced text search
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setItems([]);
+      fetchResults(textQuery, category, 0);
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [textQuery]);
 
-  // Category navigation helper
-  const navigateToCategory = useCallback(
-    (slug: string | null) => {
-      const base = isMarketplace ? "/marketplace/search" : "/networking/search";
-      if (slug) {
-        router.push(`${base}?category=${slug}`);
-      } else {
-        router.push(base);
-      }
-    },
-    [isMarketplace, router],
-  );
+  const loadMore = useCallback(() => {
+    if (!loadingMore && hasNextPage) {
+      fetchResults(textQuery, category, page + 1, true);
+    }
+  }, [loadingMore, hasNextPage, textQuery, category, page, fetchResults]);
 
-  // ------------------------------------------------------------------
-  // Intersection observer for auto load-more (optional enhancement)
-  // ------------------------------------------------------------------
+  // Intersection observer for auto load-more
   useEffect(() => {
     const el = loadMoreRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && pagination?.hasNextPage && !loading && !loadingMore) {
+        if (entry.isIntersecting && hasNextPage && !loading && !loadingMore) {
           loadMore();
         }
       },
@@ -170,17 +158,38 @@ console.log('search page')
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [pagination, loading, loadingMore, loadMore]);
+  }, [hasNextPage, loading, loadingMore, loadMore]);
 
-  // ------------------------------------------------------------------
-  // Render
-  // ------------------------------------------------------------------
+  const navigateToCategory = useCallback(
+    (slug: string | null) => {
+      const base = isMarketplace ? "/marketplace/search" : "/networking/search";
+      router.push(slug ? `${base}?category=${slug}` : base);
+    },
+    [isMarketplace, router],
+  );
+
+  // Sort client-side (Algolia already returns relevant results)
+  const searchResultItems: SearchResultItem[] = [...items]
+    .sort((a: any, b: any) => {
+      if (isMarketplace) {
+        if (sortBy === "price-low") return (a.price ?? 0) - (b.price ?? 0);
+        if (sortBy === "price-high") return (b.price ?? 0) - (a.price ?? 0);
+        if (sortBy === "name")
+          return (a.productName ?? "").localeCompare(b.productName ?? "");
+      }
+      return 0;
+    })
+    .map((hit: any): SearchResultItem =>
+      isMarketplace
+        ? { kind: "marketplace", data: mapAlgoliaHit(hit) }
+        : { kind: "networking", data: hit },
+    );
 
   const Icon = isMarketplace ? Store : Users;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 pb-24">
-      {/* ── Header Banner ── */}
+      {/* Header Banner */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-950 text-white py-12 px-6 shadow-sm border-b dark:border-slate-800">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -194,12 +203,9 @@ console.log('search page')
                 : "Discover automotive clubs that match your passion."}{" "}
               <span className="text-white font-bold">{categoryLabel}</span>
             </p>
-
-            {/* Pagination summary */}
-            {pagination && (
+            {!loading && (
               <p className="text-xs text-slate-500 mt-1">
-                Showing {rawItems.length} of {pagination.totalCount}{" "}
-                {isMarketplace ? "products" : "clubs"}
+                {totalCount} {isMarketplace ? "products" : "clubs"} found
               </p>
             )}
           </div>
@@ -208,11 +214,10 @@ console.log('search page')
           <div className="relative w-full md:w-96">
             <Search className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
             <Input
-              id="search-text-input"
               placeholder={
                 isMarketplace
-                  ? "Search products in this category..."
-                  : "Search clubs in this category..."
+                  ? "Search products…"
+                  : "Search clubs…"
               }
               value={textQuery}
               onChange={(e) => setTextQuery(e.target.value)}
@@ -224,9 +229,8 @@ console.log('search page')
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* ── Left Sidebar ── */}
+          {/* Left Sidebar */}
           <aside className="lg:col-span-3 space-y-5">
-            {/* Category list */}
             <Card className="rounded-2xl border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
               <CardHeader className="py-4 px-5 border-b dark:border-slate-800">
                 <CardTitle className="text-xs font-bold text-slate-400 uppercase tracking-wider">
@@ -235,9 +239,7 @@ console.log('search page')
               </CardHeader>
               <CardContent className="p-3">
                 <div className="space-y-1">
-                  {/* "All" option */}
                   <button
-                    id="category-all"
                     onClick={() => navigateToCategory(null)}
                     className={cn(
                       "w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition",
@@ -253,7 +255,6 @@ console.log('search page')
                   {categories.map((cat) => (
                     <button
                       key={cat.slug}
-                      id={`category-${cat.slug}`}
                       onClick={() => navigateToCategory(cat.slug)}
                       className={cn(
                         "w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition",
@@ -270,7 +271,6 @@ console.log('search page')
               </CardContent>
             </Card>
 
-            {/* Sort (marketplace only) */}
             {isMarketplace && (
               <Card className="rounded-2xl border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs">
                 <CardHeader className="py-4 px-5 border-b dark:border-slate-800">
@@ -280,7 +280,7 @@ console.log('search page')
                 </CardHeader>
                 <CardContent className="p-5">
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger id="sort-select" className="h-9 text-xs">
+                    <SelectTrigger className="h-9 text-xs">
                       <SelectValue placeholder="Sort order" />
                     </SelectTrigger>
                     <SelectContent>
@@ -294,7 +294,6 @@ console.log('search page')
               </Card>
             )}
 
-            {/* Active filter badge */}
             {category && (
               <div className="flex flex-wrap gap-2 px-1">
                 <Badge
@@ -315,10 +314,9 @@ console.log('search page')
             )}
           </aside>
 
-          {/* ── Main results area ── */}
+          {/* Main results */}
           <main className="lg:col-span-9 space-y-6">
-            {/* Results summary bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white dark:bg-slate-900 border border-slate-200/65 dark:border-slate-800 rounded-xl shadow-xs">
+            <div className="flex items-center p-4 bg-white dark:bg-slate-900 border border-slate-200/65 dark:border-slate-800 rounded-xl shadow-xs">
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                 {loading ? (
                   "Fetching results…"
@@ -326,14 +324,13 @@ console.log('search page')
                   <>
                     Found{" "}
                     <span className="font-bold text-slate-900 dark:text-white">
-                      {pagination?.totalCount ?? 0}
+                      {totalCount}
                     </span>{" "}
-                    {isMarketplace ? "products" : "clubs"}
+                    {isMarketplace ? "products" : "clubs"} via Algolia
                     {textQuery && (
                       <>
-                        {" "}
-                        — <span className="text-primary">{searchResultItems.length}</span>{" "}
-                        match your search
+                        {" "}— showing{" "}
+                        <span className="text-primary">{items.length}</span> loaded
                       </>
                     )}
                   </>
@@ -341,24 +338,16 @@ console.log('search page')
               </span>
             </div>
 
-            {/* Content */}
             {loading ? (
               <SearchSkeleton count={6} />
             ) : error ? (
-              <div className="text-center py-20 px-6 rounded-2xl border-2 border-dashed border-red-200 dark:border-red-900 bg-red-50/30 dark:bg-red-950/10">
-                <p className="text-sm font-semibold text-red-600 dark:text-red-400">
-                  Failed to load results
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
-                  {error}
-                </p>
+              <div className="text-center py-20 px-6 rounded-2xl border-2 border-dashed border-red-200 dark:border-red-900 bg-red-50/30">
+                <p className="text-sm font-semibold text-red-600">{error}</p>
                 <Button
                   size="sm"
                   variant="outline"
                   className="mt-4 rounded-xl"
-                  onClick={() =>
-                    search({ where: category ? { category } : {} })
-                  }
+                  onClick={() => fetchResults(textQuery, category, 0)}
                 >
                   Retry
                 </Button>
@@ -373,16 +362,14 @@ console.log('search page')
               <>
                 <SearchResults items={searchResultItems} />
 
-                {/* Load More / Infinite scroll sentinel */}
                 <div ref={loadMoreRef} className="mt-6 flex justify-center">
                   {loadingMore ? (
-                    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 font-medium py-4">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 font-medium py-4">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Loading more…
                     </div>
-                  ) : pagination?.hasNextPage ? (
+                  ) : hasNextPage ? (
                     <Button
-                      id="load-more-btn"
                       variant="outline"
                       className="rounded-xl font-semibold px-8"
                       onClick={loadMore}
@@ -390,10 +377,9 @@ console.log('search page')
                       Load More
                     </Button>
                   ) : (
-                    rawItems.length > 0 && (
-                      <p className="text-xs text-slate-400 dark:text-slate-600 font-medium py-4">
-                        All {isMarketplace ? "products" : "clubs"} loaded ·{" "}
-                        {pagination?.totalCount ?? 0} total
+                    items.length > 0 && (
+                      <p className="text-xs text-slate-400 font-medium py-4">
+                        All {isMarketplace ? "products" : "clubs"} loaded · {totalCount} total
                       </p>
                     )
                   )}
