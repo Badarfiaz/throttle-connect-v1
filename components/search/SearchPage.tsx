@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { marketplaceCategories, networkingCategories } from "@/data/category";
 import { MarketplaceProduct } from "@/types/marketplace";
+import { GET_CLUBS_PAGINATED_QUERY } from "@/app/graphql/networking";
+import { FETCHER_URL } from "@/lib/config";
 import SearchResults, { SearchResultItem } from "./SearchResults";
 import SearchSkeleton from "./SearchSkeleton";
 import EmptyState from "./EmptyState";
@@ -93,22 +95,48 @@ export default function SearchPage({ type, category }: SearchPageProps) {
       else { setLoading(true); setError(null); }
 
       try {
-        const params = new URLSearchParams({
-          query,
-          hitsPerPage: String(PAGE_SIZE),
-          page: String(pg),
-        });
-        if (cat) params.set("category", cat);
+        if (isMarketplace) {
+          const params = new URLSearchParams({
+            query,
+            hitsPerPage: String(PAGE_SIZE),
+            page: String(pg),
+          });
+          if (cat) params.set("category", cat);
 
-        const res = await fetch(`/api/algolia/search?${params.toString()}`);
-        if (!res.ok) throw new Error("Search failed");
-        const data = await res.json();
+          const res = await fetch(`/api/algolia/search?${params.toString()}`);
+          if (!res.ok) throw new Error("Search failed");
+          const data = await res.json();
 
-        const newItems = data.hits ?? [];
-        setItems((prev) => (append ? [...prev, ...newItems] : newItems));
-        setTotalCount(data.nbHits ?? 0);
-        setPage(pg);
-        setHasNextPage((pg + 1) * PAGE_SIZE < (data.nbHits ?? 0));
+          const newItems = data.hits ?? [];
+          setItems((prev) => (append ? [...prev, ...newItems] : newItems));
+          setTotalCount(data.nbHits ?? 0);
+          setPage(pg);
+          setHasNextPage((pg + 1) * PAGE_SIZE < (data.nbHits ?? 0));
+        } else {
+          // Networking clubs are browsed directly by category slug (clubType) via Firestore — no Algolia involved.
+          const res = await fetch(FETCHER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              query: GET_CLUBS_PAGINATED_QUERY,
+              variables: {
+                where: cat ? { category: cat } : undefined,
+                page: pg + 1,
+                limit: PAGE_SIZE,
+              },
+            }),
+          });
+          if (!res.ok) throw new Error("Search failed");
+          const result = await res.json();
+          if (result.errors) throw new Error("Search failed");
+
+          const newItems = result.data?.clubs?.items ?? [];
+          const pagination = result.data?.clubs?.pagination;
+          setItems((prev) => (append ? [...prev, ...newItems] : newItems));
+          setTotalCount(pagination?.totalCount ?? 0);
+          setPage(pg);
+          setHasNextPage(!!pagination?.hasNextPage);
+        }
       } catch (e: any) {
         setError(e.message ?? "Failed to fetch results");
       } finally {
@@ -116,7 +144,7 @@ export default function SearchPage({ type, category }: SearchPageProps) {
         setLoadingMore(false);
       }
     },
-    [],
+    [isMarketplace],
   );
 
   // Fetch on category or initial load
@@ -297,7 +325,7 @@ export default function SearchPage({ type, category }: SearchPageProps) {
                     <span className="font-bold text-slate-900 dark:text-white">
                       {totalCount}
                     </span>{" "}
-                    {isMarketplace ? "products" : "clubs"} via Algolia
+                    {isMarketplace ? "products" : "clubs"}
                     {textQuery && (
                       <>
                         {" "}— showing{" "}
