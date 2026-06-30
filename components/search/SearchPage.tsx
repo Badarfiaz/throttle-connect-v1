@@ -7,6 +7,7 @@ import { MarketplaceProduct } from "@/types/marketplace";
 import SearchResults, { SearchResultItem } from "./SearchResults";
 import SearchSkeleton from "./SearchSkeleton";
 import EmptyState from "./EmptyState";
+import MarketplaceSearch from "@/components/marketplace/MarketplaceSearch";
 import {
   ChevronRight,
   Loader2,
@@ -189,6 +190,13 @@ export default function SearchPage({ type, category }: SearchPageProps) {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 pb-24">
+      {isMarketplace && (
+        <MarketplaceSearch
+          value={textQuery}
+          onChange={setTextQuery}
+          onSearchSubmit={(val) => setTextQuery(val)}
+        />
+      )}
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-950 text-white py-12 px-6 shadow-sm border-b dark:border-slate-800">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -211,19 +219,17 @@ export default function SearchPage({ type, category }: SearchPageProps) {
           </div>
 
           {/* Live text search */}
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
-            <Input
-              placeholder={
-                isMarketplace
-                  ? "Search products…"
-                  : "Search clubs…"
-              }
-              value={textQuery}
-              onChange={(e) => setTextQuery(e.target.value)}
-              className="pl-10 pr-4 h-11 rounded-xl bg-slate-900/60 border-slate-800 text-white placeholder-slate-500 focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-amber-500"
-            />
-          </div>
+          {!isMarketplace && (
+            <div className="relative w-full md:w-96">
+              <Search className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
+              <Input
+                placeholder="Search clubs…"
+                value={textQuery}
+                onChange={(e) => setTextQuery(e.target.value)}
+                className="pl-10 pr-4 h-11 rounded-xl bg-slate-900/60 border-slate-800 text-white placeholder-slate-500 focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-amber-500"
+              />
+            </div>
+          )}
         </div>
       </div>
 
