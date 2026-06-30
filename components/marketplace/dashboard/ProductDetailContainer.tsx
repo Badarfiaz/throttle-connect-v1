@@ -18,7 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import CategoryProductsSection from "../CategoryProductsSection";
 import Link from "next/link";
 
-import { Package, Tag, MapPin, Clock, Store, Layers, ChevronLeft, ShieldCheck, Mail, Phone, ShoppingCart, Heart } from "lucide-react";
+import { Package, Tag, MapPin, Clock, Store, Layers, ChevronLeft, ShieldCheck, Mail, Phone, ShoppingCart, Heart, ChevronRight } from "lucide-react";
 import ContactButton from "../ContactButton";
 import SellerProfileCard from "../SellerProfileCard";
 
@@ -37,6 +37,7 @@ const ProductDetailContainer = () => {
   const [product, setProduct] = useState<MarketplaceProduct | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
     if (!productId) return;
@@ -125,36 +126,122 @@ const ProductDetailContainer = () => {
           {/* ── LEFT COLUMN (image + details) ── */}
           <div className="lg:col-span-2 space-y-6">
 
-            {/* Image Card */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm border border-slate-200/60 dark:border-slate-800/80 p-4 flex items-center justify-center relative">
-              {product.imageurl?.url ? (
-                <img
-                  src={product.imageurl.url}
-                  alt={product.productName}
-                  className="w-full max-h-[480px] object-contain rounded-2xl"
-                />
-              ) : (
-                <div className="w-full h-96 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-600 rounded-2xl border border-dashed dark:border-slate-800">
-                  <Package size={48} strokeWidth={1.2} />
-                  <p className="mt-2 text-sm">No image available</p>
-                </div>
-              )}
+            {/* Image Carousel */}
+            {(() => {
+              const images =
+                product.imageUrlMulti && product.imageUrlMulti.length > 0
+                  ? product.imageUrlMulti
+                  : product.imageurl?.url
+                    ? [product.imageurl]
+                    : [];
+              const hasMultiple = images.length > 1;
 
-              {/* Wishlist Button inside detail page */}
-              <button 
-                onClick={() => {
-                  setIsWishlisted(!isWishlisted);
-                  toast.success(isWishlisted ? "Removed from Wishlist" : "Added to Wishlist");
-                }}
-                className={`absolute top-6 right-6 p-3 rounded-full border shadow-sm transition-all cursor-pointer ${
-                  isWishlisted 
-                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20" 
-                    : "bg-white dark:bg-slate-950 text-slate-400 hover:text-rose-500 border-slate-200 dark:border-slate-850"
-                }`}
-              >
-                <Heart className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`} />
-              </button>
-            </div>
+              return (
+                <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm border border-slate-200/60 dark:border-slate-800/80 p-4 relative">
+                  {images.length > 0 ? (
+                    <>
+                      <div className="w-full h-[420px] flex items-center justify-center bg-slate-50 dark:bg-slate-950 rounded-2xl overflow-hidden">
+                        <img
+                          src={images[activeImageIndex]?.url}
+                          alt={`${product.productName} – image ${activeImageIndex + 1}`}
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      </div>
+
+                      {/* Prev / Next buttons */}
+                      {hasMultiple && (
+                        <>
+                          <button
+                            onClick={() =>
+                              setActiveImageIndex((i) =>
+                                i === 0 ? images.length - 1 : i - 1,
+                              )
+                            }
+                            className="absolute left-6 top-1/2 -translate-y-1/2 flex size-9 items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 shadow border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                          >
+                            <ChevronLeft size={18} />
+                          </button>
+                          <button
+                            onClick={() =>
+                              setActiveImageIndex((i) =>
+                                i === images.length - 1 ? 0 : i + 1,
+                              )
+                            }
+                            className="absolute right-6 top-1/2 -translate-y-1/2 flex size-9 items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 shadow border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                          >
+                            <ChevronRight size={18} />
+                          </button>
+
+                          {/* Dot indicators */}
+                          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
+                            {images.map((_, i) => (
+                              <button
+                                key={i}
+                                onClick={() => setActiveImageIndex(i)}
+                                className={`size-2 rounded-full transition-all ${
+                                  i === activeImageIndex
+                                    ? "bg-slate-800 dark:bg-white w-4"
+                                    : "bg-slate-300 dark:bg-slate-600"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+
+                      {/* Thumbnail strip */}
+                      {hasMultiple && (
+                        <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+                          {images.map((img, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setActiveImageIndex(i)}
+                              className={`shrink-0 size-16 rounded-lg overflow-hidden border-2 transition-all ${
+                                i === activeImageIndex
+                                  ? "border-slate-800 dark:border-white"
+                                  : "border-transparent opacity-60 hover:opacity-100"
+                              }`}
+                            >
+                              <img
+                                src={img.url}
+                                alt={`Thumbnail ${i + 1}`}
+                                className="size-full object-cover"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="w-full h-96 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-600 rounded-2xl border border-dashed dark:border-slate-800">
+                      <Package size={48} strokeWidth={1.2} />
+                      <p className="mt-2 text-sm">No image available</p>
+                    </div>
+                  )}
+
+                  {/* Wishlist Button */}
+                  <button
+                    onClick={() => {
+                      setIsWishlisted(!isWishlisted);
+                      toast.success(
+                        isWishlisted
+                          ? "Removed from Wishlist"
+                          : "Added to Wishlist",
+                      );
+                    }}
+                    className={`absolute top-6 right-6 p-3 rounded-full border shadow-sm transition-all cursor-pointer ${
+                      isWishlisted
+                        ? "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                        : "bg-white dark:bg-slate-950 text-slate-400 hover:text-rose-500 border-slate-200 dark:border-slate-850"
+                    }`}
+                  >
+                    <Heart
+                      className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`}
+                    />
+                  </button>
+                </div>
+              );
+            })()}
 
             {/* Title + Price Card */}
             <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200/60 dark:border-slate-800/80 p-6 sm:p-8">

@@ -49,6 +49,10 @@ export const GET_PRODUCTS_BY_CATEGORY_QUERY = `
         ref
         url
       }
+      imageUrlMulti {
+        ref
+        url
+      }
       stock
       price
       category
@@ -122,6 +126,10 @@ export const CREATE_PRODUCT_MUTATION = `
         ref
         url
       }
+      imageUrlMulti {
+        ref
+        url
+      }
       stock
       price
       createdAt
@@ -148,8 +156,11 @@ export const GET_PRODUCTS_QUERY = `
       productName
       category
       description
-
       imageurl {
+        ref
+        url
+      }
+      imageUrlMulti {
         ref
         url
       }
@@ -179,8 +190,11 @@ export const GET_PRODUCTS_BY_OWNER_UID_QUERY = `
       productName
       category
       description
-
       imageurl {
+        ref
+        url
+      }
+      imageUrlMulti {
         ref
         url
       }
@@ -214,6 +228,10 @@ export const GET_PRODUCT_BY_ID_QUERY = `
         ref
         url
       }
+      imageUrlMulti {
+        ref
+        url
+      }
       stock
       price
       createdAt
@@ -232,10 +250,13 @@ export const UPDATE_PRODUCT_MUTATION = `
         ref
         url
       }
+      imageUrlMulti {
+        ref
+        url
+      }
       stock
       category
       description
-
       price
       createdAt
       updatedAt
@@ -254,6 +275,10 @@ export const GET_FEATURED_PRODUCTS_QUERY = `
       id
       productName
       imageurl {
+        ref
+        url
+      }
+      imageUrlMulti {
         ref
         url
       }
@@ -403,6 +428,10 @@ export const GET_PRODUCTS_PAGINATED_QUERY = `
         ownerUid
         productName
         imageurl {
+          ref
+          url
+        }
+        imageUrlMulti {
           ref
           url
         }

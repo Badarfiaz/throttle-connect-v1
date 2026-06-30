@@ -84,9 +84,9 @@ const ProductsSection = ({
               className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between"
             >
               <div className="flex items-start gap-4">
-                {product.imageurl?.url && (
+                {(product.imageUrlMulti?.[0]?.url ?? product.imageurl?.url) && (
                   <img
-                    src={product.imageurl.url}
+                    src={product.imageUrlMulti?.[0]?.url ?? product.imageurl?.url}
                     alt={product.productName}
                     className="size-16 rounded-lg border border-slate-200 object-cover"
                   />

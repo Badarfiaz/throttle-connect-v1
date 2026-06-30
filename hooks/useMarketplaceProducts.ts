@@ -13,6 +13,7 @@ import {
 } from "@/app/graphql/marketplace";
 import {
   buildMarketplaceProductImageInput,
+  buildMarketplaceProductImageMultiInput,
   executeMarketplaceProductRequest,
   executeMarketplaceProductRequestPublic,
   getMarketplaceAuthContext,
@@ -67,7 +68,11 @@ export const useMarketplaceProducts = () => {
   }, []);
 
   const createProduct = useCallback(
-    async (input: MarketplaceProductFormInput, imageFile?: File | null) => {
+    async (
+      input: MarketplaceProductFormInput,
+      imageFile?: File | null,
+      imageFiles?: File[],
+    ) => {
       setCreating(true);
       setError(null);
 
@@ -77,10 +82,17 @@ export const useMarketplaceProducts = () => {
           imageFile,
           uid,
         );
+        const imageUrlMultiData =
+          imageFiles && imageFiles.length > 0
+            ? await buildMarketplaceProductImageMultiInput(imageFiles, uid)
+            : [];
 
         const productInput: MarketplaceProductFormInput = {
           ...input,
           ...(imageUrlData && { imageurl: imageUrlData }),
+          ...(imageUrlMultiData.length > 0 && {
+            imageUrlMulti: imageUrlMultiData,
+          }),
         };
         const result = await executeMarketplaceProductRequest<{
           createMarketplaceProduct: MarketplaceProduct;
@@ -115,6 +127,7 @@ export const useMarketplaceProducts = () => {
       id: string,
       input: Partial<MarketplaceProductFormInput>,
       imageFile?: File | null,
+      imageFiles?: File[],
     ) => {
       setUpdating(true);
       setError(null);
@@ -125,10 +138,17 @@ export const useMarketplaceProducts = () => {
           imageFile,
           uid,
         );
+        const imageUrlMultiData =
+          imageFiles && imageFiles.length > 0
+            ? await buildMarketplaceProductImageMultiInput(imageFiles, uid)
+            : undefined;
 
         const productInput = {
           ...input,
           ...(imageUrlData && { imageurl: imageUrlData }),
+          ...(imageUrlMultiData !== undefined && {
+            imageUrlMulti: imageUrlMultiData,
+          }),
         };
 
         const result = await executeMarketplaceProductRequest<{

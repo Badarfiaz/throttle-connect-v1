@@ -42,6 +42,7 @@ export type MarketplaceProduct = {
     ref: string;
     url: string;
   };
+  imageUrlMulti?: { ref: string; url: string }[];
   stock: number;
   price: number;
   featured?: boolean;
@@ -119,6 +120,7 @@ export const PRICE_UNITS = [
 export type MarketplaceProductFormInput = {
   productName: string;
   imageurl?: MarketplaceProductImageInput;
+  imageUrlMulti?: MarketplaceProductImageInput[];
   stock: number;
   price: number;
   description?: string;

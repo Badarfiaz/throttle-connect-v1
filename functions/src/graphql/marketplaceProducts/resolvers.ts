@@ -259,6 +259,7 @@ const marketplaceProductsResolvers = {
         ownerUid: uid,
         productName: input.productName,
         imageurl: input.imageurl || null,
+        imageUrlMulti: input.imageUrlMulti || [],
         category: input.category || null,
         description: input.description || null,
         stock: input.stock,
@@ -334,6 +335,10 @@ const marketplaceProductsResolvers = {
 
       if (input.imageurl !== undefined) {
         update.imageurl = input.imageurl;
+      }
+
+      if (input.imageUrlMulti !== undefined) {
+        update.imageUrlMulti = input.imageUrlMulti;
       }
 
       if (input.category !== undefined) {

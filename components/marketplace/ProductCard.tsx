@@ -142,7 +142,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandi
             )}
           >
             <Image
-              src={product.imageurl?.url || "/images/logos/segalmotors.jpg"}
+              src={product.imageUrlMulti?.[0]?.url ?? product.imageurl?.url ?? "/images/logos/segalmotors.jpg"}
               alt={product.productName}
               fill
               className="object-contain p-2 rounded-t-xl transition-transform duration-350 hover:scale-102"
@@ -155,7 +155,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandi
                 itemType="product"
                 itemData={{
                   title: product.productName,
-                  image: product.imageurl?.url,
+                  image: product.imageUrlMulti?.[0]?.url ?? product.imageurl?.url,
                   details: `PKR ${product.price?.toLocaleString()}`,
                   link: `/marketplace/product/${product.id}`,
                 }}

@@ -14,6 +14,7 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
     ownerUid: ID!
     productName: String!
     imageurl: ImageUrl
+    imageUrlMulti: [ImageUrl]
     stock: Int!
     owner: MarketplaceStore
     category: String
@@ -46,6 +47,7 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
   input CreateMarketplaceProductInput {
     productName: String!
     imageurl: ImageUrlInput
+    imageUrlMulti: [ImageUrlInput]
     stock: Int!
     price: Float!
     category: String
@@ -55,6 +57,7 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
   input UpdateMarketplaceProductInput {
     productName: String
     imageurl: ImageUrlInput
+    imageUrlMulti: [ImageUrlInput]
     stock: Int
     price: Float
     category: String
