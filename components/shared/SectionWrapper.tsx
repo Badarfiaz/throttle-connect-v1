@@ -18,7 +18,7 @@ export const SectionWrapper = ({
 }: SectionProps) => {
   return (
     <div
-      className={`${className ?? ""} py-6`}
+      className={`${className ?? ""} mt-6 py-6`}
       style={bg ? { backgroundColor: bg } : undefined}
     >
       {(title || description) && (

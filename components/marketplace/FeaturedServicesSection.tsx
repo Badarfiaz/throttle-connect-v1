@@ -37,7 +37,7 @@ console.log('services', services)
       title="Vehicle Services"
       description="Mechanics, electricians, body shops & more — trusted professionals near you."
     >
-      <div className="pt-4">
+      <div className="pt-4 pb-4">
         {loading ? (
           <PrimaryCarousel
             items={Array.from({ length: 4 })}

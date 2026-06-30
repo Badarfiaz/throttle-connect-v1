@@ -209,9 +209,7 @@ function Page() {
           categoryDescription="Find quality automotive accessories for your vehicle."
         />
       </div>
-      {/* Vehicle Services */}
-      <FeaturedServicesSection />
-
+      
       <div className={SECTION_CONTAINER}>
         <CategoryProductsSection
           category="oils-and-fluids"
@@ -227,6 +225,9 @@ function Page() {
           categoryDescription="Professional riding gear and safety equipment."
         />
       </div>
+       {/* Vehicle Services */}
+      <FeaturedServicesSection />
+
     </div>
   );
 }
