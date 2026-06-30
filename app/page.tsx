@@ -369,7 +369,7 @@ export default async function LandingPage() {
         </div>
       </section>
  
-      <UpcomingEventsSection />
+      <UpcomingEventsSection displayLimit={3} />
 
       {/* Section 5: Featured Clubs */}
       <section className="py-20 bg-[#eef5f9] border-y border-[#0C6792]/10 px-6">

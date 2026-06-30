@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export default function UpcomingEventsSection() {
+export default function UpcomingEventsSection({ displayLimit = 20 }: { displayLimit?: number } = {}) {
   const router = useRouter();
   const user = useAppSelector((state) => state.auth.user);
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
@@ -39,7 +39,7 @@ export default function UpcomingEventsSection() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
       list.sort((a, b) => a.startDateTime.localeCompare(b.startDateTime));
-      setUpcomingEvents(list.slice(0, 20));
+      setUpcomingEvents(list.slice(0, displayLimit));
       setLoadingEvents(false);
     }, (error) => {
       console.error("Error fetching upcoming events:", error);
