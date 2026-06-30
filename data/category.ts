@@ -163,4 +163,14 @@ export const networkingCategories: Category[] = [
     slug: "other",
     imageUrl: "/images/category/racing_flag.png",
   },
+    {
+    name: "Electric Cars",
+    slug: "car",
+    imageUrl: "/images/category/electric_car.png",
+  },
+    {
+    name: "Café Racers",
+    slug: "bike",
+    imageUrl: "/images/category/cafe_racer.png",
+  },
 ];

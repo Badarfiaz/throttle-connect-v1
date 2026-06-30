@@ -25,8 +25,9 @@ import EventsTab from "./EventsTab";
 import AchievementsTab from "./AchievementsTab";
 import GalleryTab from "./GalleryTab";
 import AnalyticsTab from "./AnalyticsTab";
+import LeadsTab from "./LeadsTab";
 
-type DashboardTab = "overview" | "profile" | "members" | "events" | "achievements" | "gallery" | "analytics";
+type DashboardTab = "overview" | "profile" | "members" | "events" | "achievements" | "gallery" | "analytics" | "leads";
 
 export default function NetworkingDashboardContainer() {
   const router = useRouter();
@@ -167,6 +168,11 @@ export default function NetworkingDashboardContainer() {
         id: "analytics",
         label: "Analytics",
         description: "Profile views & listing clicks",
+      },
+      {
+        id: "leads",
+        label: "Leads",
+        description: "Riders who viewed your club profile",
       },
     ];
   }, [pendingRequests.length, eventsList, club?.gallery]);
@@ -487,6 +493,7 @@ export default function NetworkingDashboardContainer() {
         />
       )}
       {activeTab === "analytics" && <AnalyticsTab clubId={club?.id} />}
+      {activeTab === "leads" && <LeadsTab clubId={club?.id} />}
     </DashboardContainer>
   );
 }

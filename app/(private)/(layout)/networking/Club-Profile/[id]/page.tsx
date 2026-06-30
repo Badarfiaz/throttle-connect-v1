@@ -35,6 +35,7 @@ import {
 import SharedButton from "@/components/shared/SharedButton";
 import { useAppSelector, useAppDispatch } from "@/app/redux/hooks";
 import { useTrackView } from "@/hooks/analytics/useTrackView";
+import { useNetworkingLeads } from "@/hooks/useNetworkingLeads";
 import { fetchUserProfileData } from "@/app/redux/features/authSlice";
 import { toast } from "sonner";
 import {
@@ -53,6 +54,7 @@ export default function ClubProfile() {
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
   const { trackView } = useTrackView("clubAnalytics", id as string);
+  const { recordLead } = useNetworkingLeads();
   const [submitting, setSubmitting] = useState(false);
   const [myRequest, setMyRequest] = useState<any>(null);
   const [loadingRequest, setLoadingRequest] = useState(false);
@@ -77,8 +79,14 @@ export default function ClubProfile() {
         const docRef = doc(db, "networkingStores", id as string);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          setDbClub(docSnap.data());
+          const clubData = docSnap.data();
+          setDbClub(clubData);
           trackView(user?.userId);
+          recordLead({
+            clubId: id as string,
+            clubName: clubData.clubName || "Unnamed Club",
+            clubOwnerUid: clubData.ownerUid,
+          });
         }
       } catch (err) {
         console.error("Error fetching club profile:", err);

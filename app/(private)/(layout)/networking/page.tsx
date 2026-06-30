@@ -11,11 +11,13 @@ import RegistureClubBanner from "@/components/shared/RegistureClubBanner";
 import Title from "@/components/shared/Title";
 import ProfileRequiredBanner from "@/components/networking/ProfileRequiredBanner";
 import UpcomingEventsSection from "@/components/networking/UpcomingEventsSection";
+import FeaturedClubsSection from "@/components/networking/FeaturedClubsSection";
 import { Compass, Wrench, Trophy, ShieldCheck, Users, CalendarDays, Image as ImageIcon, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 import NetworkingCategoryGrid from "@/components/networking/NetworkingCategoryGrid";
+import { SectionWrapper } from "@/components/shared/SectionWrapper";
 
 
 function Home() {
@@ -41,6 +43,7 @@ function Home() {
               description: data.description || "No description provided.",
               createdBy: data.email || "Owner",
               logoUrl: data.logoUrl || "/images/category/offroad.webp",
+              featured: !!data.featured,
             });
           }
         });
@@ -88,6 +91,7 @@ function Home() {
 
       <ProfileRequiredBanner />
 
+ 
       {/* Global Discussion Channel Banner */}
       <div className="max-w-5xl mx-auto px-6 mt-8">
         <div className="bg-gradient-to-r from-[#0B2447] via-[#19376D] to-[#0F4C75] rounded-3xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
@@ -117,7 +121,7 @@ function Home() {
       </div>
 
       {/* Redesigned Club Benefits Section */}
-      <section className="bg-slate-50/50 text-slate-900 py-16 px-6 relative overflow-hidden border-y border-slate-100">
+      {/* <section className="bg-slate-50/50 text-slate-900 py-16 px-6 relative overflow-hidden border-y border-slate-100">
         <div className="max-w-5xl mx-auto animate-in fade-in duration-300">
           <div className="text-center mb-12 max-w-3xl mx-auto space-y-4">
             <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Why Join an Automotive Club?</h2>
@@ -176,8 +180,10 @@ function Home() {
             </div>
           </div>
         </div>
-      </section>
-    
+      </section> */}
+        
+
+          <FeaturedClubsSection />
 
       <div className="bg-background text-text py-12 xs:py-16 px-4 xs:px-6">
         <div className="max-w-6xl mx-auto text-center space-y-6 xs:space-y-8">
@@ -205,12 +211,12 @@ function Home() {
           )}
         </div>
       </div>
-      <RegistureClubBanner
+      {/* <RegistureClubBanner
         title="Start Your Own Automotive Chapter"
         description="Have a crew or want to lead the pack? Register your club, schedule weekend runs, moderate membership requests, and share milestones with a polished gallery moments view."
         ctaButton1="Register Your Club"
         cardData={customClubStartData}
-      />
+      /> */}
    <UpcomingEventsSection />
 
 

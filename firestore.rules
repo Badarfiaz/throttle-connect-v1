@@ -45,6 +45,12 @@ service cloud.firestore {
         allow read: if true;
         allow write: if isClubOwner(clubId);
       }
+
+      // Leads subcollection — visitors record themselves as leads; only the club owner can read them
+      match /leads/{leadId} {
+        allow create: if isAuthenticated() && request.resource.data.clickerUid == request.auth.uid;
+        allow read: if isAuthenticated() && request.auth.uid == resource.data.clubOwnerUid;
+      }
     }
 
 
@@ -85,10 +91,25 @@ service cloud.firestore {
     match /marketplaceStores/{storeId} {
       allow read: if true;
       allow write: if isAuthenticated() && (
-        storeId == request.auth.uid || 
+        storeId == request.auth.uid ||
         (resource != null && resource.data.ownerUid == request.auth.uid) ||
         (request.resource != null && request.resource.data.ownerUid == request.auth.uid)
       );
+    }
+
+    // 7. Marketplace Products Collection
+    match /marketplaceProducts/{productId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && (
+        (resource != null && resource.data.ownerUid == request.auth.uid) ||
+        (request.resource != null && request.resource.data.ownerUid == request.auth.uid)
+      );
+
+      // Leads subcollection — visitors record themselves as leads; only the product owner can read them
+      match /leads/{leadId} {
+        allow create: if isAuthenticated() && request.resource.data.clickerUid == request.auth.uid;
+        allow read: if isAuthenticated() && request.auth.uid == resource.data.storeOwnerUid;
+      }
     }
   }
 }
