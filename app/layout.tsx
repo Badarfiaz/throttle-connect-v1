@@ -26,6 +26,8 @@ export default function RootLayout({
       >
         <ReduxProvider>
           <ConditionalShell>{children}</ConditionalShell>
+          {/* Required by Firebase Phone Auth — must stay in DOM at all times */}
+          <div id="recaptcha-container" style={{ position: "fixed", bottom: 0, zIndex: -9999 }} />
           <Toaster
             position="top-center"
             richColors

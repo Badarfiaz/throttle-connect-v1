@@ -41,7 +41,7 @@ const HeaderPrimary: FC = () => {
 
   const openModal = useCallback(() => setOpen(true), []);
 
-  const { handleSubmit, handleGoogle, submitting } = useAuthHandlers({
+  const { handleSubmit, handleGoogle, submitGooglePhone, verifyOtpEmailSignup, verifyOtpGooglePhone, cancelOtp, submitting, pendingGoogleUser, otpStep } = useAuthHandlers({
     mode,
     closeModal,
   });
@@ -137,6 +137,12 @@ const HeaderPrimary: FC = () => {
             handleGoogle={handleGoogle}
             submitting={submitting}
             openModal={openModal}
+            pendingGoogleUser={pendingGoogleUser}
+            submitGooglePhone={submitGooglePhone}
+            otpStep={otpStep}
+            verifyOtpEmailSignup={verifyOtpEmailSignup}
+            verifyOtpGooglePhone={verifyOtpGooglePhone}
+            cancelOtp={cancelOtp}
           />
         )}
       </div>
