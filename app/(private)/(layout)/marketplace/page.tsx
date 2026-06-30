@@ -101,7 +101,7 @@ function Page() {
             <PrimaryCarousel
               items={Array.from({ length: 5 })}
               responsive={{
-                mobile: mobileResponsiveCount,
+                mobile: 3,
                 tablet: 3,
                 desktop: 6,
               }}
@@ -116,7 +116,7 @@ function Page() {
             <PrimaryCarousel
               items={storeCards}
               responsive={{
-                mobile: mobileResponsiveCount,
+                mobile: 2,
                 tablet: 3,
                 desktop: 6,
               }}

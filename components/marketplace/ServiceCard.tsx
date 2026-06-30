@@ -146,10 +146,10 @@ export default function ServiceCard({
     return <ServiceCardSkeleton size={size} isLandingPage={isLandingPage} />;
   }
 
-  const sizeStyles = {
+ const sizeStyles = {
     sm: "w-[200px]",
-    md: "w-[232px]",
-    lg: "w-[320px]",
+    md: "w-[262px] md:w-[232px]",
+    lg: "w-[310px]",
   };
 
   const imageHeightStyles = {

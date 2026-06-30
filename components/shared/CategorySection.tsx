@@ -89,7 +89,7 @@ export default function CategorySection({
       <Card
         className={cn(
           // dimensions & layout
-          "w-[185px] h-[234px] p-3 flex flex-col items-start justify-start gap-3",
+          "w-[170px] h-[234px] p-3 flex flex-col items-start justify-start gap-3",
           // colours & border
           "bg-[#F5F9FB] border border-[#0C679233] rounded-[6px]",
           // shadow
