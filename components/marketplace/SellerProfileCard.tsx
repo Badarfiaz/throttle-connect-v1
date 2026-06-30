@@ -39,6 +39,7 @@ export default function SellerProfileCard({
   onContact,
 }: SellerProfileCardProps) {
   if (!store) return null;
+const phone = "923344444503";
 
   const locationText = [
     store.location?.area,
@@ -48,11 +49,10 @@ export default function SellerProfileCard({
     .filter(Boolean)
     .join(", ");
 
-  const whatsappMessage = itemName
-    ? `Hi, I am interested in your ${itemType}: "${itemName}" on Throttle Connect.`
-    : `Hi, I am interested in your listings on Throttle Connect.`;
-
-  return (
+const whatsappMessage = itemName
+  ? `Hi, I am interested in your ${itemType}: "${itemName}" from "${store.title}" on Throttle Connect.`
+  : `Hi, I am interested in the listings from "${store.title}" on Throttle Connect.`;
+   return (
     <div className={`bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200/50 dark:border-slate-800 p-6 space-y-6 ${className || ""}`}>
       {/* Provider Header */}
       <Link
@@ -136,8 +136,7 @@ export default function SellerProfileCard({
           {/* Instant Inquiry Button (WhatsApp Icon) */}
           {store.phone && (
             <a
-              href={`https://wa.me/${store.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(whatsappMessage)}`}
-              target="_blank"
+href={`https://wa.me/${phone}?text=${encodeURIComponent(whatsappMessage)}`}              target="_blank"
               rel="noopener noreferrer"
               className="shrink-0"
               onClick={() => onContact?.()}

@@ -197,42 +197,7 @@ export default function SearchPage({ type, category }: SearchPageProps) {
           onSearchSubmit={(val) => setTextQuery(val)}
         />
       )}
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-950 text-white py-12 px-6 shadow-sm border-b dark:border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight capitalize flex items-center gap-2">
-              {isMarketplace ? "Browse Marketplace" : "Browse Clubs"}{" "}
-              <Icon className="h-6 w-6 text-amber-500" />
-            </h1>
-            <p className="text-sm text-slate-400 mt-2">
-              {isMarketplace
-                ? "Find premium parts, riding gear, tools, and accessories."
-                : "Discover automotive clubs that match your passion."}{" "}
-              <span className="text-white font-bold">{categoryLabel}</span>
-            </p>
-            {!loading && (
-              <p className="text-xs text-slate-500 mt-1">
-                {totalCount} {isMarketplace ? "products" : "clubs"} found
-              </p>
-            )}
-          </div>
-
-          {/* Live text search */}
-          {!isMarketplace && (
-            <div className="relative w-full md:w-96">
-              <Search className="absolute left-3.5 top-3.5 h-4.5 w-4.5 text-slate-400" />
-              <Input
-                placeholder="Search clubs…"
-                value={textQuery}
-                onChange={(e) => setTextQuery(e.target.value)}
-                className="pl-10 pr-4 h-11 rounded-xl bg-slate-900/60 border-slate-800 text-white placeholder-slate-500 focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-amber-500"
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
+ 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Sidebar */}
