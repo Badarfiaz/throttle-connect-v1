@@ -69,7 +69,7 @@ export default function CategoryProductsSection({
           responsive={{
             mobile: 1.5,
             tablet: 2,
-            desktop: 4,
+            desktop: 5,
           }}
           renderItem={(_, i) => (
             <ProductCardSkeleton key={i} />
@@ -103,7 +103,7 @@ export default function CategoryProductsSection({
         responsive={{
           mobile: 1.5,
           tablet: 2,
-          desktop: 4,
+          desktop: 5,
         }}
         renderItem={(product) => (
           <ProductCard key={product.id} product={product} />

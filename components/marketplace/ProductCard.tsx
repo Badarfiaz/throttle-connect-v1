@@ -104,8 +104,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, size = "md", isLandi
 
   const sizeStyles = {
     sm: "w-[200px]",
-    md: "w-[252px]",
-    lg: "w-[320px]",
+    md: "w-[232px]",
+    lg: "w-[310px]",
   };
 
   const imageHeightStyles = {

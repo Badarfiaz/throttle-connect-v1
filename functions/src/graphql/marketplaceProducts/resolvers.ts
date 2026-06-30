@@ -99,7 +99,7 @@ const marketplaceProductsResolvers = {
       const snapshot = await db
         .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
         .orderBy("createdAt", "desc")
-        .limit(10)
+        .limit(20)
         .get();
 
       if (snapshot.empty) return [];

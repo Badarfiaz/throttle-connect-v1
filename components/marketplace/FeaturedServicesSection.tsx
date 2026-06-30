@@ -44,7 +44,7 @@ console.log('services', services)
             responsive={{
               mobile: mobileResponsiveCount,
               tablet: 2,
-              desktop: 4,
+              desktop: 5,
             }}
             className="w-full"
             renderItem={(_, i) => (
@@ -57,7 +57,7 @@ console.log('services', services)
             responsive={{
               mobile: mobileResponsiveCount,
               tablet: 2,
-              desktop: 4,
+              desktop: 5,
             }}
             className="w-full"
             renderItem={(service) => (

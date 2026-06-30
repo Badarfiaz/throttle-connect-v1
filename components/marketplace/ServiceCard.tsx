@@ -148,7 +148,7 @@ export default function ServiceCard({
 
   const sizeStyles = {
     sm: "w-[200px]",
-    md: "w-[252px]",
+    md: "w-[232px]",
     lg: "w-[320px]",
   };
 

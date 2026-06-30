@@ -25,16 +25,16 @@ function Page() {
   >([]);
   const [featuredLoading, setFeaturedLoading] = useState(false);
   const [featuredError, setFeaturedError] = useState<string | null>(null);
-
+  
   const { data, loading, error, fetchMarketplaceStores } = useMarketplaceStore({
     query: MARKETPLACE_ALL_STORES_QUERY,
     isPublic: true,
   });
-
+  
   useEffect(() => {
     fetchMarketplaceStores().catch(() => undefined);
   }, [fetchMarketplaceStores]);
-
+  
   useEffect(() => {
     let isMounted = true;
     const loadFeaturedProducts = async () => {
@@ -42,6 +42,7 @@ function Page() {
       setFeaturedError(null);
       try {
         const products = await getMarketplaceFeaturedProducts();
+        console.log("Fetched featured products:", products);
         if (isMounted) {
           setFeaturedProducts(products);
         }
@@ -49,8 +50,8 @@ function Page() {
         if (isMounted) {
           setFeaturedError(
             error instanceof Error
-              ? error.message
-              : "Failed to load featured products.",
+            ? error.message
+            : "Failed to load featured products.",
           );
         }
       } finally {
@@ -64,7 +65,9 @@ function Page() {
       isMounted = false;
     };
   }, []);
-
+  
+  const tophalf = featuredProducts.slice(0, 11);
+  const bottomhalf = featuredProducts.slice(12, 22);
   const storeCards = useMemo(
     () =>
       (data ?? []).map((store, i) => ({
@@ -100,7 +103,7 @@ function Page() {
               responsive={{
                 mobile: mobileResponsiveCount,
                 tablet: 3,
-                desktop: 5,
+                desktop: 6,
               }}
               className="w-full"
               renderItem={(_, i) => (
@@ -115,7 +118,7 @@ function Page() {
               responsive={{
                 mobile: mobileResponsiveCount,
                 tablet: 3,
-                desktop: 5,
+                desktop: 6,
               }}
               className="w-full"
               renderItem={(store) => (
@@ -154,7 +157,7 @@ function Page() {
             responsive={{
               mobile: mobileResponsiveCount,
               tablet: 2,
-              desktop: 4,
+              desktop: 5,
             }}
             renderItem={(_, i) => (
               <ProductCardSkeleton key={i} />
@@ -163,18 +166,33 @@ function Page() {
         ) : featuredError ? (
           <p className={CENTER_TEXT}>Failed to load featured products.</p>
         ) : featuredProducts.length > 0 ? (
+          <>
           <PrimaryCarousel
-            items={featuredProducts}
+            items={tophalf}
             className="w-full"
             responsive={{
               mobile: mobileResponsiveCount,
               tablet: 2,
-              desktop: 4,
+              desktop: 5,
             }}
             renderItem={(product) => (
               <ProductCard key={product.id} product={product} />
             )}
           />
+           <PrimaryCarousel
+            items={bottomhalf}
+            className="w-full"
+            responsive={{
+              mobile: mobileResponsiveCount,
+              tablet: 2,
+              desktop: 5,
+            }}
+            renderItem={(product) => (
+              <ProductCard key={product.id} product={product} />
+            )}
+          />
+          </>
+
         ) : (
           <p className={CENTER_TEXT}>
             No featured products available right now.
