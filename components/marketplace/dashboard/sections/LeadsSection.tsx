@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { safeFormatDate } from "@/lib/utils";
+import { useAppSelector } from "@/app/redux/hooks";
 import {
   Phone,
   Mail,
@@ -15,14 +16,32 @@ import {
   ArrowUpRight,
   RefreshCw,
   Users,
+  Lock,
+  Crown,
 } from "lucide-react";
 
 type Props = {
   products: { id: string; productName: string }[];
 };
 
+// Number of unblurred leads each plan can see. Platinum sees everything.
+const PLAN_LEAD_LIMIT: Record<"silver" | "gold" | "platinum", number> = {
+  silver: 1,
+  gold: 2,
+  platinum: Infinity,
+};
+
 export default function LeadsSection({ products }: Props) {
   const { leads, loading, fetchLeads } = useLeads();
+  const user = useAppSelector((s) => s.auth.user);
+
+  const subscriptionPlan = user?.subscriptionPlan;
+  const visibleLimit =
+    subscriptionPlan && subscriptionPlan in PLAN_LEAD_LIMIT
+      ? PLAN_LEAD_LIMIT[subscriptionPlan as "silver" | "gold" | "platinum"]
+      : 0;
+  const isUnlimited = visibleLimit === Infinity;
+
   const pagination = usePagination(leads, 5);
 
   useEffect(() => {
@@ -77,10 +96,15 @@ export default function LeadsSection({ products }: Props) {
       {!loading && leads.length > 0 && (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {pagination.paged.map((lead) => (
-              <LeadCard key={lead.id} lead={lead} />
-            ))}
+            {pagination.paged.map((lead, i) => {
+              const globalIndex = (pagination.page - 1) * pagination.pageSize + i;
+              const isLocked = !isUnlimited && globalIndex >= visibleLimit;
+              return <LeadCard key={lead.id} lead={lead} locked={isLocked} />;
+            })}
           </div>
+          {!isUnlimited && leads.length > visibleLimit && (
+            <UpgradePrompt plan={subscriptionPlan} />
+          )}
           {leads.length > 5 && <AdminPagination {...pagination} />}
         </>
       )}
@@ -88,10 +112,40 @@ export default function LeadsSection({ products }: Props) {
   );
 }
 
-function LeadCard({ lead }: { lead: Lead }) {
+function UpgradePrompt({ plan }: { plan: string | null | undefined }) {
+  const nextPlan = !plan ? "Silver" : plan === "silver" ? "Gold" : "Platinum";
+
   return (
-    <Card className="rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-5 space-y-4">
+    <div className="rounded-2xl border border-amber-200 dark:border-amber-900/40 bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/10 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-start gap-3">
+        <div className="p-2.5 bg-amber-500 text-white rounded-xl shrink-0 shadow-md">
+          <Crown className="h-4 w-4" />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-slate-900 dark:text-white">
+            Unlock more leads with {nextPlan}
+          </p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            {plan
+              ? `Your ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan only reveals a limited number of leads. Upgrade to see contact details for all of them.`
+              : "Subscribe to a plan to start viewing buyer contact details for your leads."}
+          </p>
+        </div>
+      </div>
+      <Link href="/pricing" className="shrink-0">
+        <Button className="bg-[#19376D] hover:bg-[#0B2447] text-white rounded-xl text-xs font-bold gap-1.5">
+          <Crown className="h-3.5 w-3.5" />
+          Upgrade Plan
+        </Button>
+      </Link>
+    </div>
+  );
+}
+
+function LeadCard({ lead, locked }: { lead: Lead; locked: boolean }) {
+  return (
+    <Card className="relative rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+      <CardContent className={`p-5 space-y-4 ${locked ? "blur-sm select-none pointer-events-none" : ""}`}>
         {/* Buyer info */}
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 rounded-full bg-[#19376D] text-white font-bold text-sm flex items-center justify-center shrink-0">
@@ -136,6 +190,19 @@ function LeadCard({ lead }: { lead: Lead }) {
           </Link>
         </div>
       </CardContent>
+
+      {locked && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/40 dark:bg-slate-900/40">
+          <div className="p-2 bg-slate-900/80 text-white rounded-full">
+            <Lock className="h-4 w-4" />
+          </div>
+          <Link href="/pricing">
+            <Button size="sm" className="bg-[#19376D] hover:bg-[#0B2447] text-white rounded-lg text-xs font-bold">
+              Upgrade to unlock
+            </Button>
+          </Link>
+        </div>
+      )}
     </Card>
   );
 }
