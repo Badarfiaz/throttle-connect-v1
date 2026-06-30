@@ -226,7 +226,7 @@ export default function NetworkingDashboardContainer() {
               </p>
             </div>
             <div className="shrink-0 flex items-center gap-2">
-              <Button size="sm" onClick={() => { setEditingEvent(null); setIsEventModalOpen(true); }} className="rounded-xl bg-[#19376D] text-white">
+              <Button size="sm" onClick={() => { setEditingEvent(null); setActiveTab("events"); setIsEventModalOpen(true); }} className="rounded-xl bg-[#19376D] text-white">
                 <Plus className="h-4 w-4 mr-1.5" /> Plan Event
               </Button>
             </div>
@@ -301,11 +301,11 @@ export default function NetworkingDashboardContainer() {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" onClick={() => { setEditingEvent(null); setIsEventModalOpen(true); }} className="h-16 flex flex-col items-center justify-center gap-1 border dark:border-slate-800 hover:border-primary rounded-xl cursor-pointer">
+                  <Button variant="outline" onClick={() => { setEditingEvent(null); setActiveTab("events"); setIsEventModalOpen(true); }} className="h-16 flex flex-col items-center justify-center gap-1 border dark:border-slate-800 hover:border-primary rounded-xl cursor-pointer">
                     <Calendar className="h-4.5 w-4.5 text-amber-500" />
                     <span className="text-xs font-bold">Plan Event</span>
                   </Button>
-                  <Button variant="outline" onClick={() => { setEditingAchievement(null); setIsAchievementModalOpen(true); }} className="h-16 flex flex-col items-center justify-center gap-1 border dark:border-slate-800 hover:border-primary rounded-xl cursor-pointer">
+                  <Button variant="outline" onClick={() => { setEditingAchievement(null); setActiveTab("achievements"); setIsAchievementModalOpen(true); }} className="h-16 flex flex-col items-center justify-center gap-1 border dark:border-slate-800 hover:border-primary rounded-xl cursor-pointer">
                     <Trophy className="h-4.5 w-4.5 text-purple-650" />
                     <span className="text-xs font-bold">Add Achievement</span>
                   </Button>

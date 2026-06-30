@@ -16,6 +16,7 @@ export const MARKETPLACE_STORES_QUERY = `{
     ownerUid
     pageType
     phone
+    slugUrl
   }
 }`;
 export const MARKETPLACE_STORE_PROFILE_QUERY = `
