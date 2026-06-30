@@ -1,12 +1,10 @@
 import React from "react";
 import Link from "next/link";
-import { 
-  Users, 
-  ShoppingBag, 
-  ShieldCheck, 
-  MapPin, 
-  Star, 
-  TrendingUp, 
+import {
+  Users,
+  ShoppingBag,
+  ShieldCheck,
+  TrendingUp,
   ArrowRight,
   Plus,
   Car,
@@ -14,50 +12,12 @@ import {
   ArrowUpRight,
   Calendar
 } from "lucide-react";
-import { db } from "@/firebase";
-import { collection, query, where, getDocs, limit } from "firebase/firestore";
 import { getMarketplaceFeaturedProducts } from "@/ulity/marketplaceProducts";
 import UpcomingEventsSection from "@/components/networking/UpcomingEventsSection";
-import ClubCard from "@/components/networking/ClubsCard";
+import FeaturedClubsSection from "@/components/networking/FeaturedClubsSection";
+import FeaturedServicesSection from "@/components/marketplace/FeaturedServicesSection";
 import ProductCard from "@/components/marketplace/ProductCard";
-import type { Club } from "@/types/main";
 import type { MarketplaceProduct } from "@/types/marketplace";
-
-const staticClubs: Club[] = [
-  {
-    id: "static-c1",
-    name: "Elite Angles",
-    categoryType: "bikes",
-    image: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600",
-    location: "Lahore",
-    memberCount: 125,
-    description: "Expand your automotive connections. Join group rides, meet like-minded drivers, and become a part of active local auto clubs.",
-    createdBy: "Owner",
-    logoUrl: ""
-  },
-  {
-    id: "static-c2",
-    name: "GearHeads Pakistan",
-    categoryType: "sedans",
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=600",
-    location: "Islamabad",
-    memberCount: 340,
-    description: "Expand your automotive connections. Join group rides, meet like-minded drivers, and become a part of active local auto clubs.",
-    createdBy: "Owner",
-    logoUrl: ""
-  },
-  {
-    id: "static-c3",
-    name: "Karachi Offroaders",
-    categoryType: "offroad",
-    image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=600",
-    location: "Karachi",
-    memberCount: 95,
-    description: "Expand your automotive connections. Join group rides, meet like-minded drivers, and become a part of active local auto clubs.",
-    createdBy: "Owner",
-    logoUrl: ""
-  }
-];
 
 const staticProducts: MarketplaceProduct[] = [
   {
@@ -110,30 +70,6 @@ const staticProducts: MarketplaceProduct[] = [
   }
 ];
 
-const services = [
-  {
-    name: "Auto Masters Lahore",
-    rating: "5.0",
-    specialty: "Vehicle Maintenance & Performance Tuning",
-    location: "DHA Phase 5, Lahore",
-    tags: ["Tuning", "Diagnostics", "Repairs"]
-  },
-  {
-    name: "Detailer's Zone Karachi",
-    rating: "4.9",
-    specialty: "Paint Protection, Wrap & Ceramic Coating",
-    location: "Clifton, Karachi",
-    tags: ["Ceramic Coating", "PPF", "Detailing"]
-  },
-  {
-    name: "Islamabad Tuning Lab",
-    rating: "4.8",
-    specialty: "ECU Remapping & Exhaust Upgrades",
-    location: "I-9 Sector, Islamabad",
-    tags: ["Remapping", "Exhaust", "Dyno"]
-  }
-];
-
 const galleryImages = [
   "https://images.openai.com/static-rsc-4/vpXiLi-Kuh9b_IDW3V83vZAZDw6Wp_XOTZvSVPu-9-aWbfqRDIOa1KK9jsmZYYE2RadjnkqirnbT_F0FFnrKE3fVp0yje9aYbufOjCT9e7RROhsxwrSToVr9Fb8GbGLunzHGD9C76YbXWrF4lU4pWShfFZAx9ShE55zodHtE7uzfYl4uE_LhqjabFc7W2QPE?purpose=fullsize",
   "https://images.openai.com/static-rsc-4/AbctnWLNFCgC6xdqi-IMI5vW2hup74u3l36WFgQVzSa-IVoMWL4ktf28BWKS-ZvRmtzT3QoprgpFeF5y10u88MWw7DyJKI9e3euzxRfROpCM6t0UJyytaR_b9O7_s3lkUtQ2xZUBLESSPa0cIiWuLEZ1z9_Z-DLuGn_rTtXsvv5XQ1woc4biGVHgURcbRdjR?purpose=fullsize",
@@ -144,37 +80,7 @@ const galleryImages = [
 ];
 
 export default async function LandingPage() {
-  let clubsList: Club[] = [];
   let productsList: MarketplaceProduct[] = [];
-
-  try {
-    const q = query(
-      collection(db, "networkingStores"),
-      where("completed", "==", true),
-      limit(3)
-    );
-    const querySnapshot = await getDocs(q);
-    clubsList = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      const cityStr = (data.city && typeof data.city === "object")
-        ? (data.city.city || data.city.name || "Pakistan")
-        : (data.city || "Pakistan");
-
-      return {
-        id: doc.id,
-        name: data.clubName || "Unnamed Club",
-        categoryType: (data.clubType === "car" ? "sedans" : data.clubType === "bike" ? "bikes" : "offroad") as any,
-        image: data.bannerUrl || "/images/category/offroad.webp",
-        location: cityStr,
-        memberCount: data.memberCount || 1,
-        logoUrl: data.logoUrl || null,
-        description: data.description || "No description provided.",
-        createdBy: data.email || "Owner"
-      };
-    });
-  } catch (err) {
-    console.error("Error fetching dynamic clubs on server:", err);
-  }
 
   try {
     const products = await getMarketplaceFeaturedProducts();
@@ -185,7 +91,6 @@ export default async function LandingPage() {
     console.error("Error fetching dynamic products on server:", err);
   }
 
-  const finalClubs = clubsList.length > 0 ? clubsList : staticClubs;
   const finalProducts = productsList.length > 0 ? productsList : staticProducts;
 
   return (
@@ -257,7 +162,7 @@ export default async function LandingPage() {
         <div className="grid gap-12 lg:grid-cols-2 items-center">
           <div className="relative h-[300px] sm:h-[450px] w-full rounded-3xl overflow-hidden border border-slate-200 shadow-xl bg-white">
             <img 
-              src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&q=80&w=800" 
+              src="/bike2.jpeg" 
               alt="Automotive Community" 
               className="w-full h-full object-cover"
             />
@@ -372,27 +277,7 @@ export default async function LandingPage() {
       <UpcomingEventsSection displayLimit={3} />
 
       {/* Section 5: Featured Clubs */}
-      <section className="py-20 bg-[#eef5f9] border-y border-[#0C6792]/10 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center space-y-3 mb-16">
-            <span className="inline-block bg-[#19376D]/10 text-[#19376D] border border-[#19376D]/20 px-3 py-0.5 rounded-full font-mono text-[11px] uppercase tracking-wider font-semibold">
-              Clubs roster
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0B2447]">Featured Auto Clubs</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto text-sm sm:text-base font-medium">Find groups with similar passion, verify credentials, submit requests, and join club runs.</p>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {finalClubs.map((club) => (
-              <ClubCard 
-                key={club.id} 
-                club={club} 
-                isLandingPage={true} 
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      <FeaturedClubsSection />
 
       {/* Section 6: Marketplace Preview */}
       <section className="py-20 px-6 max-w-7xl mx-auto">
@@ -423,45 +308,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Section 7: Service Providers */}
-      <section className="py-20 bg-[#eef5f9] border-y border-[#0C6792]/10 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center space-y-3 mb-16">
-            <span className="inline-block bg-[#19376D]/10 text-[#19376D] border border-[#19376D]/20 px-3 py-0.5 rounded-full font-mono text-[11px] uppercase tracking-wider font-semibold">
-              Trusted Experts
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#0B2447]">Verified Service Providers</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto text-sm sm:text-base font-medium">Find professional workshops, detailers, mechanics, and tire shops in your city.</p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {services.map((srv, idx) => (
-              <div 
-                key={idx} 
-                className="border border-slate-200 bg-white p-6 rounded-2xl space-y-4 hover:border-[#19376D]/20 transition duration-300 shadow-xs"
-              >
-                <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-[#0B2447] text-base">{srv.name}</h4>
-                  <div className="flex items-center gap-1 text-xs text-amber-500 font-extrabold">
-                    <Star className="h-3.5 w-3.5 fill-amber-500 stroke-amber-500" />
-                    {srv.rating}
-                  </div>
-                </div>
-                <p className="text-xs text-slate-500 min-h-[2.5rem] leading-relaxed font-medium">{srv.specialty}</p>
-                <p className="text-[11px] text-slate-400 flex items-center gap-1 font-semibold">
-                  <MapPin className="h-3.5 w-3.5" /> {srv.location}
-                </p>
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {srv.tags.map((t, i) => (
-                    <span key={i} className="inline-block bg-[#eef5f9] text-[#19376D] text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-[#19376D]/10">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FeaturedServicesSection />
 
       {/* Section 8: Why ThrottleConnect? */}
       <section className="py-20 px-6 max-w-7xl mx-auto">

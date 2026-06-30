@@ -61,10 +61,10 @@ export default function FeaturedClubsSection() {
           </div>
           <div>
             <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Featured Clubs
+              Featured Auto Clubs
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-              Hand-picked automotive communities worth joining
+              Find groups with similar passion, verify credentials, submit requests, and join club runs.
             </p>
           </div>
         </div>
