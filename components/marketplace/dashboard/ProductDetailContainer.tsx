@@ -236,14 +236,14 @@ const ProductDetailContainer = () => {
                 trackClick();
               }}
             >
-              <Button 
+              {/* <Button 
                 onClick={() => {
                   toast.success("Added to Cart!");
                 }}
                 className="w-full h-11 bg-emerald-600 hover:bg-emerald-550 text-white font-bold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
                 <ShoppingCart className="h-4 w-4" /> Add to Cart
-              </Button>
+              </Button> */}
             </SellerProfileCard>
 
             {/* Category + Stock Cards */}

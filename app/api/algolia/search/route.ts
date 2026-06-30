@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!;
-const ADMIN_KEY = process.env.ALGOLIA_ADMIN_KEY!;
+// const APP_ID = process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!;
+const APP_ID = "BDXQ3YSOFN";
+// const ADMIN_KEY = process.env.ALGOLIA_ADMIN_KEY!;
+const ADMIN_KEY = "53e96ee7418fc58616b605e8c4808715";
 const INDEX = "marketplace_products";
 
 export async function GET(req: NextRequest) {
