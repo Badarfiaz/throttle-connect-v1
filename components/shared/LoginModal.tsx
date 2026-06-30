@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import type { OtpStep, PendingGoogleUser } from "@/hooks/useAuthHandlers";
+import type { PendingGoogleUser } from "@/hooks/useAuthHandlers";
 
 type AuthMode = "login" | "signup";
 
@@ -26,10 +26,6 @@ interface LoginModalProps {
   openModal: () => void;
   pendingGoogleUser?: PendingGoogleUser | null;
   submitGooglePhone?: (phone: string) => Promise<void>;
-  otpStep?: OtpStep;
-  verifyOtpEmailSignup?: (otp: string) => Promise<void>;
-  verifyOtpGooglePhone?: (otp: string) => Promise<void>;
-  cancelOtp?: () => void;
 }
 
 const LoginModal: FC<LoginModalProps> = ({
@@ -43,22 +39,8 @@ const LoginModal: FC<LoginModalProps> = ({
   openModal,
   pendingGoogleUser,
   submitGooglePhone,
-  otpStep,
-  verifyOtpEmailSignup,
-  verifyOtpGooglePhone,
-  cancelOtp,
 }) => {
   const [googlePhone, setGooglePhone] = useState("");
-  const [otp, setOtp] = useState("");
-
-  const handleOtpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (otpStep === "email-signup") {
-      await verifyOtpEmailSignup?.(otp);
-    } else if (otpStep === "google-phone") {
-      await verifyOtpGooglePhone?.(otp);
-    }
-  };
 
   return (
     <>
@@ -74,54 +56,7 @@ const LoginModal: FC<LoginModalProps> = ({
 
         <DialogContent className="max-w-md rounded-2xl">
 
-          {/* OTP verification step */}
-          {otpStep ? (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-semibold text-center mb-1">
-                  Verify your phone
-                </DialogTitle>
-                <DialogDescription className="text-center">
-                  Enter the 6-digit code sent to your phone number.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleOtpSubmit} className="space-y-4 mt-4">
-                <div className="flex flex-col space-y-2">
-                  <Label htmlFor="otp">Verification Code</Label>
-                  <Input
-                    id="otp"
-                    name="otp"
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="123456"
-                    maxLength={6}
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-[#0B2447] hover:bg-[#19376D] text-white"
-                  disabled={submitting || otp.length < 6}
-                >
-                  {submitting ? "Verifying..." : "Verify OTP"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full"
-                  onClick={() => {
-                    setOtp("");
-                    cancelOtp?.();
-                  }}
-                  disabled={submitting}
-                >
-                  Back
-                </Button>
-              </form>
-            </>
-          ) : pendingGoogleUser ? (
+          {pendingGoogleUser ? (
             /* Phone collection step after Google sign-in */
             <>
               <DialogHeader>
@@ -157,7 +92,7 @@ const LoginModal: FC<LoginModalProps> = ({
                   className="w-full bg-[#0B2447] hover:bg-[#19376D] text-white"
                   disabled={submitting}
                 >
-                  {submitting ? "Sending OTP..." : "Send OTP"}
+                  {submitting ? "Saving..." : "Submit"}
                 </Button>
               </form>
             </>
@@ -208,7 +143,7 @@ const LoginModal: FC<LoginModalProps> = ({
                       {submitting
                         ? mode === "login"
                           ? "Logging in..."
-                          : "Sending OTP..."
+                          : "Creating Account..."
                         : mode === "login"
                         ? "Log in"
                         : "Create Account"}
