@@ -46,7 +46,7 @@ function PrimaryCarousel<T>({
         align: "start",
         loop: true,
       }}
-      className={cn("mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8", className)}
+      className={cn("w-full", className)}
     >
       <CarouselContent className="-ml-2 md:-ml-4">
         {items.map((item, index) => (

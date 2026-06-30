@@ -1,4 +1,4 @@
-import { SECTION_TITLE_CONTAINER } from "@/types/main";
+import { SECTION_TITLE_CONTAINER, SECTION_CONTAINER } from "@/types/main";
 import Title from "@/components/shared/Title";
 
 type SectionProps = {
@@ -26,7 +26,9 @@ export const SectionWrapper = ({
           <Title title={title} description={description} spacing="tight" />
         </div>
       )}
-      {children}
+      <div className={SECTION_CONTAINER}>
+        {children}
+      </div>
     </div>
   );
 };

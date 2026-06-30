@@ -59,7 +59,7 @@ export default function CategoryProductsSection({
 
   if (loading) {
     return (
-      <div className="mt-16">
+      <div className="mt-8">
         <Title
           title={categoryTitle || `${category} Products`}
           align="left"
@@ -92,7 +92,7 @@ export default function CategoryProductsSection({
   }
 
   return (
-    <div className="mt-16">
+    <div className="mt-8">
       <Title
         title={categoryTitle || `${category} Products`}
         // description={categoryDescription}
