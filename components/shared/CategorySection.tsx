@@ -13,9 +13,9 @@ type CategorySectionSkeletonProps = {
   className?: string;
 };
 
-export const CategorySectionSkeleton: React.FC<CategorySectionSkeletonProps> = ({
-  className,
-}) => {
+export const CategorySectionSkeleton: React.FC<
+  CategorySectionSkeletonProps
+> = ({ className }) => {
   return (
     <Card
       className={cn(
@@ -68,7 +68,7 @@ export default function CategorySection({
   if (loading || !items) {
     return <CategorySectionSkeleton />;
   }
-   const link =
+  const link =
     pageType === "marketplace"
       ? `/marketplace/storeProfile/${items?.slugUrl}`
       : `/networking/Club-list/${items?.slugUrl}`;
