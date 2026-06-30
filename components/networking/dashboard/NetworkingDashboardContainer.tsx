@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/app/redux/hooks";
 import { DashboardContainer } from "@/components/shared/DashboardContainer";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ import AnalyticsTab from "./AnalyticsTab";
 type DashboardTab = "overview" | "profile" | "members" | "events" | "achievements" | "gallery" | "analytics";
 
 export default function NetworkingDashboardContainer() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<DashboardTab>("overview");
   const [isEditing, setIsEditing] = useState(false);
   
@@ -202,7 +204,7 @@ export default function NetworkingDashboardContainer() {
           <Badge variant="secondary" className="bg-[#19376D]/10 text-[#19376D] font-medium border border-[#19376D]/20">
             Club Active
           </Badge>
-          <Button size="sm" variant="outline" onClick={() => window.location.href = `/networking/Club-Profile/${club?.id ?? user?.userId}`}>
+          <Button size="sm" variant="outline" onClick={() => router.push(`/networking/Club-Profile/${club?.id ?? user?.userId}`)}>
             View Club Page
           </Button>
         </div>

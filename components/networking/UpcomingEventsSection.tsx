@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { db } from "@/firebase";
 import { collection, doc, runTransaction, onSnapshot, query, where, limit } from "firebase/firestore";
 import { useAppSelector } from "@/app/redux/hooks";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 
 export default function UpcomingEventsSection() {
+  const router = useRouter();
   const user = useAppSelector((state) => state.auth.user);
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
@@ -393,7 +395,7 @@ export default function UpcomingEventsSection() {
                       </p>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" type="button" className="rounded-lg text-xs font-semibold h-8 bg-white" onClick={() => window.location.href = `/networking/Club-Profile/${selectedEvent.clubId}`}>
+                  <Button size="sm" variant="outline" type="button" className="rounded-lg text-xs font-semibold h-8 bg-white" onClick={() => router.push(`/networking/Club-Profile/${selectedEvent.clubId}`)}>
                     View Club
                   </Button>
                 </div>

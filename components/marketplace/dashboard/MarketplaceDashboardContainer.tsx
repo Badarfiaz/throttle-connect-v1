@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DashboardContainer } from "@/components/shared/DashboardContainer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ type MarketplaceProduct = {
 };
 
 const MarketplaceDashboardContainer = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<LocalDashboardTab>("overview");
   const [editingProduct, setEditingProduct] = useState<MarketplaceProduct | null>(null);
   const [editingService, setEditingService] = useState<MarketplaceService | null>(null);
@@ -181,7 +183,7 @@ const MarketplaceDashboardContainer = () => {
             <Badge variant="secondary">Store ready</Badge>
           )}
           {store?.slugUrl && (
-            <Button size="sm" variant="outline" onClick={() => window.location.href = `/marketplace/storeProfile/${store.slugUrl}`}>
+            <Button size="sm" variant="outline" onClick={() => router.push(`/marketplace/storeProfile/${store.slugUrl}`)}>
               Preview Store Page
             </Button>
           )}
@@ -301,7 +303,7 @@ const MarketplaceDashboardContainer = () => {
                   </Button>
                   <Button variant="outline" onClick={() => {
                     if (store?.slugUrl) {
-                      window.location.href = `/marketplace/storeProfile/${store.slugUrl}`;
+                      router.push(`/marketplace/storeProfile/${store.slugUrl}`);
                     } else {
                       toast.error("Store page unavailable.");
                     }
