@@ -62,9 +62,6 @@ const LoginModal: FC<LoginModalProps> = ({
 
   return (
     <>
-      {/* Invisible reCAPTCHA container — required by Firebase Phone Auth */}
-      <div id="recaptcha-container" />
-
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button
