@@ -285,6 +285,7 @@ export const GET_FEATURED_PRODUCTS_QUERY = `
       }
       stock
       price
+      featured
       category
       description
       owner {

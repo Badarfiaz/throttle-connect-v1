@@ -98,6 +98,7 @@ const marketplaceProductsResolvers = {
     getMarketplaceFeaturedProducts: async () => {
       const snapshot = await db
         .collection(COLLECTIONS.MARKETPLACE_PRODUCTS)
+        .where("featured", "==", true)
         .orderBy("createdAt", "desc")
         .limit(20)
         .get();

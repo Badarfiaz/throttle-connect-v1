@@ -20,6 +20,7 @@ const marketplaceProductsTypeDefs = /* GraphQL */ `
     category: String
     description: String
     price: Float!
+    featured: Boolean
     createdAt: String
     updatedAt: String
   }

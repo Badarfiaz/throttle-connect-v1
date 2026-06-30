@@ -149,7 +149,7 @@ export const getMarketplaceFeaturedProducts = async () =>
       },
       body: JSON.stringify({ query: GET_FEATURED_PRODUCTS_QUERY }),
     });
-
+console.log('product res', res)
     const result = (await res.json()) as GraphQLResult & {
       data?: { getMarketplaceFeaturedProducts?: MarketplaceProduct[] };
     };
