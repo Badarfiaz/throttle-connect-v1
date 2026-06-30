@@ -60,7 +60,7 @@ export default function MarketplaceCategoryGrid() {
             responsive={{
               mobile: 2,
               tablet: 3,
-              desktop: 5,
+              desktop: 6,
             }}
             className="w-full"
             renderItem={(group) => (
