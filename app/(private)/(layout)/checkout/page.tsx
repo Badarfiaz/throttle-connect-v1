@@ -54,8 +54,8 @@ const PLATINUM_FEATURES = [
 const PLAN_DETAILS = {
   silver: {
     name: "Silver Plan",
-    price: "Rs. 46,000",
-    originalPrice: "Rs. 56,000",
+    price: "Rs. 7,999",
+    originalPrice: "Rs. 11,500",
     monthly: "Rs. 11,500/month",
     discount: "Rs. 10,000",
     features: SILVER_FEATURES,
@@ -67,8 +67,8 @@ const PLAN_DETAILS = {
   },
   gold: {
     name: "Gold Plan",
-    price: "Rs. 83,000",
-    originalPrice: "Rs. 104,000",
+    price: "Rs. 14,999",
+    originalPrice: "Rs. 20,750",
     monthly: "Rs. 20,750/month",
     discount: "Rs. 21,000",
     features: GOLD_FEATURES,
@@ -80,8 +80,8 @@ const PLAN_DETAILS = {
   },
   platinum: {
     name: "Platinum Plan",
-    price: "Rs. 112,000",
-    originalPrice: "Rs. 140,000",
+    price: "Rs. 21,999",
+    originalPrice: "Rs. 28,000",
     monthly: "Rs. 28,000/month",
     discount: "Rs. 28,000",
     features: PLATINUM_FEATURES,
