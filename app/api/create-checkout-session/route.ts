@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.NEXT_PUBLIC_FIREBASE_SECRET_KEY!, {
-  apiVersion: "2026-06-24.dahlia",
-});
+const stripe = new Stripe(
+  process.env.STRIPE_SECRET_KEY || process.env.NEXT_PUBLIC_FIREBASE_SECRET_KEY || "sk_test_placeholder",
+  {
+    apiVersion: "2026-06-24.dahlia",
+  }
+);
 
 const PRODUCT_IDS: Record<string, string | undefined> = {
   gold: process.env.NEXT_PUBLIC_STRIPE_GOLD_PRICE_ID,

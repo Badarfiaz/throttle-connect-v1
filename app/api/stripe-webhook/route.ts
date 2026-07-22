@@ -3,9 +3,12 @@ import Stripe from "stripe";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
-const stripe = new Stripe(process.env.NEXT_PUBLIC_FIREBASE_SECRET_KEY!, {
-  apiVersion: "2026-06-24.dahlia",
-});
+const stripe = new Stripe(
+  process.env.STRIPE_SECRET_KEY || process.env.NEXT_PUBLIC_FIREBASE_SECRET_KEY || "sk_test_placeholder",
+  {
+    apiVersion: "2026-06-24.dahlia",
+  }
+);
 
 function getAdminDb() {
   if (!getApps().length) {

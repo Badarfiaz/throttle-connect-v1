@@ -13,7 +13,7 @@ export default function FeaturedServicesSection() {
   const { fetchFeaturedServices } = useMarketplaceServices();
   const [services, setServices] = useState<MarketplaceService[]>([]);
   const [loading, setLoading] = useState(true);
-console.log('services', services)
+  console.log("services", services);
   useEffect(() => {
     let mounted = true;
     fetchFeaturedServices(20)
@@ -30,7 +30,7 @@ console.log('services', services)
   }, [fetchFeaturedServices]);
 
   if (!loading && services.length === 0) return null;
-
+  //
   return (
     <SectionWrapper
       bg="#D8E7ED"
@@ -47,9 +47,7 @@ console.log('services', services)
               desktop: 5,
             }}
             className="w-full"
-            renderItem={(_, i) => (
-              <ServiceCardSkeleton key={i} />
-            )}
+            renderItem={(_, i) => <ServiceCardSkeleton key={i} />}
           />
         ) : (
           <PrimaryCarousel
